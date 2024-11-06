@@ -1,86 +1,144 @@
-'use client';
+"use client"; // Ensures this is a client component
 
-import React from 'react';
-import { Table, Button, Space, Image } from 'antd';
-import {FaTrashAlt} from "react-icons/fa";
+import React, { useState } from "react";
+import { Table, Button, Typography, Spin, Modal } from "antd";
+import type { ColumnsType } from "antd/es/table";
+import { FaSync } from "react-icons/fa"; // Import refresh icon
+import { CategoriesList } from "@/lib/categoriesList";
+import { useDeleteCategory } from "@/hooks/cateogry/useCategories";
+import { MdOutlineDelete } from "react-icons/md";
+import { FaRegEdit } from "react-icons/fa";
+import CreateBlogCategory from "./CreateBlogCategory";
 
-const CategoryImage: React.FC<{ src: string }> = ({ src }) => {
-    return <Image src={src} width={100} alt="Category Image" />;
-};
+const { Title } = Typography;
 
 const BlogCategories: React.FC = () => {
-    const categories = [
-        {
-            id: 1,
-            name: 'Category 1',
-            image: 'link-to-category-image1',
-            create_by: 1,
-            create_at: '2024-01-01',
-            update_at: '2024-01-02',
-        },
-        {
-            id: 2,
-            name: 'Category 2',
-            image: 'link-to-category-image2',
-            create_by: 1,
-            create_at: '2024-01-03',
-            update_at: '2024-01-04',
-        },
-        // Thêm các danh mục khác tại đây
-    ];
+    const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
+    const [currentPage, setCurrentPage] = useState(1);
+    const [refreshKey, setRefreshKey] = useState(0);
+    const [isModalVisible, setIsModalVisible] = useState(false); // Modal visibility state
+    const { mutate: deleteCategory } = useDeleteCategory();
 
-    const columns = [
+    const { queueData, isLoading, isError } = CategoriesList(currentPage, "blog", refreshKey);
+
+    const handleDelete = (categoryId: string) => {
+        Modal.confirm({
+            title: 'Xác nhận xóa',
+            content: 'Bạn có chắc chắn muốn xóa thể loại này?',
+            okText: 'Xóa',
+            okType: 'danger',
+            cancelText: 'Hủy',
+            onOk: () => {
+                deleteCategory(categoryId);
+            },
+        });
+    };
+
+    const columns: ColumnsType<any> = [
         {
-            title: 'ID',
-            dataIndex: 'id',
-            key: 'id',
+            title: "ID",
+            dataIndex: "id",
+            key: "id",
+            width: 100,
+            render: (text) => <span>{text}</span>,
         },
         {
-            title: 'Name',
-            dataIndex: 'name',
-            key: 'name',
+            title: "Name",
+            dataIndex: "name",
+            key: "name",
+            width: 400,
+            render: (text) => <span>{text}</span>,
         },
         {
-            title: 'Image',
-            dataIndex: 'image',
-            key: 'image',
-            render: (text: string) => <CategoryImage src={text} />, // Sử dụng component CategoryImage
+            title: "File",
+            dataIndex: "file",
+            key: "file",
+            width: 150,
+            render: (text) => <span>{text}</span>,
         },
         {
-            title: 'Create By',
-            dataIndex: 'create_by',
-            key: 'create_by',
-        },
-        {
-            title: 'Create At',
-            dataIndex: 'create_at',
-            key: 'create_at',
-        },
-        {
-            title: 'Update At',
-            dataIndex: 'update_at',
-            key: 'update_at',
-        },
-        {
-            title: 'Action',
-            key: 'action',
-            render: () => (
-                <Space size="middle">
-                    <Button type="primary">Edit</Button>
-                    <FaTrashAlt className="text-albert-error"  />
-                </Space>
+            title: "Action",
+            dataIndex: "action",
+            key: "action",
+            width: 100,
+            render: (_, record) => (
+                <>
+                    <Button danger onClick={() => handleDelete(record.id)}>
+                        <MdOutlineDelete className="text-albert-error" />
+                    </Button>
+                    <Button>
+                        <FaRegEdit />
+                    </Button>
+                </>
             ),
         },
     ];
 
+    if (isLoading) return <Spin size="large" />;
+    if (isError) return <div>Error loading queue data.</div>;
+
+    const handleRefresh = () => {
+        setRefreshKey((prev) => prev + 1);
+    };
+
+    const handleCreateCategory = () => {
+        setIsModalVisible(true); // Show the modal when "Create Category" is clicked
+    };
+
+    const handleCancelModal = () => {
+        setIsModalVisible(false); // Hide the modal when cancelled
+    };
+
     return (
-        <div style={{ padding: '24px' }}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '16px' }}>
-                <h1 style={{ fontSize: '24px', fontWeight: 'bold' }}>Blog Categories</h1>
-                <Button type="primary">Tạo Danh Mục</Button>
+        <>
+            <div className="p-4">
+                <Title level={2}>Quản Lý Thể Loại Bài Viết</Title>
+
+                <div className="flex justify-between items-center mb-4">
+                    <Button onClick={handleRefresh}>
+                        <FaSync /> Làm mới
+                    </Button>
+                    <Button type="primary" onClick={handleCreateCategory}>
+                        Tạo Thể Loại
+                    </Button>
+                </div>
+
+                <div className="overflow-auto" style={{ maxHeight: "800px" }}>
+                    <Table
+                        columns={columns}
+                        dataSource={queueData}
+                        rowKey="id"
+                        pagination={false}
+                        scroll={{ y: 500 }}
+                        rowSelection={{
+                            selectedRowKeys: selectedKeys,
+                            onChange: (selectedRowKeys) => setSelectedKeys(selectedRowKeys as number[]),
+                        }}
+                    />
+                </div>
+                <div style={{ marginTop: "16px", textAlign: "center" }}>
+                    <Button
+                        disabled={currentPage === 1}
+                        onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+                    >
+                        Previous
+                    </Button>
+                    <span style={{ margin: "0 8px" }}>Page {currentPage}</span>
+                    <Button onClick={() => setCurrentPage((prev) => prev + 1)}>Next</Button>
+                </div>
             </div>
-            <Table dataSource={categories} columns={columns} rowKey="id" />
-        </div>
+
+            {/* Modal to Create Blog Category */}
+            <Modal
+                title="Tạo Thể Loại"
+                visible={isModalVisible}
+                onCancel={handleCancelModal}
+                footer={null}
+                width={600}
+            >
+                <CreateBlogCategory /> {/* Render the CreateBlogCategory form inside the modal */}
+            </Modal>
+        </>
     );
 };
 

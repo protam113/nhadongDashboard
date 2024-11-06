@@ -1,10 +1,20 @@
-import {MdDashboard,MdAddToQueue,MdOutlineEventAvailable,MdManageSearch   } from "react-icons/md";
+import {MdDashboard
+    ,MdAddToQueue,
+    MdOutlineEventAvailable,
+    MdGroup,
+    MdManageSearch,
+    MdOutlineAdminPanelSettings,
+} from "react-icons/md";
 import { FaNewspaper,FaFileAlt,FaChurch   } from "react-icons/fa";
 import { HiUserGroup } from "react-icons/hi2";
 import { SlNotebook ,SlCalender } from "react-icons/sl";
 import { IoMdSettings } from "react-icons/io";
 import { BiCategory } from "react-icons/bi";
 import { PiHandsPrayingBold } from "react-icons/pi";
+import { CgSandClock } from "react-icons/cg";
+import { HiOutlineNewspaper } from "react-icons/hi";
+import { RiCommunityLine } from "react-icons/ri";
+import { GrGroup } from "react-icons/gr";
 
 
 export const NavItems = () => {
@@ -16,12 +26,6 @@ export const NavItems = () => {
             icon: <MdDashboard />,
         },
         {
-            name: 'Hàng Đợi',
-            link: '/queue',
-            key: '2',
-            icon: <MdAddToQueue />,
-        },
-        {
             name: 'User',
             link: '/user',
             key: '3',
@@ -31,11 +35,13 @@ export const NavItems = () => {
                     name: "User",
                     link: '/user/client_user', // Đổi link thành href
                     key: '7',
+                    icon: <MdGroup/>
                 },
                 {
                     name: 'Admin & Manager',
                     link: '/user/administrator',
                     key: '8',
+                    icon: <MdOutlineAdminPanelSettings/>
                 },
 
             ]
@@ -48,7 +54,7 @@ export const NavItems = () => {
             children: [
                 {
                     name: "Thể Loại",
-                    link: '/hoi_dong/about_us', // Đổi link thành href
+                    link: '/hoi_dong/about_us',
                     key: '20',
                     icon: <BiCategory/>,
                 },
@@ -56,6 +62,7 @@ export const NavItems = () => {
                     name: 'Quản Lý Tin Tức',
                     link: '/history_monastery',
                     key: '21',
+                    icon: <HiOutlineNewspaper/>
                 },
             ]
         },
@@ -67,7 +74,7 @@ export const NavItems = () => {
             children: [
                 {
                     name: "Thể Loại",
-                    link: '/blog/blog_categories', // Đổi link thành href
+                    link: '/blog/blog_categories',
                     key: '22',
                     icon: <BiCategory/>,
                 },
@@ -86,7 +93,7 @@ export const NavItems = () => {
             children: [
                 {
                     name: "Ơn Gọi",
-                    link: '/hoi_dong/about_us', // Đổi link thành href
+                    link: '/hoi_dong/on_goi',
                     key: '18',
                 },
                 {
@@ -96,9 +103,9 @@ export const NavItems = () => {
                     children: [
                         {
                             name: "Giai Đoạn",
-                            link: '/blog/blog_categories', // Đổi link thành href
+                            link: '/blog/blog_categories',
                             key: '31',
-                            icon: <BiCategory/>,
+                            icon: <CgSandClock/>,
                         },
                         {
                             name: 'Lịch Sử',
@@ -109,12 +116,12 @@ export const NavItems = () => {
                 },
                 {
                     name: 'Sứ Vụ',
-                    link: '/missio',
+                    link: '/hoi_dong/missio',
                     key: '9',
                     children: [
                         {
                             name: "Thể loại",
-                            link: '/blog/blog_categories', // Đổi link thành href
+                            link: '/blog/blog_categories',
                             key: '36',
                             icon: <BiCategory/>,
                         },
@@ -127,7 +134,7 @@ export const NavItems = () => {
                 },
                 {
                     name: "Thuong AI",
-                    link: '/hoi_dong/on_goi', // Đổi link thành href
+                    link: '/hoi_dong/on_goi',
                     key: '10',
                 }
             ]
@@ -140,16 +147,11 @@ export const NavItems = () => {
             children: [
                 {
                     name: "Thể Loại",
-                    link: '/event/event_categories', // Đổi link thành href
+                    link: '/event/event_categories',
                     key: '24',
                     icon: <BiCategory/>,
                 },
-                {
-                    name: 'Quản Lý Sự Kiện',
-                    link: '/blog/blog_management',
-                    key: '25',
-                    icon: <MdManageSearch/>,
-                },
+
             ]
         },
         {
@@ -166,12 +168,12 @@ export const NavItems = () => {
             children: [
                 {
                     name: "Bài Học",
-                    link: '/hoi_dong/about_us', // Đổi link thành href
+                    link: '/hoi_dong/about_us',
                     key: '13',
                     children: [
                         {
                             name: "Thể Loại",
-                            link: '/blog/blog_categories', // Đổi link thành href
+                            link: '/blog/blog_categories',
                             key: '27',
                             icon: <BiCategory/>,
                         },
@@ -184,12 +186,12 @@ export const NavItems = () => {
                 },
                 {
                     name: "Giáo Án",
-                    link: '/hoi_dong/history', // Đổi link thành href
+                    link: '/hoi_dong/history',
                     key: '14',
                     children: [
                         {
                             name: "Thể Loại",
-                            link: '/blog/blog_categories', // Đổi link thành href
+                            link: '/blog/blog_categories',
                             key: '34',
                             icon: <BiCategory/>,
                         },
@@ -202,12 +204,12 @@ export const NavItems = () => {
                 },
                 {
                     name: "Tài Liệu ",
-                    link: '/hoi_dong/on_goi', // Đổi link thành href
+                    link: '/hoi_dong/on_goi',
                     key: '15',
                     children: [
                         {
                             name: "Thể Loại",
-                            link: '/blog/blog_categories', // Đổi link thành href
+                            link: '/blog/blog_categories',
                             key: '29',
                             icon: <BiCategory/>,
                         },
@@ -220,7 +222,7 @@ export const NavItems = () => {
                 },
                 {
                     name: "Thuong AI",
-                    link: '/hoi_dong/on_goi', // Đổi link thành href
+                    link: '/hoi_dong/on_goi',
                     key: '16',
                 }
             ]
@@ -230,6 +232,41 @@ export const NavItems = () => {
             link: '/prayer',
             key: '33',
             icon: <PiHandsPrayingBold/>,
+        },
+        {
+            name: 'Danh Mục',
+            link: '/danh_muc',
+            key: '2',
+            icon: <MdAddToQueue />,
+            children: [
+                {
+                    name: 'Hàng Đợi',
+                    link: '/danh_muc/queue',
+                    key: '25',
+                    icon: <MdManageSearch/>,
+                },
+                {
+                    name: 'Thể Loại',
+                    link: '/danh_muc/categories',
+                    key: '38',
+                    icon: <MdManageSearch/>,
+                },
+            ]
+        },
+        {
+            name: 'Cộng Đoàn',
+            link: '/danh_muc',
+            key: '39',
+            icon: <RiCommunityLine />,
+            children: [
+                {
+                    name: 'Thành Viên',
+                    link: '/danh_muc/queue',
+                    key: '40',
+                    icon: <GrGroup/>,
+                },
+
+            ]
         },
         {
             name: 'Settings',

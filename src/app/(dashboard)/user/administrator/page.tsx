@@ -1,102 +1,81 @@
-'use client';
+"use client";
 
-import React, { useState } from 'react';
-import { Table, Button, Input, Popconfirm, message } from 'antd';
-import { SearchOutlined } from '@ant-design/icons';
-import { useRouter } from 'next/navigation'; // Sử dụng next/navigation cho Next.js 13
-
-const dataSource = [
-    {
-        key: '1',
-        username: 'admin1',
-        fullName: 'Nguyen Van A',
-        phone_number: '0123456789',
-        mail: 'admin1@example.com',
-        role: 'Admin',
-    },
-    {
-        key: '2',
-        username: 'manager1',
-        fullName: 'Tran Thi B',
-        phone_number: '0987654321',
-        mail: 'manager1@example.com',
-        role: 'Manager',
-    },
-    // Thêm dữ liệu mẫu khác ở đây
-];
+import React from "react";
+import {Table, Spin, Pagination, Button} from "antd";
+import { useUserList } from "@/hooks/user/useUsers";
+import { useRouter } from "next/navigation";
 
 const ManageUsersPage: React.FC = () => {
-    const [searchText, setSearchText] = useState('');
-    const router = useRouter(); // Khai báo useRouter tại đây
+    const [currentPage, setCurrentPage] = React.useState(1);
+    const router = useRouter(); // Hook for navigation
 
-    const handleDelete = (key: string) => {
-        // Logic để xóa người dùng
-        message.success(`Đã xóa người dùng với ID: ${key}`);
-    };
+    // Pass multiple roles as an array
+    const { data, isLoading, isError, isFetching } = useUserList(currentPage, {
+        role: ["1", "2"],
+    });
 
-    const filteredData = dataSource.filter(user =>
-        user.username.toLowerCase().includes(searchText.toLowerCase()) ||
-        user.fullName.toLowerCase().includes(searchText.toLowerCase())
-    );
+    if (isError) {
+        return <div>Error fetching users</div>;
+    }
 
+    if (isLoading) {
+        return <Spin size="large" />;
+    }
+
+    const users = data?.results || [];
     const columns = [
-        {
-            title: 'Tên người dùng',
-            dataIndex: 'username',
-            key: 'username',
-        },
-        {
-            title: 'Họ và Tên',
-            dataIndex: 'fullName',
-            key: 'fullName',
-        },
-        {
-            title: 'Số điện thoại',
-            dataIndex: 'phone_number',
-            key: 'phone_number',
-        },
-        {
-            title: 'Email',
-            dataIndex: 'mail',
-            key: 'mail',
-        },
-        {
-            title: 'Vai trò',
-            dataIndex: 'role',
-            key: 'role',
-        },
-        {
-            title: 'Thao tác',
-            key: 'action',
-            render: (_ : any, record: any) => (
-                <Popconfirm
-                    title="Bạn có chắc chắn muốn xóa người dùng này?"
-                    onConfirm={() => handleDelete(record.key)}
-                >
-                    <Button type="link" danger>Xóa</Button>
-                </Popconfirm>
-            ),
-        },
+        { title: "ID", dataIndex: "id", key: "id" },
+        { title: "Username", dataIndex: "username", key: "username" },
+        { title: "First Name", dataIndex: "first_name", key: "first_name" },
+        { title: "Last Name", dataIndex: "last_name", key: "last_name" },
+        { title: "Email", dataIndex: "email", key: "email" },
+        { title: "Phone Number", dataIndex: "phone_number", key: "phone_number" },
     ];
 
+
+    const handleCreateManager = () => {
+        router.push("/user/administrator/create_manager"); // Navigate to the create category page
+    };
+    const handleAddManager = () => {
+        router.push("/user/administrator/them_manager_tu_list"); // Navigate to the create category page
+    };
     return (
-        <div style={{ padding: '20px' }}>
-            <h1>Quản lý người dùng</h1>
-            <Button type="primary" onClick={() => router.push('/user/administrator/create_manager')} style={{ marginBottom: '20px' }}>
-                Thêm Quản Trị Viên
-            </Button>
-            <Input
-                placeholder="Tìm kiếm người dùng..."
-                prefix={<SearchOutlined />}
-                onChange={e => setSearchText(e.target.value)}
-                style={{ width: 300, marginBottom: 20 }}
-            />
-            <Table
-                dataSource={filteredData}
-                columns={columns}
-                pagination={{ pageSize: 10 }}
-                rowKey="key"
-            />
+        <div>
+            <div className="flex justify-between items-center mb-4">
+                <h1 className="mt-4 text-16 font-bold">Quản Lý Quản Trị Viên</h1>
+                <div className="flex space-x-4">
+                    {/* Button with border and rounded corners */}
+                    <div
+                        className="border-2 border-primary-500 p-2 text-center cursor-pointer hover:bg-primary-500 hover:text-white transition-all duration-300 rounded-full flex items-center justify-center"
+                        onClick={handleAddManager}
+                        style={{minWidth: 'auto'}} // Ensures the width fits the text
+                    >
+                        Thêm Quản Trị Viên từ dánh sách
+                    </div>
+
+                    {/* Button without border */}
+                    <Button
+                        type="primary"
+                        onClick={handleCreateManager}
+                        className="w-auto"
+                    >
+                        Tạo Quản Trị Viên
+                    </Button>
+                </div>
+
+
+            </div>
+            <Table dataSource={users} columns={columns} rowKey="id" pagination={false}/>
+            <div className="flex justify-center mt-4">
+                <Pagination
+                    current={currentPage}
+                    pageSize={20}
+                    total={data?.count || 0}
+                    onChange={(page) => setCurrentPage(page)}
+                    showSizeChanger={false}
+                />
+            </div>
+            {isFetching && <Spin size="small"/>}
         </div>
     );
 };

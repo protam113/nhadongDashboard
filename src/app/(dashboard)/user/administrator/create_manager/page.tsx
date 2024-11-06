@@ -1,43 +1,48 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Form, Input, Button, Upload, Card, message, Row, Col } from 'antd';
-import { UploadOutlined, UserAddOutlined } from '@ant-design/icons';
+import { Form, Input, Button, Card, message, Row, Col } from 'antd';
+import { UserAddOutlined } from '@ant-design/icons';
+import { useCreateManager } from "@/hooks/user/useUsers"; // Giả sử hook này đã được định nghĩa
 
 const AddUserPage: React.FC = () => {
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false);
+    const { mutate: createManagerMutation } = useCreateManager();
 
-    const handleAddUser = (values: any) => {
+    const handleAddUser = async (values: any) => {
         setLoading(true);
-        // Thêm vai trò là Manager mặc định
         const newUser = { ...values, role: 'Manager' };
-        console.log('Dữ liệu người dùng mới:', newUser);
-        // Gửi dữ liệu lên backend hoặc thực hiện logic thêm người dùng
-        setTimeout(() => {
-            message.success('Thêm người dùng thành công!');
-            setLoading(false);
-            form.resetFields();
-        }, 1000);
-    };
 
+        try {
+            await createManagerMutation(newUser);
+            message.success('Thêm người dùng thành công!');
+            form.resetFields();
+        } catch (error: any) { // Assert the error type as any
+            console.error(error);
+            message.error('Có lỗi xảy ra khi thêm người dùng.');
+        } finally {
+            setLoading(false);
+        }
+    };
     return (
-        <div style={{ padding: '20px', maxWidth: '600px', margin: '0 auto' }}>
-            <Card title="Thêm Người Dùng" bordered={false} style={{ textAlign: 'center' }}>
+        <div style={{ margin: '0 auto'}}>
+            <Card title="Thêm Quản Trị Viên" bordered={true}
+                  style={{textAlign: 'center'}}>
                 <Form
                     form={form}
                     layout="vertical"
                     onFinish={handleAddUser}
-                    initialValues={{ role: 'Manager' }}
+                    initialValues={{role: 'Manager'}}
                 >
                     <Row gutter={16}>
                         <Col xs={24} sm={12}>
                             <Form.Item
                                 name="username"
                                 label="Tên người dùng"
-                                rules={[{ required: true, message: 'Vui lòng nhập tên người dùng' }]}
+                                rules={[{required: true, message: 'Vui lòng nhập tên người dùng'}]}
                             >
-                                <Input prefix={<UserAddOutlined />} placeholder="Tên người dùng" />
+                                <Input prefix={<UserAddOutlined/>} placeholder="Tên người dùng"/>
                             </Form.Item>
                         </Col>
 
@@ -45,9 +50,9 @@ const AddUserPage: React.FC = () => {
                             <Form.Item
                                 name="password"
                                 label="Mật khẩu"
-                                rules={[{ required: true, message: 'Vui lòng nhập mật khẩu' }]}
+                                rules={[{required: true, message: 'Vui lòng nhập mật khẩu'}]}
                             >
-                                <Input.Password placeholder="Mật khẩu" />
+                                <Input.Password placeholder="Mật khẩu"/>
                             </Form.Item>
                         </Col>
 
@@ -55,9 +60,9 @@ const AddUserPage: React.FC = () => {
                             <Form.Item
                                 name="first_name"
                                 label="Họ và tên đệm"
-                                rules={[{ required: true, message: 'Vui lòng nhập họ' }]}
+                                rules={[{required: true, message: 'Vui lòng nhập họ và tên đệm'}]}
                             >
-                                <Input placeholder="Họ và tên đệm" />
+                                <Input placeholder="Họ và tên đệm"/>
                             </Form.Item>
                         </Col>
 
@@ -65,9 +70,9 @@ const AddUserPage: React.FC = () => {
                             <Form.Item
                                 name="last_name"
                                 label="Tên"
-                                rules={[{ required: true, message: 'Vui lòng nhập tên' }]}
+                                rules={[{required: true, message: 'Vui lòng nhập tên'}]}
                             >
-                                <Input placeholder="Tên" />
+                                <Input placeholder="Tên"/>
                             </Form.Item>
                         </Col>
 
@@ -75,29 +80,29 @@ const AddUserPage: React.FC = () => {
                             <Form.Item
                                 name="phone_number"
                                 label="Số điện thoại"
-                                rules={[{ required: true, message: 'Vui lòng nhập số điện thoại' }]}
+                                rules={[{required: true, message: 'Vui lòng nhập số điện thoại'}]}
                             >
-                                <Input placeholder="Số điện thoại" />
+                                <Input placeholder="Số điện thoại"/>
                             </Form.Item>
                         </Col>
 
                         <Col xs={24} sm={12}>
-                            <Form.Item name="mail" label="Email" rules={[{ type: 'email', message: 'Email không hợp lệ' }]}>
-                                <Input placeholder="Email" />
-                            </Form.Item>
-                        </Col>
-
-                        <Col xs={24} sm={12}>
-                            <Form.Item name="profile_image" label="Ảnh hồ sơ">
-                                <Upload beforeUpload={() => false} listType="picture" maxCount={1}>
-                                    <Button icon={<UploadOutlined />}>Tải lên ảnh hồ sơ</Button>
-                                </Upload>
+                            <Form.Item
+                                name="email"
+                                label="Email"
+                                rules={[{type: 'email', message: 'Email không hợp lệ'}, {
+                                    required: true,
+                                    message: 'Vui lòng nhập email'
+                                }]}
+                            >
+                                <Input placeholder="Email"/>
                             </Form.Item>
                         </Col>
                     </Row>
 
-                    <Form.Item style={{ textAlign: 'center' }}>
-                        <Button type="primary" htmlType="submit" loading={loading}>
+                    <Form.Item style={{textAlign: 'center'}}>
+                        <Button type="primary" htmlType="submit" loading={loading}
+                                style={{width: '100%', borderRadius: '4px'}}>
                             Thêm người dùng
                         </Button>
                     </Form.Item>

@@ -2,6 +2,8 @@ import React from 'react';
 import { Layout, Menu } from 'antd';
 import { NavItems } from '@/utils/navItem';
 import Link from 'next/link';
+import Image from 'next/image';
+import Logo from '@/assets/image/image_logo.png';
 
 const { Sider } = Layout;
 
@@ -16,7 +18,8 @@ const SidebarComponent: React.FC<{ collapsed: boolean }> = ({ collapsed }) => {
         scrollbarWidth: 'thin',
         scrollbarGutter: 'stable',
         width: collapsed ? 120 : 250,
-        transition: 'width 0.2s ease', // Thêm hiệu ứng cho transition
+        transition: 'width 0.2s ease',
+        fontSize: '18px'
     };
 
     interface NavItem {
@@ -53,14 +56,22 @@ const SidebarComponent: React.FC<{ collapsed: boolean }> = ({ collapsed }) => {
 
     return (
         <Sider trigger={null} collapsible collapsed={collapsed} style={siderStyle}>
-            <div style={{ textAlign: 'center', margin: '16px 0' }}>
-                Logo
+            <div style={{ textAlign: 'center', margin: '18px 0' }}>
+                <Image
+                    src={Logo}
+                    className={`w-full h-auto ${collapsed ? 'max-h-[40px]' : 'max-h-[70px]'} object-contain`}
+                    alt="Logo"
+                />
+                {/*{!collapsed && (*/}
+                {/*    <p className='text-white text-14 font-bold'>Champagnat Dashboard</p>*/}
+                {/*)}*/}
             </div>
             <Menu
                 theme="dark"
                 mode="inline"
                 defaultSelectedKeys={['1']}
                 items={menuItems}
+                style={{ fontSize: '16px' }}
             />
         </Sider>
     );

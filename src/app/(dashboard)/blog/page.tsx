@@ -1,122 +1,175 @@
-'use client';
+    "use client"; // Ensures this is a client component
 
-import React from 'react';
-import { Table, Button, Image } from 'antd';
-import { useRouter } from 'next/navigation';
+    import React, { useState } from "react";
+    import { Table, Button, Typography, Spin, Select,Modal  } from "antd";
+    import type { ColumnsType } from "antd/es/table";
+    import { FaSync } from "react-icons/fa"; // Import refresh icon
+    import {useDeleteCategory} from "@/hooks/cateogry/useCategories";
+    import { MdOutlineDelete } from "react-icons/md";
+    import { FaRegEdit } from "react-icons/fa";
+    import {BlogList} from "@/lib/blogList";
+    import BlogDetailsModal from "@/app/(dashboard)/blog/BlogDetailsModal";
+    import { EyeOutlined } from "@ant-design/icons";
+    import BlogQueueList from "@/app/(dashboard)/blog/BlogQueueTable";
 
-const BlogImage: React.FC<{ src: string }> = ({ src }) => {
-    return <Image src={src} width={100} alt="Blog Image" />;
-};
+    const { Title } = Typography;
 
-const getStatusColor = (status: string) => {
-    switch (status) {
-        case 'Pending':
-            return { backgroundColor: 'yellow', color: 'black' }; // Màu vàng cho trạng thái Pending
-        case 'Approve':
-            return { backgroundColor: 'lightgreen', color: 'black' }; // Màu xanh cho trạng thái Approve
-        case 'Reject':
-            return { backgroundColor: 'red', color: 'white' }; // Màu đỏ cho trạng thái Reject
-        default:
-            return {};
-    }
-};
+    const Blogs: React.FC = () => {
+        const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
+        const [currentPage, setCurrentPage] = useState(1);
+        const [model, setModel] = useState<string>(""); // State to hold selected model
+        const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
+        const { mutate: deleteCategory } = useDeleteCategory();
+        const [selectedBlog, setSelectedBlog] = useState(null); // State for selected blog
+        const [isModalVisible, setIsModalVisible] = useState(false);
 
-const BlogOverview: React.FC = () => {
-    const router = useRouter();
+        // Pass model into CategoriesList
+        const { queueData, isLoading, isError } = BlogList(currentPage, model, refreshKey);
 
-    const categories = [
-        { id: 1, name: 'Category 1' },
-        { id: 2, name: 'Category 2' },
-        { id: 3, name: 'Category 3' },
-        { id: 4, name: 'Category 4' },
-        { id: 5, name: 'Category 5' },
-        { id: 6, name: 'Category 6' },
-        { id: 7, name: 'Category 7' },
-        { id: 8, name: 'Category 8' },
-        { id: 9, name: 'Category 9' },
-        { id: 10, name: 'Category 10' },
-    ];
+        const handleDelete = (categoryId: string) => {
+            // Show confirmation dialog before deletion
+            Modal.confirm({
+                title: 'Xác nhận xóa',
+                content: 'Bạn có chắc chắn muốn xóa thể loại này?',
+                okText: 'Xóa',
+                okType: 'danger',
+                cancelText: 'Hủy',
+                onOk: () => {
+                    deleteCategory(categoryId);
+                },
+            });
+        };
 
-    const blogs = [
-        {
-            id: 1,
-            image: 'link-to-image1',
-            title: 'Blog Title 1',
-            create_by: 'Author 1',
-            categories: 'Category 1',
-            create_at: '2024-01-01',
-            status: 'Pending',
-        },
-        {
-            id: 2,
-            image: 'link-to-image2',
-            title: 'Blog Title 2',
-            create_by: 'Author 2',
-            categories: 'Category 2',
-            create_at: '2024-01-03',
-            status: 'Approve',
-        },
-        {
-            id: 3,
-            image: 'link-to-image3',
-            title: 'Blog Title 3',
-            create_by: 'Author 3',
-            categories: 'Category 3',
-            create_at: '2024-01-05',
-            status: 'Reject',
-        },
-        // Thêm các blog khác tại đây
-    ];
-
-    return (
-        <div style={{ padding: '24px' }}>
-            <h1 style={{ fontSize: '24px', fontWeight: 'bold', marginBottom: '16px' }}>Blog Overview</h1>
-
-            <h2 style={{ marginBottom: '12px' }}>Categories</h2>
-            <Table
-                dataSource={categories}
-                rowKey="id"
-                pagination={false}
-                footer={() => (
-                    <Button type="primary" onClick={() => router.push('/blog/blog_categories')}>
-                        Xem Tất Cả Danh Mục
+        const columns: ColumnsType<any> = [
+            {
+                title: "Chi Tiết",
+                dataIndex: "full",
+                key: "full",
+                width: 150,
+                render: (_, record) => (
+                    <Button onClick={() => handleViewDetails(record)}>
+                        <EyeOutlined /> Xem Chi Tiết
                     </Button>
-                )}
-            >
-                <Table.Column title="ID" dataIndex="id" key="id" />
-                <Table.Column title="Name" dataIndex="name" key="name" />
-            </Table>
+                ),
+            },
+            {
+                title: "ID",
+                dataIndex: "id",
+                key: "id",
+                width: 60,
+                render: (text) => <span>{text}</span>,
+            },
+            {
+                title: "Tiêu Đề",
+                dataIndex: "title",
+                key: "title",
+                width: 400,
+                render: (text) => <span>{text}</span>,
+            },
+            {
+                title: "Thể Loại",
+                dataIndex: "categories",
+                key: "categories",
+                width: 150,
+                render: (categories) => (
+                    <span>
+                        {categories.map((category: any) => (
+                            <div
+                                key={category.id}
+                                style={{
+                                    backgroundColor: category.color || '#142857', // Màu nền tùy chọn cho thể loại
+                                    color: '#fff', // Màu chữ
+                                    padding: '5px 10px',
+                                    borderRadius: '4px',
+                                    marginBottom: '5px',
+                                    marginRight: '5px',
+                                }}
+                            >
+                                {category.name} {/* Hiển thị tên của thể loại */}
+                            </div>
+                        ))}
+                    </span>
+                ),
+            },
+            {
+                title: "Action",
+                dataIndex: "action",
+                key: "action",
+                width: 100,
+                render: (_, record) => (
+                    <>
+                        <Button danger onClick={() => handleDelete(record.id)}>
+                            <MdOutlineDelete className="text-albert-error" />
+                        </Button>
+                        <Button>
+                            <FaRegEdit />
+                        </Button>
+                    </>
+                ),
+            },
+        ];
 
-            <h2 style={{ marginTop: '24px', marginBottom: '12px' }}>Blogs</h2>
-            <Table
-                dataSource={blogs}
-                rowKey="id"
-                pagination={false}
-                footer={() => (
-                    <Button type="primary" onClick={() => router.push('/blog/blog_management')}>
-                        Xem Tất Cả Bài Viết
+
+        if (isLoading) return <Spin size="large" />;
+        if (isError) return <div>Error loading queue data.</div>;
+
+        const handleViewDetails = (blog: any) => {
+            setSelectedBlog(blog);
+            setIsModalVisible(true);
+        };
+
+        // Function to handle closing the modal
+        const handleModalClose = () => {
+            setIsModalVisible(false);
+            setSelectedBlog(null);
+        };
+
+
+        const handleRefresh = () => {
+            setRefreshKey((prev) => prev + 1); // Refresh data manually
+        };
+
+        return (
+            <>
+            <div className="p-4">
+                <Title level={2}>Quản Lý Bài Viết</Title>
+
+                {/* Model selection */}
+                <div className="flex justify-between items-center mb-4">
+                        <Button onClick={handleRefresh} style={{marginLeft: "8px"}}>
+                            <FaSync/> Làm mới
+                        </Button>
+                </div>
+
+                <div className="overflow-auto" style={{maxHeight: "800px"}}>
+                    <Table
+                        columns={columns}
+                        dataSource={queueData}
+                        rowKey="id"
+                        pagination={false}
+                        scroll={{y: 500}}
+                        rowSelection={{
+                            selectedRowKeys: selectedKeys,
+                            onChange: (selectedRowKeys) => setSelectedKeys(selectedRowKeys as number[]),
+                        }}
+                    />
+                </div>
+                <div style={{marginTop: "16px", textAlign: "center"}}>
+                    <Button disabled={currentPage === 1} onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}>
+                        Previous
                     </Button>
-                )}
-            >
-                <Table.Column title="ID" dataIndex="id" key="id" />
-                <Table.Column title="Image" dataIndex="image" key="image" render={(text: string) => <BlogImage src={text} />} />
-                <Table.Column title="Title" dataIndex="title" key="title" />
-                <Table.Column title="Create By" dataIndex="create_by" key="create_by" />
-                <Table.Column title="Categories" dataIndex="categories" key="categories" />
-                <Table.Column title="Create At" dataIndex="create_at" key="create_at" />
-                <Table.Column
-                    title="Status"
-                    dataIndex="status"
-                    key="status"
-                    render={(status: string) => (
-                        <span style={{ padding: '5px 10px', borderRadius: '4px', ...getStatusColor(status) }}>
-                            {status}
-                        </span>
-                    )}
+                    <span style={{margin: "0 8px"}}>Page {currentPage}</span>
+                    <Button onClick={() => setCurrentPage((prev) => prev + 1)}>Next</Button>
+                </div>
+                <BlogQueueList/>
+            </div>
+                <BlogDetailsModal
+                    visible={isModalVisible}
+                    onClose={handleModalClose}
+                    blog={selectedBlog}
                 />
-            </Table>
-        </div>
-    );
-};
+            </>
+        );
+    };
 
-export default BlogOverview;
+    export default Blogs;

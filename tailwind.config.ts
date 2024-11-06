@@ -28,6 +28,7 @@ const config: Config = {
         background: "var(--background)",
         foreground: "var(--foreground)",
 
+        "primary-logo": "var(--primary-logo)",
         "primary-900": "var(--primary-900)",
         "primary-800": "var(--primary-800)",
         "primary-700": "var(--primary-700)",
