@@ -62,18 +62,19 @@ const BlogQueueList: React.FC = () => {
             width: 400,
             render: (text) => {
                 const dataObject = JSON.parse(
-                    text.replace(/'/g, '"').replace(/False/g, 'false').replace(/True/g, 'true')
+                    text.replace(/'/g, '"')
+                        .replace(/False/g, 'false')
+                        .replace(/True/g, 'true')
+                        .replace(/None/g, 'null') // Handle None as null
                 );
 
                 const content = [
-                    `Username: ${dataObject.username}`,
-                    `Email: ${dataObject.email}`,
-                    `Phone Number: ${dataObject.phone_number}`,
-                    `First Name: ${dataObject.first_name}`,
-                    `Last Name: ${dataObject.last_name}`,
-                    `Is Active: ${dataObject.is_active ? 'Yes' : 'No'}`,
-                    `Date Joined: ${dataObject.date_joined}`,
-                    `Profile Image: ${dataObject.profile_image}`,
+                    `Tiêu Đề: ${dataObject.title}`,
+                    `Mô Tả: ${dataObject.description}`,
+                    `Link: ${dataObject.link}`,
+                    `Người Tạo: ${dataObject.user.username}`,
+                    `Tên: ${dataObject.user.first_name} ${dataObject.user.last_name}`,
+
                 ];
 
                 return (

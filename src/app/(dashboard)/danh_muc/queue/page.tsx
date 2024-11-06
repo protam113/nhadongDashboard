@@ -80,7 +80,10 @@ const Queue: React.FC = () => {
             width: 250,
             render: (text, record) => {
                 const dataObject = JSON.parse(
-                    text.replace(/'/g, '"').replace(/False/g, 'false').replace(/True/g, 'true')
+                    text.replace(/'/g, '"')
+                        .replace(/False/g, 'false')
+                        .replace(/True/g, 'true')
+                        .replace(/None/g, 'null') // Handle None as null
                 );
 
                 const content = [

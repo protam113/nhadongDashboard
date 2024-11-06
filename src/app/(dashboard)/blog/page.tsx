@@ -1,7 +1,7 @@
     "use client"; // Ensures this is a client component
 
     import React, { useState } from "react";
-    import { Table, Button, Typography, Spin, Select,Modal  } from "antd";
+    import { Table, Button, Typography, Spin,Modal  } from "antd";
     import type { ColumnsType } from "antd/es/table";
     import { FaSync } from "react-icons/fa"; // Import refresh icon
     import {useDeleteCategory} from "@/hooks/cateogry/useCategories";
@@ -17,7 +17,7 @@
     const Blogs: React.FC = () => {
         const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
         const [currentPage, setCurrentPage] = useState(1);
-        const [model, setModel] = useState<string>(""); // State to hold selected model
+        const [model] = useState<string>(""); // State to hold selected model
         const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
         const { mutate: deleteCategory } = useDeleteCategory();
         const [selectedBlog, setSelectedBlog] = useState(null); // State for selected blog

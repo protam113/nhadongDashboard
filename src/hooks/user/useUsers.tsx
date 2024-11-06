@@ -33,6 +33,10 @@ interface Filters {
     [key: string]: string | number | string[] | undefined;
 }
 
+/**
+Hàm xử lý lấy danh sách user
+ **/
+
 const fetchUserList = async (
     pageParam: number = 1,
     token: string,
@@ -105,6 +109,11 @@ interface NewManager {
     [key: string]: any; // Hoặc bạn có thể định nghĩa các trường cụ thể mà bạn cần
 }
 
+/**
+Hàm xử lý tạo manager
+ **/
+
+
 const CreateManager = async (newManager: NewManager, token: string) => {
     const formData = new FormData();
 
@@ -163,6 +172,10 @@ const useCreateManager = () => {
 interface AddManager {
     [key: string]: any; // Hoặc bạn có thể định nghĩa các trường cụ thể mà bạn cần
 }
+
+/**
+Hàm xử lý thêm user từ danh sách user thành admin
+**/
 
 const AddManager = async (addManager: AddManager, token: string) => {
     const formData = new FormData();
