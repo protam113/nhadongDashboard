@@ -156,7 +156,7 @@ const CategoriesQueueTable: React.FC = () => {
 
     return (
         <div className="p-4">
-            <h1 className='text-16 font-bold mt-4'>Quản lý hàng đợi duyệt người dùng</h1>
+            <h1 className='text-16 font-bold mt-4'>Quản lý hàng đợi duyệt thể loại (Category)</h1>
             <div className="p-4">
                 <Button type="primary" onClick={handleBulkApprove} style={{ marginBottom: '16px' }}>
                     Chấp Thuận

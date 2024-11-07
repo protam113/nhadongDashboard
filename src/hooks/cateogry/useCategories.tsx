@@ -100,18 +100,18 @@ const useCateogiesList = (page: number, filters: Filters = {}, refreshKey: numbe
     });
 };
 
-interface CreateCatoryItem {
+interface CreateCategoryItem {
     name: string;
     model: string;
     file: File | string | null; // Use File type for file, or string if necessary
 }
 
-const CreateCategory = async (browseManager: CreateCatoryItem, token: string) => {
+const CreateCategory = async (newCategory: CreateCategoryItem, token: string) => {
     const formData = new FormData();
 
-    for (const key in browseManager) {
-        if (Object.prototype.hasOwnProperty.call(browseManager, key)) {
-            const value = browseManager[key as keyof CreateCatoryItem];
+    for (const key in newCategory) {
+        if (Object.prototype.hasOwnProperty.call(newCategory, key)) {
+            const value = newCategory[key as keyof CreateCategoryItem];
 
             if (Array.isArray(value)) {
                 // If the value is an array, append each element
@@ -151,7 +151,7 @@ const useCreateCategory = () => {
     }, [getToken]);
 
     return useMutation({
-        mutationFn: async (createCategory: CreateCatoryItem) => {
+        mutationFn: async (createCategory: CreateCategoryItem) => {
             if (!token) {
                 throw new Error("Token is not available");
             }
@@ -169,6 +169,7 @@ const useCreateCategory = () => {
 
 const DeleteCategory = async (categoryId: string, token: string) => {
     if (!token) throw new Error("No token available");
+
 
     try {
         const response = await handleAPI(`${endpoints.category.replace(":id", categoryId)}`, 'DELETE', null, token);
@@ -209,5 +210,83 @@ const useDeleteCategory = () => {
     });
 };
 
+interface EditCategoryItem {
+    name: string;
+    file: File | string | null;
+}
 
-export { useCateogiesList,useCreateCategory,useDeleteCategory };
+const EditCategory = async (
+    editCategory: EditCategoryItem,
+    categoryId: string,
+    token: string
+) => {
+    const formData = new FormData();
+
+    if (!token) throw new Error("No token available");
+
+    for (const key in editCategory) {
+        if (Object.prototype.hasOwnProperty.call(editCategory, key)) {
+            const value = editCategory[key as keyof EditCategoryItem];
+
+            if (Array.isArray(value)) {
+                value.forEach((v) => formData.append(key, v));
+            } else if (value instanceof File) {
+                formData.append(key, value); // Đây là nơi bạn gửi tệp thực tế
+            } else if (typeof value === "string") {
+                formData.append(key, value);
+            }
+        }
+    }
+
+    try {
+        const response = await handleAPI(
+            `${endpoints.category.replace(":id", categoryId)}`,
+            "PATCH",
+            formData, // Gửi formData trong body request
+            token
+        );
+        return response.data;
+    } catch (error: any) {
+        console.error("Error editing category:", error.response?.data);
+        throw new Error(error.response?.data?.message || "Failed to edit category");
+    }
+};
+
+
+const useEditCategory = () => {
+    const queryClient = useQueryClient();
+    const { getToken } = useAuth();
+    const [token, setToken] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchToken = async () => {
+            const userToken = await getToken();
+            setToken(userToken);
+        };
+        fetchToken();
+    }, [getToken]);
+
+    return useMutation({
+        mutationFn: async ({
+                               editCategory,
+                               categoryId,
+                           }: {
+            editCategory: EditCategoryItem;
+            categoryId: string;
+        }) => {
+            if (!token) {
+                throw new Error("Token is not available");
+            }
+            return EditCategory(editCategory, categoryId, token);
+        },
+        onSuccess: () => {
+            message.success("Sửa Thể Loại Thành Công!");
+            queryClient.invalidateQueries({ queryKey: ["categoriesList"] });
+        },
+        onError: (error: any) => {
+            message.error(error.message || "Failed to edit category.");
+        },
+    });
+};
+
+export { useCateogiesList,useCreateCategory,useDeleteCategory,useEditCategory };

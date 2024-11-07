@@ -1,17 +1,22 @@
 "use client"; // Đảm bảo đây là client component
 
 import React, { useState } from "react";
-import { Input, Upload, Button, message } from "antd";
-import { UploadOutlined } from "@ant-design/icons";
+import {Input, Upload, Button, message, Image} from "antd";
+import {PlusOutlined} from "@ant-design/icons";
 import { useCreateCategory } from "@/hooks/cateogry/useCategories"; // Ensure Tailwind CSS is imported
 import { useRouter } from "next/navigation";
 import {useUser} from "@/context/userProvider";
+import {UploadFile, UploadProps} from "antd/lib/upload/interface";
+import {RcFile} from "antd/lib/upload";
 
 const CreateBlogCategory: React.FC = () => {
     const { userRoleId } = useUser() || {};;
     const { mutate: createCategory } = useCreateCategory();
     const [name, setName] = useState<string>(""); // State for category name
-    const [file, setFile] = useState<File | null>(null); // State for file upload
+    const [fileList, setFileList] = useState<UploadFile[]>([]);
+    const [previewImage, setPreviewImage] = useState<string>("");
+    const [previewOpen, setPreviewOpen] = useState<boolean>(false);
+
     const router = useRouter(); // Initialize useRouter
 
     const handleSubmit = () => {
@@ -21,7 +26,7 @@ const CreateBlogCategory: React.FC = () => {
         }
 
         // Create category with model set to "blog"
-        createCategory({ name, model: "blog", file });
+        createCategory({ name, model: "blog", file: fileList[0]?.originFileObj ?? null });
 
         // Check user role and show appropriate message
         if (userRoleId === 1) { // Admin
@@ -35,10 +40,28 @@ const CreateBlogCategory: React.FC = () => {
         router.push("/blog/blog_categories"); // Redirect after submission
     };
 
-    const handleFileChange = (info: any) => {
-        const uploadedFile = info.file.originFileObj as File;
-        setFile(uploadedFile);
+    const handleChange: UploadProps["onChange"] = ({ fileList }) => {
+        setFileList(fileList);
     };
+
+    const handlePreview = async (file: UploadFile) => {
+        if (!file.url && !file.preview) {
+            const reader = new FileReader();
+            reader.onload = () => setPreviewImage(reader.result as string);
+            reader.readAsDataURL(file.originFileObj as RcFile);
+        } else {
+            setPreviewImage(file.url || file.preview || "");
+        }
+        setPreviewOpen(true);
+    };
+
+    const uploadButton = (
+        <div>
+            <PlusOutlined />
+            <div style={{ marginTop: 8 }}>Upload</div>
+        </div>
+    );
+
 
     return (
         <div className="p-4">
@@ -54,17 +77,30 @@ const CreateBlogCategory: React.FC = () => {
             />
 
             {/* File Upload */}
-            <label className="block mb-2 font-medium text-gray-700">File</label>
+            <label className="block mb-2 font-medium text-gray-700">Ảnh</label>
             <Upload
-                beforeUpload={() => false} // Prevent auto upload
-                onChange={handleFileChange}
-                className="mb-4"
+                listType="picture-card"
+                fileList={fileList}
+                onPreview={handlePreview}
+                onChange={handleChange}
+                beforeUpload={() => false} // Ngăn tự động tải lên
             >
-                <Button icon={<UploadOutlined />}>Click to Upload</Button>
+                {fileList.length >= 1 ? null : uploadButton}
             </Upload>
 
+            {previewImage && (
+                <Image
+                    wrapperStyle={{ display: 'none' }}
+                    preview={{
+                        visible: previewOpen,
+                        onVisibleChange: (visible) => setPreviewOpen(visible),
+                    }}
+                    src={previewImage}
+                />
+            )}
+
             {/* Submit Button */}
-            <Button type="primary" onClick={handleSubmit} className="w-full">
+            <Button type="primary" onClick={handleSubmit} className="w-full mt-4">
                 Create Category
             </Button>
         </div>

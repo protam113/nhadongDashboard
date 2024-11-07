@@ -1,22 +1,28 @@
-"use client"; // Ensures this is a client component
+"use client";
+
 
 import React, { useState } from "react";
-import { Table, Button, Typography, Spin, Modal } from "antd";
+import { Table, Button, Typography, Spin, Modal, Image } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { FaSync } from "react-icons/fa"; // Import refresh icon
+import { FaSync } from "react-icons/fa";
 import { CategoriesList } from "@/lib/categoriesList";
 import { useDeleteCategory } from "@/hooks/cateogry/useCategories";
 import { MdOutlineDelete } from "react-icons/md";
 import { FaRegEdit } from "react-icons/fa";
 import CreateBlogCategory from "./CreateBlogCategory";
+import EditBlogCategory from "@/app/(dashboard)/blog/blog_categories/EditBlogCategory";
 
 const { Title } = Typography;
+
 
 const BlogCategories: React.FC = () => {
     const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [refreshKey, setRefreshKey] = useState(0);
-    const [isModalVisible, setIsModalVisible] = useState(false); // Modal visibility state
+    const [isCreateModalVisible, setIsCreateModalVisible] = useState(false); // For creating category
+    const [isEditModalVisible, setIsEditModalVisible] = useState(false); // For editing category
+    const [editingCategory, setEditingCategory] = useState(null);
+
     const { mutate: deleteCategory } = useDeleteCategory();
 
     const { queueData, isLoading, isError } = CategoriesList(currentPage, "blog", refreshKey);
@@ -34,6 +40,16 @@ const BlogCategories: React.FC = () => {
         });
     };
 
+    const handleEdit = (editCategory: any) => {
+        if (!editCategory.id) {
+            console.error("ID thể loại không hợp lệ!");
+            return;
+        }
+        setEditingCategory(editCategory);
+        setIsEditModalVisible(true); // Mở modal chỉnh sửa
+    };
+
+
     const columns: ColumnsType<any> = [
         {
             title: "ID",
@@ -43,32 +59,42 @@ const BlogCategories: React.FC = () => {
             render: (text) => <span>{text}</span>,
         },
         {
-            title: "Name",
+            title: "Tên Thể Loại",
             dataIndex: "name",
             key: "name",
             width: 400,
             render: (text) => <span>{text}</span>,
         },
         {
-            title: "File",
+            title: "Hình Ảnh",
             dataIndex: "file",
             key: "file",
             width: 150,
-            render: (text) => <span>{text}</span>,
+            render: (fileUrl: string) => (
+                <Image
+                    width={100}
+                    src={fileUrl}
+                    preview={{
+                        destroyOnClose: true,
+                    }}
+                    alt="Category Image"
+                />
+            ),
         },
         {
-            title: "Action",
+            title: "Thao Tác",
             dataIndex: "action",
             key: "action",
             width: 100,
             render: (_, record) => (
                 <>
-                    <Button danger onClick={() => handleDelete(record.id)}>
+                    <Button danger onClick={() => handleDelete(record.id)} className="mr-2">
                         <MdOutlineDelete className="text-albert-error" />
                     </Button>
-                    <Button>
+                    <Button onClick={() => handleEdit(record)}>
                         <FaRegEdit />
                     </Button>
+
                 </>
             ),
         },
@@ -82,11 +108,16 @@ const BlogCategories: React.FC = () => {
     };
 
     const handleCreateCategory = () => {
-        setIsModalVisible(true); // Show the modal when "Create Category" is clicked
+        setIsCreateModalVisible(true); // Show the modal when "Create Category" is clicked
     };
 
-    const handleCancelModal = () => {
-        setIsModalVisible(false); // Hide the modal when cancelled
+    const handleCancelCreateModal = () => {
+        setIsCreateModalVisible(false); // Hide the create category modal
+    };
+
+    const handleCancelEditModal = () => {
+        setIsEditModalVisible(false); // Hide the edit category modal
+        setEditingCategory(null); // Reset editing category
     };
 
     return (
@@ -128,15 +159,26 @@ const BlogCategories: React.FC = () => {
                 </div>
             </div>
 
-            {/* Modal to Create Blog Category */}
+            {/* Modal tạo thể loại */}
             <Modal
                 title="Tạo Thể Loại"
-                visible={isModalVisible}
-                onCancel={handleCancelModal}
+                visible={isCreateModalVisible}
+                onCancel={handleCancelCreateModal}
                 footer={null}
                 width={600}
             >
-                <CreateBlogCategory /> {/* Render the CreateBlogCategory form inside the modal */}
+                <CreateBlogCategory /> {/* Render CreateBlogCategory form */}
+            </Modal>
+
+            {/* Modal sửa thể loại */}
+            <Modal
+                title="Sửa Thể Loại"
+                visible={isEditModalVisible}
+                onCancel={handleCancelEditModal}
+                footer={null}
+                width={600}
+            >
+                <EditBlogCategory category={editingCategory} /> {/* Hiển thị thông tin thể loại */}
             </Modal>
         </>
     );
