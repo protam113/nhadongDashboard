@@ -45,13 +45,14 @@ const ManageUsersPage: React.FC = () => {
                 <h1 className="mt-4 text-16 font-bold">Quản Lý Quản Trị Viên</h1>
                 <div className="flex space-x-4">
                     {/* Button with border and rounded corners */}
-                    <div
-                        className="border-2 border-primary-500 p-2 text-center cursor-pointer hover:bg-primary-500 hover:text-white transition-all duration-300 rounded-full flex items-center justify-center"
+                    <Button
                         onClick={handleAddManager}
-                        style={{minWidth: 'auto'}} // Ensures the width fits the text
+                        type="default" // dùng "default" cho nút viền, hoặc "primary" cho nút màu nền
+                        className="border-2 border-primary-500 text-primary-500 hover:bg-primary-500 hover:text-white transition-all duration-300 rounded-full flex items-center justify-center"
+                        style={{ padding: '8px 16px', minWidth: 'auto' }} // Điều chỉnh padding để kích thước phù hợp
                     >
-                        Thêm Quản Trị Viên từ dánh sách
-                    </div>
+                        Thêm Quản Trị Viên từ danh sách
+                    </Button>
 
                     {/* Button without border */}
                     <Button

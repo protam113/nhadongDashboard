@@ -13,7 +13,7 @@ const CreateBlogCategory: React.FC = () => {
     const { userRoleId } = useUser() || {};;
     const { mutate: createCategory } = useCreateCategory();
     const [name, setName] = useState<string>(""); // State for category name
-    const [fileList, setFileList] = useState<UploadFile[]>([]);
+    const [imageList, setImageList] = useState<UploadFile[]>([]);
     const [previewImage, setPreviewImage] = useState<string>("");
     const [previewOpen, setPreviewOpen] = useState<boolean>(false);
 
@@ -26,7 +26,7 @@ const CreateBlogCategory: React.FC = () => {
         }
 
         // Create category with model set to "blog"
-        createCategory({ name, model: "blog", file: fileList[0]?.originFileObj ?? null });
+        createCategory({ name, model: "blog", image: imageList[0]?.originFileObj ?? null });
 
         // Check user role and show appropriate message
         if (userRoleId === 1) { // Admin
@@ -41,7 +41,7 @@ const CreateBlogCategory: React.FC = () => {
     };
 
     const handleChange: UploadProps["onChange"] = ({ fileList }) => {
-        setFileList(fileList);
+        setImageList(fileList);
     };
 
     const handlePreview = async (file: UploadFile) => {
@@ -80,12 +80,12 @@ const CreateBlogCategory: React.FC = () => {
             <label className="block mb-2 font-medium text-gray-700">Ảnh</label>
             <Upload
                 listType="picture-card"
-                fileList={fileList}
+                fileList={imageList}
                 onPreview={handlePreview}
                 onChange={handleChange}
                 beforeUpload={() => false} // Ngăn tự động tải lên
             >
-                {fileList.length >= 1 ? null : uploadButton}
+                {imageList.length >= 1 ? null : uploadButton}
             </Upload>
 
             {previewImage && (

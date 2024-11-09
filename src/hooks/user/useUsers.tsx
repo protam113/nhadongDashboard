@@ -234,4 +234,66 @@ const useAddManager = () => {
 };
 
 
-export { useUserList,useCreateManager,useAddManager };
+interface ActiveUser {
+    [key: string]: any; // Hoặc bạn có thể định nghĩa các trường cụ thể mà bạn cần
+}
+
+const ActiveUserList = async (activeUser: ActiveUser, token: string) => {
+    const formData = new FormData();
+
+    // Duyệt qua các trường trong browseManager
+    for (const key in activeUser) {
+        const value = activeUser[key];
+        if (Array.isArray(value)) {
+            value.forEach((v) => formData.append(key, v));
+        } else {
+            formData.append(key, value);
+        }
+    }
+    // Nếu không có token, ném lỗi
+    if (!token) throw new Error("No token available");
+
+    try {
+        // Gửi yêu cầu POST với formData
+        const response = await handleAPI(`${endpoints.queueApprove}`, 'POST', formData, token);
+        return response.data;
+    } catch (error: any) {
+        console.error('Error browse queue:', error.response?.data);
+        throw new Error(error.response?.data?.message || 'Failed to browse queue');
+    }
+};
+
+
+
+const useActiveUser = () => {
+    const queryClient = useQueryClient();
+    const { getToken } = useAuth();
+    const [token, setToken] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchToken = async () => {
+            const userToken = await getToken();
+            setToken(userToken);
+        };
+        fetchToken();
+    }, [getToken]);
+
+    return useMutation({
+        mutationFn: async (activeUser: ActiveUser) => {
+            if (!token) {
+                throw new Error("Token is not available");
+            }
+            return ActiveUserList(activeUser, token);
+        },
+        onSuccess: () => {
+            console.log("duyệt hàng đợi thành công");
+            queryClient.invalidateQueries({ queryKey: ["queueList"] });
+        },
+        onError: (error) => {
+            console.log(error.message || "Failed to browse queue.");
+        },
+    });
+};
+
+
+export { useUserList,useCreateManager,useAddManager,useActiveUser };

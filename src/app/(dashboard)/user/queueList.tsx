@@ -2,78 +2,84 @@
 
 import React, { useState } from 'react';
 import {Table, Button, Spin, Pagination} from 'antd';
-import { ReloadOutlined,PlusOutlined, MinusOutlined } from '@ant-design/icons'; // Icon từ Ant Design
+import { PlusOutlined, MinusOutlined } from '@ant-design/icons'; // Icon từ Ant Design
 import type { ColumnsType } from 'antd/es/table';
-import { UserQueue } from '@/lib/userQueue';
+import {UserList} from "@/lib/userList";
 
 const UserQueueList: React.FC = () => {
     const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [refreshKey, setRefreshKey] = useState(0); // State để làm mới dữ liệu
-    const [isRefreshing, setIsRefreshing] = useState(false); // State để kiểm tra trạng thái làm mới
     const [seeMore, setSeeMore] = useState(false);
 
     // Gọi hook `UserQueue` và thêm `refreshKey` làm dependency để làm mới dữ liệu
-    const { queueData, isLoading, isError, handleBulkUpdate } = UserQueue(currentPage,"user", refreshKey);
+    const { queueData, isLoading, isError, handleActiveUser } = UserList(
+        currentPage,
+        "false"  // Truyền "false" cho is_active
+    );
 
-    // Xử lý làm mới dữ liệu
-    const handleRefresh = () => {
-        setIsRefreshing(true); // Bắt đầu làm mới
-        setRefreshKey((prevKey) => prevKey + 1); // Cập nhật `refreshKey` để làm mới dữ liệu
-        setTimeout(() => setIsRefreshing(false), 1000); // Đặt lại trạng thái sau 1 giây (có thể điều chỉnh thời gian)
-    };
 
     const handleBulkApprove = () => {
-        handleBulkUpdate(selectedKeys, 'approved');
+        handleActiveUser(selectedKeys, 'approved');
         setSelectedKeys([]);
     };
 
-    const handleBulkReject = () => {
-        handleBulkUpdate(selectedKeys, 'rejected');
-        setSelectedKeys([]);
-    };
+    // const handleBulkReject = () => {
+    //     handleActiveUser(selectedKeys, 'rejected');
+    //     setSelectedKeys([]);
+    // };
 
     const columns: ColumnsType<any> = [
         {
             title: 'ID',
             dataIndex: 'id',
             key: 'id',
-            width: 50,
+            width: 100,
             render: (text) => <span>{text}</span>,
         },
-        {
-            title: 'Ngày Tạo',
-            dataIndex: 'created_date',
-            key: 'created_date',
-            width: 150,
-            render: (text) => <span>{new Date(text).toLocaleString()}</span>,
-        },
-        {
-            title: 'Ngày Cập Nhật',
-            dataIndex: 'updated_date',
-            key: 'updated_date',
-            width: 150,
-            render: (text) => <span>{new Date(text).toLocaleString()}</span>,
-        },
+        // {
+        //     title: 'Ngày Tạo',
+        //     dataIndex: 'created_date',
+        //     key: 'created_date',
+        //     width: 150,
+        //     render: (text) => <span>{new Date(text).toLocaleString()}</span>,
+        // },
+        // {
+        //     title: 'Ngày Cập Nhật',
+        //     dataIndex: 'updated_date',
+        //     key: 'updated_date',
+        //     width: 150,
+        //     render: (text) => <span>{new Date(text).toLocaleString()}</span>,
+        // },
         {
             title: 'Nội Dung',
             dataIndex: 'data',
             key: 'data',
             width: 400,
             render: (text) => {
-                const dataObject = JSON.parse(
-                    text.replace(/'/g, '"').replace(/False/g, 'false').replace(/True/g, 'true')
-                );
+                let dataObject;
+                try {
+                    // Kiểm tra xem text có phải là chuỗi JSON không
+                    if (typeof text === 'string') {
+                        dataObject = JSON.parse(
+                            text.replace(/'/g, '"').replace(/False/g, 'false').replace(/True/g, 'true')
+                        );
+                    } else {
+                        dataObject = {};
+                    }
+                } catch (error) {
+                    console.error('Invalid JSON:', error);
+                    dataObject = {};
+                }
 
                 const content = [
-                    `Username: ${dataObject.username}`,
-                    `Email: ${dataObject.email}`,
-                    `Phone Number: ${dataObject.phone_number}`,
-                    `First Name: ${dataObject.first_name}`,
-                    `Last Name: ${dataObject.last_name}`,
+                    `Username: ${dataObject.username || ''}`,
+                    `Email: ${dataObject.email || ''}`,
+                    `Phone Number: ${dataObject.phone_number || ''}`,
+                    `First Name: ${dataObject.first_name || ''}`,
+                    `Last Name: ${dataObject.last_name || ''}`,
                     `Is Active: ${dataObject.is_active ? 'Yes' : 'No'}`,
-                    `Date Joined: ${dataObject.date_joined}`,
-                    `Profile Image: ${dataObject.profile_image}`,
+                    `Date Joined: ${dataObject.date_joined || ''}`,
+                    `Profile Image: ${dataObject.profile_image || ''}`,
                 ];
 
                 return (
@@ -86,7 +92,7 @@ const UserQueueList: React.FC = () => {
                                 type="link"
                                 onClick={() => setSeeMore(!seeMore)}
                                 className="mt-1"
-                                icon={seeMore ? <MinusOutlined /> : <PlusOutlined />}
+                                icon={seeMore ? <MinusOutlined/> : <PlusOutlined/>}
                             />
                         )}
                     </div>
@@ -157,20 +163,6 @@ const UserQueueList: React.FC = () => {
             <div className="p-4">
             <Button type="primary" onClick={handleBulkApprove} style={{ marginBottom: '16px' }}>
                 Chấp Thuận
-            </Button>
-            <Button
-                className="text-albert-error"
-                onClick={handleBulkReject}
-                style={{ marginBottom: '16px', marginLeft: '8px' }}
-            >
-                Từ chối
-            </Button>
-            <Button
-                onClick={handleRefresh}
-                style={{ marginBottom: '16px', marginLeft: '8px' }}
-                icon={isRefreshing ? <Spin size="small" /> : <ReloadOutlined />} // Hiển thị icon làm mới hoặc spin
-            >
-                {isRefreshing ? 'Đang làm mới...' : ''} {/* Thay đổi text */}
             </Button>
             </div>
             <div className="overflow-auto" style={{ maxHeight: '800px' }}>

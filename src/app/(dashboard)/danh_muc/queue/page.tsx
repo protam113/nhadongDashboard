@@ -219,7 +219,6 @@ const Queue: React.FC = () => {
                 placeholder="Chọn model"
                 style={{width: 200}}
             >
-                <Option value="user">User</Option>
                 <Option value="blog">Blog</Option>
                 <Option value="category">Thể Loại</Option>
                 <Option value="news">Tin Tức</Option>

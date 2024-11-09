@@ -170,7 +170,7 @@ const useCreateBlog = () => {
             return CreateManager(newBlog, token);
         },
         onSuccess: () => {
-            console.log("Bài Viết đã được thêm thành công");
+            message.success("Bài Viết đã được thêm thành công");
             queryClient.invalidateQueries({ queryKey: ["userList"] });
         },
         onError: (error) => {

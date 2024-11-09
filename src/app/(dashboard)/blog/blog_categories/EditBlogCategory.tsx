@@ -10,18 +10,18 @@ import { RcFile } from "antd/es/upload";
 // Định nghĩa kiểu EditCategoryItem
 interface EditCategoryItem {
     name: string;
-    file: RcFile | null; // Chỉnh sửa kiểu file thành RcFile | null
+    image: RcFile | null; // Chỉnh sửa kiểu file thành RcFile | null
 }
 
 const EditBlogCategory: React.FC<{ category: any }> = ({ category }) => {
     const [name, setName] = useState(category?.name || ""); // Hiển thị tên thể loại
-    const [fileList, setFileList] = useState<UploadFile<any>[]>(
-        category?.file
+    const [imageList, setImageList] = useState<UploadFile<any>[]>(
+        category?.image
             ? [
                 {
                     uid: '-1', // Unique identifier
-                    name: 'file',
-                    url: category?.file, // Sử dụng URL từ category nếu có
+                    name: 'image',
+                    url: category?.image, // Sử dụng URL từ category nếu có
                 }
             ]
             : []
@@ -37,7 +37,7 @@ const EditBlogCategory: React.FC<{ category: any }> = ({ category }) => {
 
         const editCategory: EditCategoryItem = {
             name,
-            file: fileList.length > 0 && fileList[0].originFileObj ? fileList[0].originFileObj : null, // Lấy file thực tế từ fileList
+            image: imageList.length > 0 && imageList[0].originFileObj ? imageList[0].originFileObj : null, // Lấy file thực tế từ fileList
         };
 
         editCategoryMutation({
@@ -47,7 +47,7 @@ const EditBlogCategory: React.FC<{ category: any }> = ({ category }) => {
     };
 
     const handleChange: UploadProps["onChange"] = ({ fileList }) => {
-        setFileList(fileList); // Cập nhật fileList khi người dùng chọn ảnh mới
+        setImageList(fileList); // Cập nhật fileList khi người dùng chọn ảnh mới
     };
 
     const uploadButton = (
@@ -67,11 +67,11 @@ const EditBlogCategory: React.FC<{ category: any }> = ({ category }) => {
             <label className="block mb-2 font-medium text-gray-700">Ảnh</label>
             <Upload
                 listType="picture-card"
-                fileList={fileList} // Hiển thị ảnh cũ nếu có
-                onChange={handleChange} // Cập nhật danh sách file
-                beforeUpload={() => false} // Ngừng tự động upload ảnh
+                fileList={imageList}
+                onChange={handleChange}
+                beforeUpload={() => false}
             >
-                {fileList.length < 1 && uploadButton} {/* Nếu không có ảnh nào trong fileList, hiển thị nút upload */}
+                {imageList.length < 1 && uploadButton}
             </Upload>
 
             <Button

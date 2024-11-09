@@ -14,6 +14,7 @@ const endpoints = {
     //queue
     queues: '/queue/',
     queueApprove: '/queue/browse/',
+    activeUser: '/user/active/',
 
     //category(thể loại)
     categories:  '/category/',
@@ -22,6 +23,7 @@ const endpoints = {
     //role
     roles: '/role/',
     roleAddUserToManager: '/role/decentralize/',
+    blockUser: '/user/block/',
 
     //blog
     blogs: '/blog/',

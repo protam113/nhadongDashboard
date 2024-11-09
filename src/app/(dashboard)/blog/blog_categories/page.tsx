@@ -55,7 +55,7 @@ const BlogCategories: React.FC = () => {
             title: "ID",
             dataIndex: "id",
             key: "id",
-            width: 100,
+            width: 200,
             render: (text) => <span>{text}</span>,
         },
         {
@@ -67,9 +67,9 @@ const BlogCategories: React.FC = () => {
         },
         {
             title: "Hình Ảnh",
-            dataIndex: "file",
-            key: "file",
-            width: 150,
+            dataIndex: "image",
+            key: "image",
+            width: 200,
             render: (fileUrl: string) => (
                 <Image
                     width={100}

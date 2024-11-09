@@ -103,7 +103,7 @@ const useCateogiesList = (page: number, filters: Filters = {}, refreshKey: numbe
 interface CreateCategoryItem {
     name: string;
     model: string;
-    file: File | string | null; // Use File type for file, or string if necessary
+    image: File | string | null; // Use File type for file, or string if necessary
 }
 
 const CreateCategory = async (newCategory: CreateCategoryItem, token: string) => {
@@ -212,7 +212,7 @@ const useDeleteCategory = () => {
 
 interface EditCategoryItem {
     name: string;
-    file: File | string | null;
+    image: File | string | null;
 }
 
 const EditCategory = async (
