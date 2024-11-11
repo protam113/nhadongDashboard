@@ -10,11 +10,13 @@ const UserQueueList: React.FC = () => {
     const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [seeMore, setSeeMore] = useState(false);
+    const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
 
     // Gọi hook `UserQueue` và thêm `refreshKey` làm dependency để làm mới dữ liệu
     const { queueData, isLoading, isError, handleActiveUser } = UserList(
         currentPage,
-        "false"  // Truyền "false" cho is_active
+        "false",
+        refreshKey// Truyền "false" cho is_active
     );
 
 

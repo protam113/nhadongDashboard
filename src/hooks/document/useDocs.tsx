@@ -17,7 +17,7 @@ interface Category {
     file: string;
 }
 
-interface User {
+interface Doc {
     id: number;
     username: string;
     first_name: string;
@@ -27,7 +27,7 @@ interface User {
     profile_image: string;
 }
 
-interface BLogs {
+interface DocsList {
     id: number;
     title: string;
     description: string;
@@ -35,15 +35,15 @@ interface BLogs {
     link: string;
     image: string | null; // Chỉnh sửa để phù hợp với giá trị null trong JSON
     categories: Category[];
-    user: User; // Sử dụng interface User đã khai báo ở trên
+    user: Doc; // Sử dụng interface User đã khai báo ở trên
 }
 
 // Khai Báo Các Thuộc Tính Không Có trong trường hiển thị
-interface FetchBLogsListResponse {
+interface FetchDocsListResponse {
     count: number;
     next: string | null;
     previous: string | null;
-    results: BLogs[];
+    results: DocsList[];
 }
 
 // Bộ Lọc
@@ -51,11 +51,11 @@ interface Filters {
     [key: string]: string | number | string[] | undefined;
 }
 
-const fetchBloglist = async (
+const fetchDocslist = async (
     pageParam: number = 1,
     token: string,
     filters: Filters
-): Promise<FetchBLogsListResponse> => {
+): Promise<FetchDocsListResponse> => {
     if (!token) {
         throw new Error("No token provided");
     }
@@ -76,14 +76,14 @@ const fetchBloglist = async (
 
         // Make the API request using handleAPI
         const response = await handleAPI(
-            `${endpoints.blogs}${queryString ? `?${queryString}` : ""}`,
+            `${endpoints.documents}${queryString ? `?${queryString}` : ""}`,
             "GET",
             null,
             token
         );
         return response;
     } catch (error) {
-        console.error("Error fetching blogs list:", error);
+        console.error("Error fetching docs list:", error);
         throw error; // Rethrow error for further handling
     }
 };
@@ -91,7 +91,7 @@ const fetchBloglist = async (
 
 
 // Custom hook for fetching the queue list
-const useBlogList = (page: number, filters: Filters = {}, refreshKey: number) => {
+const useDocsList = (page: number, filters: Filters = {}, refreshKey: number) => {
     const { getToken } = useAuth();
     const [token, setToken] = useState<string | null>(null);
     const [isReady, setIsReady] = useState<boolean>(false);
@@ -106,13 +106,13 @@ const useBlogList = (page: number, filters: Filters = {}, refreshKey: number) =>
         fetchToken();
     }, [getToken]);
 
-    return useQuery<FetchBLogsListResponse, Error>({
-        queryKey: ["blogList", token, page, filters, refreshKey], // Thêm refreshKey vào queryKey
+    return useQuery<FetchDocsListResponse, Error>({
+        queryKey: ["docsList", token, page, filters, refreshKey], // Thêm refreshKey vào queryKey
         queryFn: async () => {
             if (!token) {
                 throw new Error("Token is not available");
             }
-            return fetchBloglist(page, token, filters);
+            return fetchDocslist(page, token, filters);
         },
         enabled: isReady && !!token,
         staleTime: 60000,
@@ -120,15 +120,15 @@ const useBlogList = (page: number, filters: Filters = {}, refreshKey: number) =>
 };
 
 
-interface NewBlog {
+interface NewDocs {
     [key: string]: any; // Hoặc bạn có thể định nghĩa các trường cụ thể mà bạn cần
 }
 
-const CreateBlog = async (newBlog: NewBlog, token: string) => {
+const CreateDocs = async (newDocs: NewDocs, token: string) => {
     const formData = new FormData();
 
-    for (const key in newBlog) {
-        const value = newBlog[key];
+    for (const key in newDocs) {
+        const value = newDocs[key];
         if (Array.isArray(value)) {
             value.forEach((v) => formData.append(key, v));
         } else {
@@ -139,16 +139,16 @@ const CreateBlog = async (newBlog: NewBlog, token: string) => {
     if (!token) throw new Error("No token available");
 
     try {
-        const response = await handleAPI(`${endpoints.blogs}`, 'POST', formData, token);
+        const response = await handleAPI(`${endpoints.documents}`, 'POST', formData, token);
         return response.data;
     } catch (error: any) { // Use 'any' type assertion
-        console.error('Error creating blog:', error.response?.data);
-        throw new Error(error.response?.data?.message || 'Failed to create blog');
+        console.error('Error creating news:', error.response?.data);
+        throw new Error(error.response?.data?.message || 'Failed to create news');
     }
 };
 
 
-const useCreateBlog = () => {
+const useCreateDocs = () => {
     const queryClient = useQueryClient();
     const { getToken } = useAuth();
     const [token, setToken] = useState<string | null>(null);
@@ -163,20 +163,20 @@ const useCreateBlog = () => {
     }, [getToken]);
 
     return useMutation({
-        mutationFn: async (newBlog: NewBlog) => {
+        mutationFn: async (newDocs: NewDocs) => {
             if (!token) {
                 throw new Error("Token is not available");
             }
-            return CreateBlog(newBlog, token);
+            return CreateDocs(newDocs, token);
         },
         onSuccess: () => {
-            message.success("Bài Viết đã được thêm thành công");
-            queryClient.invalidateQueries({ queryKey: ["userList"] });
+            message.success("Tài liệu đã được thêm thành công");
+            queryClient.invalidateQueries({ queryKey: ["docsList"] });
         },
         onError: (error) => {
-            console.log(error.message || "Failed to create blog.");
+            console.log(error.message || "Failed to create docs.");
         },
     });
 };
 
-export { useBlogList,useCreateBlog };
+export { useDocsList,useCreateDocs };

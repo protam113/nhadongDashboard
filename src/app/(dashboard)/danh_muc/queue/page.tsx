@@ -56,21 +56,21 @@ const Queue: React.FC = () => {
             title: 'ID',
             dataIndex: 'id',
             key: 'id',
-            width: 100,
+            width: 200,
             render: (text) => <span>{text}</span>,
         },
         {
             title: 'Created Date',
             dataIndex: 'created_date',
             key: 'created_date',
-            width: 150,
+            width: 120,
             render: (text) => <span>{new Date(text).toLocaleString()}</span>,
         },
         {
             title: 'Updated Date',
             dataIndex: 'updated_date',
             key: 'updated_date',
-            width: 150,
+            width: 120,
             render: (text) => <span>{new Date(text).toLocaleString()}</span>,
         },
         {
@@ -79,22 +79,16 @@ const Queue: React.FC = () => {
             key: 'data',
             width: 250,
             render: (text, record) => {
-                const dataObject = JSON.parse(
-                    text.replace(/'/g, '"')
-                        .replace(/False/g, 'false')
-                        .replace(/True/g, 'true')
-                        .replace(/None/g, 'null') // Handle None as null
-                );
 
                 const content = [
-                    `Username: ${dataObject.username}`,
-                    `Email: ${dataObject.email}`,
-                    `Phone Number: ${dataObject.phone_number}`,
-                    `First Name: ${dataObject.first_name}`,
-                    `Last Name: ${dataObject.last_name}`,
-                    `Is Active: ${dataObject.is_active ? 'Yes' : 'No'}`,
-                    `Date Joined: ${dataObject.date_joined}`,
-                    `Profile Image: ${dataObject.profile_image}`,
+                    `Username: ${text.data}`,
+                    // `Email: ${text.data.name}`,
+                    // `Phone Number: ${dataObject.phone_number}`,
+                    // `First Name: ${dataObject.first_name}`,
+                    // `Last Name: ${dataObject.last_name}`,
+                    // `Is Active: ${dataObject.is_active ? 'Yes' : 'No'}`,
+                    // `Date Joined: ${dataObject.date_joined}`,
+                    // `Profile Image: ${dataObject.profile_image}`,
                 ];
 
                 const isExpanded = expandedIds.includes(record.id);
@@ -153,7 +147,7 @@ const Queue: React.FC = () => {
             title: 'Hành Động',
             dataIndex: 'action',
             key: 'action',
-            width: 150,
+            width: 120,
             filters: [
                 { text: 'Create', value: 'create' },
                 { text: 'Edit', value: 'edit' },

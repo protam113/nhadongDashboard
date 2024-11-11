@@ -25,6 +25,15 @@ const endpoints = {
     roleAddUserToManager: '/role/decentralize/',
     blockUser: '/user/block/',
 
+
+    //Doc
+    documents: '/document/',
+    document: '/document/:id/',
+
+    //News
+    news: '/news/',
+    new: '/news/:id/',
+
     //blog
     blogs: '/blog/',
 };

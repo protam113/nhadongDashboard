@@ -9,6 +9,7 @@ import { handleAPI } from "@/apis/axiosClient";
 import { endpoints } from "@/apis/api";
 import { useAuth } from "@/context/authContext";
 import { useEffect, useState } from "react";
+import { message } from "antd";
 
 interface User {
     id: number;
@@ -77,7 +78,7 @@ const fetchUserList = async (
 };
 
 // Custom hook for user list
-const useUserList = (page: number, filters: Filters = {}) => {
+const useUserList = (page: number, filters: Filters = {}, refreshKey: number) => {
     const { getToken } = useAuth();
     const [token, setToken] = useState<string | null>(null);
     const [isReady, setIsReady] = useState<boolean>(false);
@@ -93,7 +94,7 @@ const useUserList = (page: number, filters: Filters = {}) => {
     }, [getToken]);
 
     return useQuery<FetchUserListResponse, Error>({
-        queryKey: ["userList", token, page, filters],
+        queryKey: ["userList", token, page, filters, refreshKey],
         queryFn: async () => {
             if (!token) {
                 throw new Error("Token is not available");
@@ -160,7 +161,7 @@ const useCreateManager = () => {
             return CreateManager(newManager, token);
         },
         onSuccess: () => {
-            console.log("Người quản lý đã được thêm thành công");
+            message.success("Quản trị viên đã được thêm thành công");
             queryClient.invalidateQueries({ queryKey: ["userList"] });
         },
         onError: (error) => {
@@ -255,7 +256,7 @@ const ActiveUserList = async (activeUser: ActiveUser, token: string) => {
 
     try {
         // Gửi yêu cầu POST với formData
-        const response = await handleAPI(`${endpoints.queueApprove}`, 'POST', formData, token);
+        const response = await handleAPI(`${endpoints.activeUser}`, 'POST', formData, token);
         return response.data;
     } catch (error: any) {
         console.error('Error browse queue:', error.response?.data);
@@ -286,8 +287,8 @@ const useActiveUser = () => {
             return ActiveUserList(activeUser, token);
         },
         onSuccess: () => {
-            console.log("duyệt hàng đợi thành công");
-            queryClient.invalidateQueries({ queryKey: ["queueList"] });
+            message.success("Duyệt hàng đợi thành công!");
+            queryClient.invalidateQueries({ queryKey: ["userQueueList"] });
         },
         onError: (error) => {
             console.log(error.message || "Failed to browse queue.");

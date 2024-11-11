@@ -11,11 +11,11 @@ interface UserResponse {
 }
 
 export const UserList = (currentPage: number,is_active: string
-                          // , refreshKey: number
+                          , refreshKey: number
 ) => {
     const { data, isLoading, isError, isFetching } = useUserList(currentPage, {
         is_active: [is_active]
-    });
+    },refreshKey);
     const queueData = data?.results || [];
     const { mutate: activeUser } = useActiveUser();
 

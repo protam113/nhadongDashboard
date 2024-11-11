@@ -1,10 +1,9 @@
 "use client"; // Đảm bảo đây là client component
-import React from "react";
-import {Table, Pagination, Spin, Select, Button} from "antd";
+import React, {useState} from "react";
+import {Table, Pagination, Spin} from "antd";
 import { useUserList } from "@/hooks/user/useUsers";
 import { useRoleList } from "@/hooks/role/useRole";
 import UserQueueList from "@/app/(dashboard)/user/queueList";
-import {FaSync} from "react-icons/fa";
 
 const Role = () => {
     const [currentPage] = React.useState(1);
@@ -51,12 +50,13 @@ const Role = () => {
 
 const User = () => {
     const [currentPage, setCurrentPage] = React.useState(1);
+    const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
     const {
         data,
         isLoading,
         isError,
         isFetching,
-    } = useUserList(currentPage); // Truyền currentPage vào hook
+    } = useUserList(currentPage,refreshKey); // Truyền currentPage vào hook
 
     // Xử lý lỗi
     if (isError) {
