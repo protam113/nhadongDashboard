@@ -11,39 +11,34 @@ import { useAuth } from "@/context/authContext";
 import { useEffect, useState } from "react";
 import { message } from "antd";
 
-interface Category {
+
+// interface Documents {
+//     id: number;
+//     username: string;
+//     first_name: string;
+//     last_name: string;
+//     email: string;
+//     phone_number: string | null;
+//     profile_image: string;
+// }
+
+interface GroupList {
     id: number;
     name: string;
-    file: string;
-}
-
-interface User {
-    id: number;
-    username: string;
-    first_name: string;
-    last_name: string;
-    email: string;
-    phone_number: string | null;
-    profile_image: string;
-}
-
-interface BLogs {
-    id: number;
-    title: string;
-    description: string;
-    content: string; // Có thể cần điều chỉnh nếu cấu trúc khác
+    founding_date: string; // Có thể cần điều chỉnh nếu cấu trúc khác
     link: string;
     image: string | null; // Chỉnh sửa để phù hợp với giá trị null trong JSON
-    categories: Category[];
-    user: User; // Sử dụng interface User đã khai báo ở trên
+    created_date: string;
+    updated_date: string;
+    // user: Documents; // Sử dụng interface User đã khai báo ở trên
 }
 
 // Khai Báo Các Thuộc Tính Không Có trong trường hiển thị
-interface FetchBLogsListResponse {
+interface FetchGroupListResponse {
     count: number;
     next: string | null;
     previous: string | null;
-    results: BLogs[];
+    results: GroupList[];
 }
 
 // Bộ Lọc
@@ -51,11 +46,11 @@ interface Filters {
     [key: string]: string | number | string[] | undefined;
 }
 
-const fetchBloglist = async (
+const fetchGrouplist = async (
     pageParam: number = 1,
     token: string,
     filters: Filters
-): Promise<FetchBLogsListResponse> => {
+): Promise<FetchGroupListResponse> => {
     if (!token) {
         throw new Error("No token provided");
     }
@@ -76,14 +71,14 @@ const fetchBloglist = async (
 
         // Make the API request using handleAPI
         const response = await handleAPI(
-            `${endpoints.blogs}${queryString ? `?${queryString}` : ""}`,
+            `${endpoints.groups}${queryString ? `?${queryString}` : ""}`,
             "GET",
             null,
             token
         );
         return response;
     } catch (error) {
-        console.error("Error fetching blogs list:", error);
+        console.error("Error fetching group list:", error);
         throw error; // Rethrow error for further handling
     }
 };
@@ -91,7 +86,7 @@ const fetchBloglist = async (
 
 
 // Custom hook for fetching the queue list
-const useBlogList = (page: number, filters: Filters = {}, refreshKey: number) => {
+const useGroupList = (page: number, filters: Filters = {}, refreshKey: number) => {
     const { getToken } = useAuth();
     const [token, setToken] = useState<string | null>(null);
     const [isReady, setIsReady] = useState<boolean>(false);
@@ -106,13 +101,13 @@ const useBlogList = (page: number, filters: Filters = {}, refreshKey: number) =>
         fetchToken();
     }, [getToken]);
 
-    return useQuery<FetchBLogsListResponse, Error>({
-        queryKey: ["blogList", token, page, filters, refreshKey], // Thêm refreshKey vào queryKey
+    return useQuery<FetchGroupListResponse, Error>({
+        queryKey: ["groupList", token, page, filters, refreshKey], // Thêm refreshKey vào queryKey
         queryFn: async () => {
             if (!token) {
                 throw new Error("Token is not available");
             }
-            return fetchBloglist(page, token, filters);
+            return fetchGrouplist(page, token, filters);
         },
         enabled: isReady && !!token,
         staleTime: 60000,
@@ -120,16 +115,15 @@ const useBlogList = (page: number, filters: Filters = {}, refreshKey: number) =>
 };
 
 
-interface NewBlog {
-    [key: string]: any;
-    image: File | string | null;// Hoặc bạn có thể định nghĩa các trường cụ thể mà bạn cần
+interface NewNews {
+    [key: string]: any; // Hoặc bạn có thể định nghĩa các trường cụ thể mà bạn cần
 }
 
-const CreateBlog = async (newBlog: NewBlog, token: string) => {
+const CreateNews = async (newNews: NewNews, token: string) => {
     const formData = new FormData();
 
-    for (const key in newBlog) {
-        const value = newBlog[key];
+    for (const key in newNews) {
+        const value = newNews[key];
         if (Array.isArray(value)) {
             value.forEach((v) => formData.append(key, v));
         } else {
@@ -140,16 +134,16 @@ const CreateBlog = async (newBlog: NewBlog, token: string) => {
     if (!token) throw new Error("No token available");
 
     try {
-        const response = await handleAPI(`${endpoints.blogs}`, 'POST', formData, token);
+        const response = await handleAPI(`${endpoints.documents}`, 'POST', formData, token);
         return response.data;
     } catch (error: any) { // Use 'any' type assertion
-        console.error('Error creating blog:', error.response?.data);
-        throw new Error(error.response?.data?.message || 'Failed to create blog');
+        console.error('Error creating news:', error.response?.data);
+        throw new Error(error.response?.data?.message || 'Failed to create news');
     }
 };
 
 
-const useCreateBlog = () => {
+const useCreateNews = () => {
     const queryClient = useQueryClient();
     const { getToken } = useAuth();
     const [token, setToken] = useState<string | null>(null);
@@ -164,20 +158,20 @@ const useCreateBlog = () => {
     }, [getToken]);
 
     return useMutation({
-        mutationFn: async (newBlog: NewBlog) => {
+        mutationFn: async (newNews: NewNews) => {
             if (!token) {
                 throw new Error("Token is not available");
             }
-            return CreateBlog(newBlog, token);
+            return CreateNews(newNews, token);
         },
         onSuccess: () => {
-            message.success("Bài Viết đã được thêm thành công");
-            queryClient.invalidateQueries({ queryKey: ["userList"] });
+            message.success("Tin Tức đã được thêm thành công");
+            queryClient.invalidateQueries({ queryKey: ["docsList"] });
         },
         onError: (error) => {
-            console.log(error.message || "Failed to create blog.");
+            console.log(error.message || "Failed to create news.");
         },
     });
 };
 
-export { useBlogList,useCreateBlog };
+export { useGroupList,useCreateNews };

@@ -8,13 +8,13 @@ import { useRouter } from "next/navigation";
 import {useDeleteCategory} from "@/hooks/cateogry/useCategories";
 import { MdOutlineDelete } from "react-icons/md";
 import { FaRegEdit } from "react-icons/fa";
-import {BlogList} from "@/lib/blogList";
 import BlogDetailsModal from "@/app/(dashboard)/blog/BlogDetailsModal";
 import { EyeOutlined } from "@ant-design/icons";
+import {NewsList} from "@/lib/newsList";
 
 const { Title } = Typography;
 
-const BlogManagement: React.FC = () => {
+const NewsManagement: React.FC = () => {
     const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [model] = useState<string>(""); // State to hold selected model
@@ -22,10 +22,10 @@ const BlogManagement: React.FC = () => {
     const router = useRouter(); // Hook for navigation
     const { mutate: deleteCategory } = useDeleteCategory();
     const [selectedBlog, setSelectedBlog] = useState(null); // State for selected blog
-    const [isModalVisible , setIsModalVisible] = useState(false);
+    const [isModalVisible, setIsModalVisible] = useState(false);
 
     // Pass model into CategoriesList
-    const { queueData, isLoading, isError } = BlogList(currentPage, model, refreshKey);
+    const { queueData, isLoading, isError } = NewsList(currentPage, model, refreshKey);
 
     const handleDelete = (categoryId: string) => {
         // Show confirmation dialog before deletion
@@ -131,13 +131,13 @@ const BlogManagement: React.FC = () => {
     };
 
     const handleCreateBLog = () => {
-        router.push("/blog/blog_management/create_blog"); // Navigate to the create category page
+        router.push("/news/news_management/create_news"); // Navigate to the create category page
     };
 
     return (
         <>
             <div className="p-4">
-                <Title level={2}>Quản Lý Bài Viết</Title>
+                <Title level={2}>Quản Lý Tin Tức</Title>
 
                 {/* Model selection */}
                 <div className="flex justify-between items-center mb-4">
@@ -145,7 +145,7 @@ const BlogManagement: React.FC = () => {
                         <FaSync/> Làm mới
                     </Button>
                     <Button type="primary" onClick={handleCreateBLog}>
-                        Tạo Bài Viết
+                        Tạo Tin Tức
                     </Button>
                 </div>
 
@@ -179,4 +179,4 @@ const BlogManagement: React.FC = () => {
     );
 };
 
-export default BlogManagement;
+export default NewsManagement;

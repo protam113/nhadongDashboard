@@ -4,9 +4,9 @@ import React, { useState } from 'react';
 import {Form, Input, Button, Upload, Card, Select, Checkbox, message, Image} from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { RcFile } from 'antd/lib/upload';
-import { useCreateBlog } from '@/hooks/blog/useBlog';
 import { CategoriesList } from "@/lib/categoriesList";
 import {UploadFile, UploadProps} from "antd/lib/upload/interface";
+import {useCreateNews} from "@/hooks/new/useNews";
 
 const { Option } = Select;
 
@@ -20,7 +20,7 @@ interface Section {
     fields: SectionField[];
 }
 
-const CreateBlogPage: React.FC = () => {
+const CreateNewsPage: React.FC = () => {
     const [content, setContent] = useState<Section[]>([]);
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [previewImage, setPreviewImage] = useState<string>("");
@@ -36,9 +36,9 @@ const CreateBlogPage: React.FC = () => {
     const [currentPage] = useState(1);
     const [refreshKey] = useState(0);
     const [loading, setLoading] = useState(false);
-    const { mutate: createBlogMutation } = useCreateBlog();
+    const { mutate: createBlogMutation } = useCreateNews();
     const [form] = Form.useForm();
-    const { queueData, isLoading, isError } = CategoriesList(currentPage, "blog", refreshKey);
+    const { queueData, isLoading, isError } = CategoriesList(currentPage, "news", refreshKey);
 
     const handleCategoryChange = (checkedValues: string[]) => {
         setBlogData({ ...blogData, category: checkedValues });
@@ -132,7 +132,7 @@ const CreateBlogPage: React.FC = () => {
 
     return (
         <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
-            <Card title="Tạo Blog" bordered={false}>
+            <Card title="Tạo Tin Tức" bordered={false}>
                 <Form form={form} layout="vertical" onFinish={handleSaveBlog}>
                     <Form.Item label="Tiêu đề" name="title" rules={[{ required: true, message: 'Vui lòng nhập tiêu đề!' }]}>
                         <Input
@@ -237,4 +237,4 @@ const CreateBlogPage: React.FC = () => {
     );
 };
 
-export default CreateBlogPage;
+export default CreateNewsPage;

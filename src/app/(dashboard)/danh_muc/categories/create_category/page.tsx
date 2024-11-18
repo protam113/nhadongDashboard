@@ -25,7 +25,7 @@ const CreateCategory: React.FC = () => {
             message.error("Vui lòng điền đầy đủ thông tin!");
             return;
         }
-        createCategory({ name, model, file: fileList[0]?.originFileObj ?? null });
+        createCategory({ name, model, image: fileList[0]?.originFileObj ?? null });
         message.success("Tạo thể loại thành công!");
         router.back();
     };

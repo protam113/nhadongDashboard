@@ -14,7 +14,6 @@ import { PiHandsPrayingBold } from "react-icons/pi";
 import { CgSandClock } from "react-icons/cg";
 import { HiOutlineNewspaper } from "react-icons/hi";
 import { RiCommunityLine } from "react-icons/ri";
-import { GrGroup } from "react-icons/gr";
 
 
 export const NavItems = () => {
@@ -48,19 +47,19 @@ export const NavItems = () => {
         },
         {
             name: 'Tin Tức',
-            link: '/new',
+            link: '/news',
             key: '4',
             icon: <FaNewspaper />,
             children: [
                 {
                     name: "Thể Loại",
-                    link: '/hoi_dong/about_us',
+                    link: '/news/news_categories',
                     key: '20',
                     icon: <BiCategory/>,
                 },
                 {
                     name: 'Quản Lý Tin Tức',
-                    link: '/history_monastery',
+                    link: '/news/news_management',
                     key: '21',
                     icon: <HiOutlineNewspaper/>
                 },
@@ -151,7 +150,6 @@ export const NavItems = () => {
                     key: '24',
                     icon: <BiCategory/>,
                 },
-
             ]
         },
         {
@@ -162,13 +160,13 @@ export const NavItems = () => {
         },
         {
             name: 'Học Tập',
-            link: '/event',
+            link: '/study',
             key: '12',
             icon: <SlNotebook/>,
             children: [
                 {
                     name: "Bài Học",
-                    link: '/hoi_dong/about_us',
+                    link: '/study/lesson',
                     key: '13',
                     children: [
                         {
@@ -186,7 +184,7 @@ export const NavItems = () => {
                 },
                 {
                     name: "Giáo Án",
-                    link: '/hoi_dong/history',
+                    link: '/study/lesson_plan',
                     key: '14',
                     children: [
                         {
@@ -204,7 +202,7 @@ export const NavItems = () => {
                 },
                 {
                     name: "Tài Liệu ",
-                    link: '/hoi_dong/on_goi',
+                    link: '/study/document',
                     key: '15',
                     children: [
                         {
@@ -255,18 +253,9 @@ export const NavItems = () => {
         },
         {
             name: 'Cộng Đoàn',
-            link: '/danh_muc',
+            link: '/cong_doan',
             key: '39',
             icon: <RiCommunityLine />,
-            children: [
-                {
-                    name: 'Thành Viên',
-                    link: '/danh_muc/queue',
-                    key: '40',
-                    icon: <GrGroup/>,
-                },
-
-            ]
         },
         {
             name: 'Settings',

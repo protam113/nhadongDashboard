@@ -7,6 +7,10 @@ const endpoints = {
     //auth
     login: '/auth/login/',
     users: '/user/',
+    refresh: '/auth/refresh/',
+
+    //web
+    web: '/website/1/',
 
     //current user lgin
     currentUser: '/user/detail/',
@@ -25,6 +29,9 @@ const endpoints = {
     roleAddUserToManager: '/role/decentralize/',
     blockUser: '/user/block/',
 
+    //group
+    groups: '/group/',
+    group: '/group/:id/',
 
     //Doc
     documents: '/document/',
@@ -36,6 +43,11 @@ const endpoints = {
 
     //blog
     blogs: '/blog/',
+    blog: '/blog/:id/',
+    likeBlog: '/blog/:id/like/',
+    commentBlog: '/blog/:id/comment/',
+    replyComment: '/comment/:id/replies/',
+    comment: '/comment/:id/',
 };
 
 export { baseURL, endpoints };

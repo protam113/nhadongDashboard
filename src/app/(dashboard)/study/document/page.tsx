@@ -4,28 +4,28 @@ import React, { useState } from "react";
 import { Table, Button, Typography, Spin,Modal  } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { FaSync } from "react-icons/fa"; // Import refresh icon
-import { useRouter } from "next/navigation";
 import {useDeleteCategory} from "@/hooks/cateogry/useCategories";
 import { MdOutlineDelete } from "react-icons/md";
 import { FaRegEdit } from "react-icons/fa";
-import {BlogList} from "@/lib/blogList";
-import BlogDetailsModal from "@/app/(dashboard)/blog/BlogDetailsModal";
 import { EyeOutlined } from "@ant-design/icons";
+import NewsDetailsModal from "@/app/(dashboard)/news/NewsDetailsModal";
+import DocumentCategoriesTable from "@/app/(dashboard)/study/document/DocumentCategoriesTable";
+import DocumentQueueList from "@/app/(dashboard)/study/document/DocumentQueueTable";
+import {DocsList} from "@/lib/docslist";
 
 const { Title } = Typography;
 
-const BlogManagement: React.FC = () => {
+const Documents: React.FC = () => {
     const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [model] = useState<string>(""); // State to hold selected model
     const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
-    const router = useRouter(); // Hook for navigation
     const { mutate: deleteCategory } = useDeleteCategory();
-    const [selectedBlog, setSelectedBlog] = useState(null); // State for selected blog
-    const [isModalVisible , setIsModalVisible] = useState(false);
+    const [selectedNews, setSelectedNews] = useState(null);
+    const [isModalVisible, setIsModalVisible] = useState(false);
 
     // Pass model into CategoriesList
-    const { queueData, isLoading, isError } = BlogList(currentPage, model, refreshKey);
+    const { queueData, isLoading, isError } = DocsList(currentPage, model, refreshKey);
 
     const handleDelete = (categoryId: string) => {
         // Show confirmation dialog before deletion
@@ -69,27 +69,22 @@ const BlogManagement: React.FC = () => {
         },
         {
             title: "Thể Loại",
-            dataIndex: "categories",
-            key: "categories",
+            dataIndex: "category",
+            key: "category",
             width: 150,
-            render: (categories) => (
-                <span>
-                        {categories.map((category: any) => (
-                            <div
-                                key={category.id}
-                                style={{
-                                    backgroundColor: category.color || '#142857', // Màu nền tùy chọn cho thể loại
-                                    color: '#fff', // Màu chữ
-                                    padding: '5px 10px',
-                                    borderRadius: '4px',
-                                    marginBottom: '5px',
-                                    marginRight: '5px',
-                                }}
-                            >
-                                {category.name} {/* Hiển thị tên của thể loại */}
-                            </div>
-                        ))}
-                    </span>
+            render: (category) => (
+                <div
+                    style={{
+                        backgroundColor: category.color || '#142857', // Background color for category
+                        color: '#fff', // Text color
+                        padding: '5px 10px',
+                        borderRadius: '4px',
+                        marginBottom: '5px',
+                        marginRight: '5px',
+                    }}
+                >
+                    {category.name} {/* Display category name */}
+                </div>
             ),
         },
         {
@@ -114,15 +109,15 @@ const BlogManagement: React.FC = () => {
     if (isLoading) return <Spin size="large" />;
     if (isError) return <div>Error loading queue data.</div>;
 
-    const handleViewDetails = (blog: any) => {
-        setSelectedBlog(blog);
+    const handleViewDetails = (news: any) => {
+        setSelectedNews(news);
         setIsModalVisible(true);
     };
 
     // Function to handle closing the modal
     const handleModalClose = () => {
         setIsModalVisible(false);
-        setSelectedBlog(null);
+        setSelectedNews(null);
     };
 
 
@@ -130,22 +125,15 @@ const BlogManagement: React.FC = () => {
         setRefreshKey((prev) => prev + 1); // Refresh data manually
     };
 
-    const handleCreateBLog = () => {
-        router.push("/blog/blog_management/create_blog"); // Navigate to the create category page
-    };
-
     return (
         <>
             <div className="p-4">
-                <Title level={2}>Quản Lý Bài Viết</Title>
+                <Title level={2}>Quản Lý Tài Liệu</Title>
 
                 {/* Model selection */}
                 <div className="flex justify-between items-center mb-4">
                     <Button onClick={handleRefresh} style={{marginLeft: "8px"}}>
                         <FaSync/> Làm mới
-                    </Button>
-                    <Button type="primary" onClick={handleCreateBLog}>
-                        Tạo Bài Viết
                     </Button>
                 </div>
 
@@ -169,14 +157,17 @@ const BlogManagement: React.FC = () => {
                     <span style={{margin: "0 8px"}}>Page {currentPage}</span>
                     <Button onClick={() => setCurrentPage((prev) => prev + 1)}>Next</Button>
                 </div>
+                <DocumentCategoriesTable/>
+                <DocumentQueueList/>
             </div>
-            <BlogDetailsModal
+            <NewsDetailsModal
                 visible={isModalVisible}
                 onClose={handleModalClose}
-                blog={selectedBlog}
+                news={selectedNews}
             />
+
         </>
     );
 };
 
-export default BlogManagement;
+export default Documents;

@@ -10,7 +10,7 @@ import {useDeleteCategory} from "@/hooks/cateogry/useCategories";
 import { MdOutlineDelete } from "react-icons/md";
 import { FaRegEdit } from "react-icons/fa";
 import CategoriesQueueTable from "@/app/(dashboard)/danh_muc/categories/CategoriesQueueTable";
-import EditCategoryManage from "@/app/(dashboard)/danh_muc/categories/EditCategoryManage";
+import EditBlogCategory from "@/app/(dashboard)/blog/blog_categories/EditBlogCategory";
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -26,6 +26,7 @@ const Categories: React.FC = () => {
     // Pass model into CategoriesList
     const { queueData, isLoading, isError } = CategoriesList(currentPage, model, refreshKey);
     const { mutate: deleteCategory } = useDeleteCategory();
+
 
     const handleDelete = (categoryId: string) => {
         // Show confirmation dialog before deletion
@@ -67,8 +68,8 @@ const Categories: React.FC = () => {
         },
         {
             title: "Hình Ảnh",
-            dataIndex: "file",
-            key: "file",
+            dataIndex: "image",
+            key: "image",
             width: 150,
             render: (fileUrl: string) => (
                 <Image
@@ -190,7 +191,7 @@ const Categories: React.FC = () => {
             width={600}
         >
             {/* eslint-disable-next-line react/jsx-no-undef */}
-            <EditCategoryManage category={editingCategory} /> {/* Hiển thị thông tin thể loại */}
+            <EditBlogCategory category={editingCategory} /> {/* Hiển thị thông tin thể loại */}
         </Modal></>
     );
 };

@@ -6,7 +6,7 @@ import { ReloadOutlined,PlusOutlined, MinusOutlined } from '@ant-design/icons'; 
 import type { ColumnsType } from 'antd/es/table';
 import { UserQueue } from '@/lib/userQueue';
 
-const CategoriesQueueTable: React.FC = () => {
+const DocumentQueueList: React.FC = () => {
     const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [refreshKey, setRefreshKey] = useState(0); // State để làm mới dữ liệu
@@ -14,7 +14,7 @@ const CategoriesQueueTable: React.FC = () => {
     const [seeMore, setSeeMore] = useState(false);
 
     // Gọi hook `UserQueue` và thêm `refreshKey` làm dependency để làm mới dữ liệu
-    const { queueData, isLoading, isError, handleBulkUpdate } = UserQueue(currentPage,"category", refreshKey);
+    const { queueData, isLoading, isError, handleBulkUpdate } = UserQueue(currentPage,"document", refreshKey);
 
     // Xử lý làm mới dữ liệu
     const handleRefresh = () => {
@@ -23,16 +23,9 @@ const CategoriesQueueTable: React.FC = () => {
         setTimeout(() => setIsRefreshing(false), 1000); // Đặt lại trạng thái sau 1 giây (có thể điều chỉnh thời gian)
     };
 
-    const handleBulkApprove = async () => {
-        try {
-            // Gọi hàm handleBulkUpdate với status 'approved' và chờ kết quả
-            const response = await handleBulkUpdate(selectedKeys, 'approve');
-            console.log("Approve Response:", response);  // Log giá trị trả về từ API
-        } catch (error) {
-            console.error("Error during approval:", error);  // Log lỗi nếu có
-        }
-        console.log("Approve setSelectedKeys:", selectedKeys);
-        setSelectedKeys([]);  // Xóa các khóa đã chọn sau khi thực hiện
+    const handleBulkApprove = () => {
+        handleBulkUpdate(selectedKeys, 'approved');
+        setSelectedKeys([]);
     };
 
     const handleBulkReject = () => {
@@ -66,30 +59,22 @@ const CategoriesQueueTable: React.FC = () => {
             title: 'Nội Dung',
             dataIndex: 'data',
             key: 'data',
-            width: 250,
+            width: 400,
             render: (text) => {
-                // Parse `text` to an object after replacing invalid JSON format
-                let dataObject;
-                try {
-                    dataObject = JSON.parse(
-                        text.replace(/'/g, '"').replace(/False/g, 'false').replace(/True/g, 'true')
-                    );
+                const dataObject = JSON.parse(
+                    text.replace(/'/g, '"')
+                        .replace(/False/g, 'false')
+                        .replace(/True/g, 'true')
+                        .replace(/None/g, 'null') // Handle None as null
+                );
 
-                    // If `dataObject` has nested objects, adjust accordingly
-                    if (dataObject.old_data) {
-                        dataObject = dataObject.old_data;
-                    }
-                } catch (error) {
-                    console.error("Error parsing JSON:", error);
-                    return <p>Error in data format</p>;
-                }
-
-                // Extract and format content
                 const content = [
-                    `Tên: ${dataObject.name || 'N/A'}`,
-                    `Phân Loại: ${dataObject.model || 'N/A'}`,
-                    `Người Tạo: ${dataObject.request_user || 'N/A'}`,
-                    `Người Duyệt: ${dataObject.browsed_user || 'N/A'}`,
+                    `Tiêu Đề: ${dataObject.title}`,
+                    `Mô Tả: ${dataObject.description}`,
+                    `Link: ${dataObject.link}`,
+                    `Người Tạo: ${dataObject.user.username}`,
+                    `Tên: ${dataObject.user.first_name} ${dataObject.user.last_name}`,
+
                 ];
 
                 return (
@@ -169,7 +154,7 @@ const CategoriesQueueTable: React.FC = () => {
 
     return (
         <div className="p-4">
-            <h1 className='text-16 font-bold mt-4'>Quản lý hàng đợi duyệt thể loại (Category)</h1>
+            <h1 className='text-16 font-bold mt-4'>Quản lý hàng đợi duyệt tài liệu</h1>
             <div className="p-4">
                 <Button type="primary" onClick={handleBulkApprove} style={{ marginBottom: '16px' }}>
                     Chấp Thuận
@@ -215,4 +200,4 @@ const CategoriesQueueTable: React.FC = () => {
     );
 };
 
-export default CategoriesQueueTable;
+export default DocumentQueueList;
