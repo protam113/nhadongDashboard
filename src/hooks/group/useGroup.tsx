@@ -12,15 +12,6 @@ import { useEffect, useState } from "react";
 import { message } from "antd";
 
 
-// interface Documents {
-//     id: number;
-//     username: string;
-//     first_name: string;
-//     last_name: string;
-//     email: string;
-//     phone_number: string | null;
-//     profile_image: string;
-// }
 
 interface GroupList {
     id: number;
@@ -115,35 +106,48 @@ const useGroupList = (page: number, filters: Filters = {}, refreshKey: number) =
 };
 
 
-interface NewNews {
-    [key: string]: any; // Hoặc bạn có thể định nghĩa các trường cụ thể mà bạn cần
+/**
+ Tạo Cộng Đoàn
+ **/
+
+interface NewGroup {
+    name: string;
+    founding_date: Date| null;
+    description: string;
+    image?: File | string[] | null;
 }
 
-const CreateNews = async (newNews: NewNews, token: string) => {
+const CreateGroup = async (newGroup: NewGroup, token: string) => {
     const formData = new FormData();
 
-    for (const key in newNews) {
-        const value = newNews[key];
-        if (Array.isArray(value)) {
-            value.forEach((v) => formData.append(key, v));
-        } else {
-            formData.append(key, value);
+    // Sử dụng keyof NewGroup để đảm bảo các key là hợp lệ
+    for (const key in newGroup) {
+        const value = newGroup[key as keyof NewGroup];
+
+        // Kiểm tra nếu value không phải là null hoặc undefined
+        if (value !== null && value !== undefined) {
+            if (Array.isArray(value)) {
+                value.forEach((v) => formData.append(key, v)); // Nếu là mảng, thêm từng phần tử vào FormData
+            } else if (value instanceof Date) {
+                formData.append(key, value.toISOString()); // Nếu là Date, chuyển thành chuỗi ISO
+            } else {
+                formData.append(key, value as string | Blob); // Nếu là string hoặc File, append trực tiếp
+            }
         }
     }
 
     if (!token) throw new Error("No token available");
 
     try {
-        const response = await handleAPI(`${endpoints.documents}`, 'POST', formData, token);
+        const response = await handleAPI(`${endpoints.groups}`, 'POST', formData, token);
         return response.data;
     } catch (error: any) { // Use 'any' type assertion
-        console.error('Error creating news:', error.response?.data);
+        console.error('Error creating group:', error.response?.data);
         throw new Error(error.response?.data?.message || 'Failed to create news');
     }
 };
 
-
-const useCreateNews = () => {
+const useCreateGroup = () => {
     const queryClient = useQueryClient();
     const { getToken } = useAuth();
     const [token, setToken] = useState<string | null>(null);
@@ -158,20 +162,279 @@ const useCreateNews = () => {
     }, [getToken]);
 
     return useMutation({
-        mutationFn: async (newNews: NewNews) => {
+        mutationFn: async (newGroup: NewGroup) => {
             if (!token) {
                 throw new Error("Token is not available");
             }
-            return CreateNews(newNews, token);
+            return CreateGroup(newGroup, token);
         },
         onSuccess: () => {
             message.success("Tin Tức đã được thêm thành công");
-            queryClient.invalidateQueries({ queryKey: ["docsList"] });
+            queryClient.invalidateQueries({ queryKey: ["groupList"] });
         },
         onError: (error) => {
-            console.log(error.message || "Failed to create news.");
+            console.error(error.message || "Failed to create groups.");
         },
     });
 };
 
-export { useGroupList,useCreateNews };
+/**
+ Hooks Xóa Group
+ **/
+
+const DeleteGroup = async (groupId: string, token: string) => {
+    if (!token) throw new Error("No token available");
+
+
+    try {
+        const response = await handleAPI(`${endpoints.group.replace(":id", groupId)}`, 'DELETE', null, token);
+        return response.data;
+    } catch (error: any) {
+        console.error('Error deleting group:', error.response?.data);
+        throw new Error(error.response?.data?.message || 'Failed to delete group');
+    }
+};
+
+const useDeleteGroup = () => {
+    const queryClient = useQueryClient();
+    const { getToken } = useAuth();
+    const [token, setToken] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchToken = async () => {
+            const userToken = await getToken();
+            setToken(userToken);
+        };
+        fetchToken();
+    }, [getToken]);
+
+    return useMutation({
+        mutationFn: async (groupId: string) => {
+            if (!token) {
+                throw new Error("Token is not available");
+            }
+            return DeleteGroup(groupId, token);
+        },
+        onSuccess: () => {
+            message.success("Xóa Groups Thành Công!");
+            queryClient.invalidateQueries({ queryKey: ["groupList"] });
+        },
+        onError: (error: any) => {
+            console.error(error.message || "Failed to delete group.");
+        },
+    });
+};
+
+/**
+ Sửa Group
+ **/
+
+const EditGroup = async (
+    editGroup: NewGroup,
+    groupId: string,
+    token: string
+) => {
+    const formData = new FormData();
+
+    if (!token) throw new Error("No token available");
+
+    for (const key in editGroup) {
+        if (Object.prototype.hasOwnProperty.call(editGroup, key)) {
+            const value = editGroup[key as keyof NewGroup];
+
+            if (Array.isArray(value)) {
+                value.forEach((v) => formData.append(key, v));
+            } else if (value instanceof File) {
+                formData.append(key, value); // Đây là nơi bạn gửi tệp thực tế
+            } else if (typeof value === "string") {
+                formData.append(key, value);
+            }
+        }
+    }
+
+    try {
+        const response = await handleAPI(
+            `${endpoints.group.replace(":id", groupId)}`,
+            "PATCH",
+            formData, // Gửi formData trong body request
+            token
+        );
+        return response.data;
+    } catch (error: any) {
+        console.error("Error editing group:", error.response?.data);
+        throw new Error(error.response?.data?.message || "Failed to edit group");
+    }
+};
+
+
+const useEditGroup = () => {
+    const queryClient = useQueryClient();
+    const { getToken } = useAuth();
+    const [token, setToken] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchToken = async () => {
+            const userToken = await getToken();
+            setToken(userToken);
+        };
+        fetchToken();
+    }, [getToken]);
+
+    return useMutation({
+        mutationFn: async ({
+                               editGroup,
+                               groupId,
+                           }: {
+            editGroup: NewGroup;
+            groupId: string;
+        }) => {
+            if (!token) {
+                throw new Error("Token is not available");
+            }
+            return EditGroup(editGroup, groupId, token);
+        },
+        onSuccess: () => {
+            message.success("Sửa Group Thành Công!");
+            queryClient.invalidateQueries({ queryKey: ["groupList"] });
+        },
+        onError: (error: any) => {
+            message.error(error.message || "Failed to edit group.");
+        },
+    });
+};
+
+/**
+ Lấy Role  Group
+ **/
+
+
+const fetchGroupRolelist = async (
+    groupId: string,
+    pageParam: number = 1,
+    token: string
+): Promise<FetchGroupListResponse> => {
+    if (!token) {
+        throw new Error("No token provided");
+    }
+
+    try {
+        // Construct the query string
+        const queryString = new URLSearchParams({
+            page: pageParam.toString(),
+        }).toString();
+
+        // Build the API endpoint
+        const url = `${endpoints.groupRole.replace(":id", groupId)}${queryString ? `?${queryString}` : ""}`;
+
+        // Make the API request using handleAPI
+        const response = await handleAPI(url, "GET", null, token);
+        return response;
+    } catch (error) {
+        console.error("Error fetching group role list:", error);
+        throw error; // Rethrow error for further handling
+    }
+};
+
+// Custom hook for fetching the group role list
+const useGroupRoleList = (page: number, refreshKey: number, groupId: string) => {
+    const { getToken } = useAuth();
+    const [token, setToken] = useState<string | null>(null);
+    const [isReady, setIsReady] = useState<boolean>(false);
+
+    // Fetch token once when the component mounts or `getToken` changes
+    useEffect(() => {
+        const fetchToken = async () => {
+            const userToken = await getToken();
+            setToken(userToken);
+            setIsReady(true);
+        };
+
+        fetchToken();
+    }, [getToken]);
+
+    return useQuery<FetchGroupListResponse, Error>({
+        queryKey: ["groupRoleList", token, page, refreshKey, groupId],
+        queryFn: async () => {
+            if (!token) {
+                throw new Error("Token is not available");
+            }
+            return fetchGroupRolelist(groupId, page, token); // Call the corrected function
+        },
+        enabled: isReady && !!token,
+        staleTime: 60000, // Keep data fresh for 1 minute
+    });
+};
+
+
+/**
+    Thêm Role Vào Group
+ **/
+
+interface NewGroupRole {
+    name: string;
+    description: string;
+}
+
+const CreateGroupRole = async (newGroupRole: NewGroupRole, groupId : string, token: string) => {
+    const formData = new FormData();
+
+    // Sử dụng keyof NewGroup để đảm bảo các key là hợp lệ
+    for (const key in newGroupRole) {
+        const value = newGroupRole[key as keyof NewGroupRole];
+
+        // Kiểm tra nếu value không phải là null hoặc undefined
+        if (value !== null && value !== undefined) {
+            if (Array.isArray(value)) {
+                value.forEach((v) => formData.append(key, v)); // Nếu là mảng, thêm từng phần tử vào FormData
+            } else {
+                formData.append(key, value as string | Blob); // Nếu là string hoặc File, append trực tiếp
+            }
+        }
+    }
+
+    if (!token) throw new Error("No token available");
+
+    try {
+        const response = await handleAPI(`${endpoints.groupRole.replace(":id", groupId)}`
+            , 'POST',
+            formData,
+            token);
+        return response.data;
+    } catch (error: any) { // Use 'any' type assertion
+        console.error('Error creating group role:', error.response?.data);
+        throw new Error(error.response?.data?.message || 'Failed to create role group');
+    }
+};
+
+const useCreateGroupRole = (groupId: string) => {
+    const queryClient = useQueryClient();
+    const { getToken } = useAuth();
+    const [token, setToken] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchToken = async () => {
+            const userToken = await getToken();
+            setToken(userToken);
+        };
+
+        fetchToken();
+    }, [getToken]);
+
+    return useMutation({
+        mutationFn: async (newGroupRole: NewGroupRole) => {
+            if (!token) {
+                throw new Error("Token is not available");
+            }
+            return CreateGroupRole(newGroupRole,groupId, token);
+        },
+        onSuccess: () => {
+            message.success("Role đã được thêm thành công");
+            queryClient.invalidateQueries({ queryKey: ["groupList"] });
+        },
+        onError: (error) => {
+            console.error(error.message || "Failed to create roles group.");
+        },
+    });
+};
+
+export { useGroupList,useCreateGroup ,useDeleteGroup,useEditGroup,useGroupRoleList,useCreateGroupRole};

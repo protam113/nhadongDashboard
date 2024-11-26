@@ -120,15 +120,16 @@ const useDocsList = (page: number, filters: Filters = {}, refreshKey: number) =>
 };
 
 
-interface NewNews {
-    [key: string]: any; // Hoặc bạn có thể định nghĩa các trường cụ thể mà bạn cần
+interface NewDocs {
+    [key: string]: any;
+    image: File | string | null;// Hoặc bạn có thể định nghĩa các trường cụ thể mà bạn cần
 }
 
-const CreateNews = async (newNews: NewNews, token: string) => {
+const CreateDocs = async (newDoc: NewDocs, token: string) => {
     const formData = new FormData();
 
-    for (const key in newNews) {
-        const value = newNews[key];
+    for (const key in newDoc) {
+        const value = newDoc[key];
         if (Array.isArray(value)) {
             value.forEach((v) => formData.append(key, v));
         } else {
@@ -142,13 +143,13 @@ const CreateNews = async (newNews: NewNews, token: string) => {
         const response = await handleAPI(`${endpoints.documents}`, 'POST', formData, token);
         return response.data;
     } catch (error: any) { // Use 'any' type assertion
-        console.error('Error creating news:', error.response?.data);
-        throw new Error(error.response?.data?.message || 'Failed to create news');
+        console.error('Error creating docs:', error.response?.data);
+        throw new Error(error.response?.data?.message || 'Failed to create docs');
     }
 };
 
 
-const useCreateNews = () => {
+const useCreateDoc = () => {
     const queryClient = useQueryClient();
     const { getToken } = useAuth();
     const [token, setToken] = useState<string | null>(null);
@@ -163,20 +164,20 @@ const useCreateNews = () => {
     }, [getToken]);
 
     return useMutation({
-        mutationFn: async (newNews: NewNews) => {
+        mutationFn: async (newDoc: NewDocs) => {
             if (!token) {
                 throw new Error("Token is not available");
             }
-            return CreateNews(newNews, token);
+            return CreateDocs(newDoc, token);
         },
         onSuccess: () => {
-            message.success("Tin Tức đã được thêm thành công");
+            message.success("Tài Liệu đã được thêm thành công");
             queryClient.invalidateQueries({ queryKey: ["docsList"] });
         },
         onError: (error) => {
-            console.log(error.message || "Failed to create news.");
+            console.log(error.message || "Failed to create docs.");
         },
     });
 };
 
-export { useDocsList,useCreateNews };
+export { useDocsList,useCreateDoc };

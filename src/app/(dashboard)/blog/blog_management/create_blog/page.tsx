@@ -7,6 +7,7 @@ import { RcFile } from 'antd/lib/upload';
 import { useCreateBlog } from '@/hooks/blog/useBlog';
 import { CategoriesList } from "@/lib/categoriesList";
 import {UploadFile, UploadProps} from "antd/lib/upload/interface";
+import { Progress } from 'antd';
 
 const { Option } = Select;
 

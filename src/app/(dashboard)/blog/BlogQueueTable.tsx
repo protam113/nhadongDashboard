@@ -1,8 +1,8 @@
 "use client"; // Đảm bảo đây là client component
 
 import React, { useState } from 'react';
-import {Table, Button, Spin, Pagination} from 'antd';
-import { ReloadOutlined,PlusOutlined, MinusOutlined } from '@ant-design/icons'; // Icon từ Ant Design
+import { Table, Button, Spin, Pagination } from 'antd';
+import { ReloadOutlined, PlusOutlined, MinusOutlined } from '@ant-design/icons'; // Icon từ Ant Design
 import type { ColumnsType } from 'antd/es/table';
 import { UserQueue } from '@/lib/userQueue';
 
@@ -14,7 +14,7 @@ const BlogQueueList: React.FC = () => {
     const [seeMore, setSeeMore] = useState(false);
 
     // Gọi hook `UserQueue` và thêm `refreshKey` làm dependency để làm mới dữ liệu
-    const { queueData, isLoading, isError, handleBulkUpdate } = UserQueue(currentPage,"blog", refreshKey);
+    const { queueData, isLoading, isError, handleBulkUpdate } = UserQueue(currentPage, "blog", refreshKey);
 
     // Xử lý làm mới dữ liệu
     const handleRefresh = () => {
@@ -39,7 +39,7 @@ const BlogQueueList: React.FC = () => {
             dataIndex: 'id',
             key: 'id',
             width: 50,
-            render: (text) => <span>{text}</span>,
+            render: (_, __, index) => <span>{index + 1}</span>, // Display index + 1 as ID
         },
         {
             title: 'Ngày Tạo',
@@ -61,20 +61,27 @@ const BlogQueueList: React.FC = () => {
             key: 'data',
             width: 400,
             render: (text) => {
+                if (typeof text !== 'string') {
+                    console.error('Expected string but got:', typeof text);
+                    return <span>{JSON.stringify(text)}</span>;  // Safely render the text or object as a string
+                }
+
                 const dataObject = JSON.parse(
                     text.replace(/'/g, '"')
                         .replace(/False/g, 'false')
                         .replace(/True/g, 'true')
-                        .replace(/None/g, 'null') // Handle None as null
+                        .replace(/None/g, 'null')
                 );
 
+                // Extract specific fields from the object to display
                 const content = [
                     `Tiêu Đề: ${dataObject.title}`,
                     `Mô Tả: ${dataObject.description}`,
                     `Link: ${dataObject.link}`,
                     `Người Tạo: ${dataObject.user.username}`,
                     `Tên: ${dataObject.user.first_name} ${dataObject.user.last_name}`,
-
+                    `New Data: ${dataObject.new_data ? JSON.stringify(dataObject.new_data) : 'N/A'}`,
+                    `Old Data: ${dataObject.old_data ? JSON.stringify(dataObject.old_data) : 'N/A'}`,
                 ];
 
                 return (
@@ -88,7 +95,9 @@ const BlogQueueList: React.FC = () => {
                                 onClick={() => setSeeMore(!seeMore)}
                                 className="mt-1"
                                 icon={seeMore ? <MinusOutlined /> : <PlusOutlined />}
-                            />
+                            >
+                                {seeMore ? 'Ẩn bớt' : 'Xem thêm'}
+                            </Button>
                         )}
                     </div>
                 );
@@ -141,13 +150,12 @@ const BlogQueueList: React.FC = () => {
 
                 return (
                     <span className={`${bgColor} text-white px-2 py-1 rounded`}>
-                    {text}
-                </span>
+                        {text}
+                    </span>
                 );
             },
         },
     ];
-
 
     if (isLoading) return <Spin size="large" />;
     if (isError) return <div>Error loading queue data.</div>;

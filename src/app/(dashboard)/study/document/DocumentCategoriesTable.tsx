@@ -55,8 +55,8 @@ const DocumentCategoriesTable: React.FC = () => {
             title: "ID",
             dataIndex: "id",
             key: "id",
-            width: 200,
-            render: (text) => <span>{text}</span>,
+            width: 80,
+            render: (_, __, index) => <span>{index + 1}</span>, // Dynamically assign the ID based on index
         },
         {
             title: "Tên Thể Loại",

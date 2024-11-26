@@ -12,6 +12,8 @@ import NewsDetailsModal from "@/app/(dashboard)/news/NewsDetailsModal";
 import DocumentCategoriesTable from "@/app/(dashboard)/study/document/DocumentCategoriesTable";
 import DocumentQueueList from "@/app/(dashboard)/study/document/DocumentQueueTable";
 import {DocsList} from "@/lib/docslist";
+import DocsDetailsModal from "@/app/(dashboard)/study/document/DocumentDetailModal";
+import Link from "next/link";
 
 const { Title } = Typography;
 
@@ -58,7 +60,7 @@ const Documents: React.FC = () => {
             dataIndex: "id",
             key: "id",
             width: 60,
-            render: (text) => <span>{text}</span>,
+            render: (_, __, index) => <span>{index + 1}</span>, // Dynamically assign the ID based on index
         },
         {
             title: "Tiêu Đề",
@@ -135,6 +137,13 @@ const Documents: React.FC = () => {
                     <Button onClick={handleRefresh} style={{marginLeft: "8px"}}>
                         <FaSync/> Làm mới
                     </Button>
+                    <Link href="/study/document/create_document"> {/* Change the URL as needed */}
+                        <Button
+                            style={{ marginLeft: "8px", backgroundColor: "#4CAF50", color: "white" }}
+                        >
+                            Tạo Mới
+                        </Button>
+                    </Link>
                 </div>
 
                 <div className="overflow-auto" style={{maxHeight: "800px"}}>
@@ -160,7 +169,7 @@ const Documents: React.FC = () => {
                 <DocumentCategoriesTable/>
                 <DocumentQueueList/>
             </div>
-            <NewsDetailsModal
+            <DocsDetailsModal
                 visible={isModalVisible}
                 onClose={handleModalClose}
                 news={selectedNews}

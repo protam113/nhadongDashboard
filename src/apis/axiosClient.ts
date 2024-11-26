@@ -1,14 +1,16 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { baseURL } from "./api";
 
-// Function to create an Axios instance with a configured token
+// Function to create an Axios instance with optional token
 const authApi = (token: string | null = null) => {
+    const headers: Record<string, string> = {};
+    if (token) {
+        headers.Authorization = `Bearer ${token}`;
+    }
+
     return axios.create({
         baseURL,
-        headers: {
-            Authorization: token ? `Bearer ${token}` : "",
-            // Xoá Content-Type tại đây để để cho axios tự thiết lập
-        },
+        headers, // Headers được thêm tùy theo điều kiện
     });
 };
 

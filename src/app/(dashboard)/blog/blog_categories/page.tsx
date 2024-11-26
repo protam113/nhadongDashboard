@@ -22,6 +22,7 @@ const BlogCategories: React.FC = () => {
     const [isCreateModalVisible, setIsCreateModalVisible] = useState(false); // For creating category
     const [isEditModalVisible, setIsEditModalVisible] = useState(false); // For editing category
     const [editingCategory, setEditingCategory] = useState(null);
+    const [isCreateLoading, setIsCreateLoading] = useState<boolean>(false);
 
     const { mutate: deleteCategory } = useDeleteCategory();
 
@@ -40,6 +41,12 @@ const BlogCategories: React.FC = () => {
         });
     };
 
+    // Handle loading change
+    const handleLoadingChange = (isLoading: boolean) => {
+        setIsCreateLoading(isLoading);
+    };
+
+
     const handleEdit = (editCategory: any) => {
         if (!editCategory.id) {
             console.error("ID thể loại không hợp lệ!");
@@ -55,8 +62,8 @@ const BlogCategories: React.FC = () => {
             title: "ID",
             dataIndex: "id",
             key: "id",
-            width: 200,
-            render: (text) => <span>{text}</span>,
+            width: 80,
+            render: (_, __, index) => <span>{index + 1}</span>,  // index + 1
         },
         {
             title: "Tên Thể Loại",
@@ -129,7 +136,7 @@ const BlogCategories: React.FC = () => {
                     <Button onClick={handleRefresh}>
                         <FaSync /> Làm mới
                     </Button>
-                    <Button type="primary" onClick={handleCreateCategory}>
+                    <Button type="primary" onClick={handleCreateCategory} loading={isCreateLoading}>
                         Tạo Thể Loại
                     </Button>
                 </div>
@@ -167,7 +174,7 @@ const BlogCategories: React.FC = () => {
                 footer={null}
                 width={600}
             >
-                <CreateBlogCategory /> {/* Render CreateBlogCategory form */}
+                <CreateBlogCategory onLoadingChange={handleLoadingChange} />
             </Modal>
 
             {/* Modal sửa thể loại */}

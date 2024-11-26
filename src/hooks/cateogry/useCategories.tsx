@@ -158,7 +158,7 @@ const useCreateCategory = () => {
             return CreateCategory(createCategory, token);
         },
         onSuccess: () => {
-            console.error("Category created successfully!");
+            console.log("Category created successfully!");
             queryClient.invalidateQueries({ queryKey: ["categoriesList"] });
         },
         onError: (error: any) => {
