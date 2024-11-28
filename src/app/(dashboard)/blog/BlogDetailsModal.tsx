@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Modal, Typography, Divider,Button } from "antd";
+import {Modal, Typography, Divider, Button, Image} from "antd";
 
 const { Title, Paragraph } = Typography;
 
@@ -13,6 +13,31 @@ interface BlogDetailsModalProps {
 
 const BlogDetailsModal: React.FC<BlogDetailsModalProps> = ({ visible, onClose, blog }) => {
     if (!blog) return null; // Only render if blog is not null
+
+        const parseContent = (content: string) => {
+            // Loại bỏ các dấu ngoặc kép ngoài cùng nếu có
+            let cleanedString = content.replace(/^"|"$/g, "")
+                .replace(/\\"/g, '"')  // Chuyển \\" thành "
+                .replace(/'/g, '"');    // Thay dấu nháy đơn bằng dấu nháy kép
+
+            // Kiểm tra nếu chuỗi bắt đầu và kết thúc bằng {{ và }} thì loại bỏ chúng
+            if (cleanedString.startsWith("{{") && cleanedString.endsWith("}}")) {
+                cleanedString = cleanedString.slice(2, -2);  // Loại bỏ {{ và }}
+            }
+
+
+            // Chắc chắn chuỗi đã trở thành JSON hợp lệ
+            try {
+                const jsonObject = JSON.parse(`{${cleanedString}}`);  // Đảm bảo thêm dấu ngoặc nhọn bao quanh chuỗi
+                return jsonObject;
+            } catch (error) {
+                console.error("Error parsing content:", error);
+                return null;
+            }
+        };
+
+
+        const contentData = parseContent(blog.content);
 
     return (
         <Modal
@@ -34,10 +59,18 @@ const BlogDetailsModal: React.FC<BlogDetailsModalProps> = ({ visible, onClose, b
 
             {/* Nội dung bài viết */}
             <div className="mb-4">
-                <strong className="text-xl text-gray-900">Nội dung:</strong>
+                <strong className="text-gray-900">Nội dung:</strong>
                 <div className="space-y-4 mt-2">
-
-                    <p className="text-gray-600">{blog.content}</p>
+                    {/* Display the extracted content */}
+                    {contentData && contentData.title && (
+                        <p className="text-gray-600 text-16 font-bold">{contentData.title}</p> // Only display title content
+                    )}
+                    {contentData && contentData.description && (
+                        <p className="text-gray-600 text-14 ">{contentData.description}</p> // Only display description content
+                    )}
+                    {contentData && contentData.content && (
+                        <p className="text-gray-600 text-14">{contentData.content}</p> // Only display content
+                    )}
                 </div>
             </div>
 
@@ -51,7 +84,7 @@ const BlogDetailsModal: React.FC<BlogDetailsModalProps> = ({ visible, onClose, b
             {/* Hình ảnh bài viết */}
             {blog.image && (
                 <div className="mb-4">
-                    <img src={blog.image} alt="Blog Image" className="w-full h-auto rounded-xl shadow-lg"/>
+                    <Image src={blog.image} alt="Blog Image" className="w-full h-auto rounded-xl shadow-lg"/>
                 </div>
             )}
 

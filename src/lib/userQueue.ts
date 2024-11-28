@@ -29,9 +29,7 @@ export const UserQueue = (currentPage: number,type: string, refreshKey: number) 
             status: status,
         };
 
-        console.log("browseManager:", browseManager);
 
-        console.log("handleBulkUpdate - browseManager:", browseManager);
 
         browseQueue(browseManager, {
             onSuccess: (response: BrowseQueueResponse) => {

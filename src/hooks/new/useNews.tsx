@@ -120,19 +120,42 @@ const useNewsList = (page: number, filters: Filters = {}, refreshKey: number) =>
 };
 
 
+/**
+ Tạo Tin Tức
+ **/
+
 interface NewNews {
-    [key: string]: any; // Hoặc bạn có thể định nghĩa các trường cụ thể mà bạn cần
+    title: string;
+    description: string;
+    content: string; // Mảng nội dung chi tiết
+    link: string;
+    category:string[]; // Mảng danh mục
+    image: File[] | string; // Hình ảnh chính cho bài viết// Hoặc bạn có thể định nghĩa các trường cụ thể mà bạn cần
 }
 
 const CreateNews = async (newNews: NewNews, token: string) => {
     const formData = new FormData();
 
     for (const key in newNews) {
-        const value = newNews[key];
-        if (Array.isArray(value)) {
-            value.forEach((v) => formData.append(key, v));
-        } else {
+        const value = newNews[key as keyof NewNews];
+
+        if (key === 'content') {
+            // Xử lý content nếu là object hoặc JSON string
+            formData.append(key, JSON.stringify(value));
+        } else if (key === 'category' && Array.isArray(value)) {
+            value.forEach((id) => formData.append('category', id)); // Gửi từng ID
+        }
+        else if (key === 'image' && typeof value === 'string') {
+            // Nếu là URL hình ảnh
             formData.append(key, value);
+        } else if (key === 'image' && Array.isArray(value)) {
+            // Nếu là mảng hình ảnh tải lên
+            value.forEach((file) => {
+                formData.append('image', file);
+            });
+        } else if (value) {
+            // Thêm các trường khác
+            formData.append(key, value as string);
         }
     }
 
@@ -179,4 +202,52 @@ const useCreateNews = () => {
     });
 };
 
-export { useNewsList,useCreateNews };
+/**
+ Xóa Tin Tức
+ **/
+
+
+const DeleteNews = async (newsId: string, token: string) => {
+    if (!token) throw new Error("No token available");
+
+
+    try {
+        const response = await handleAPI(`${endpoints.new.replace(":id", newsId)}`, 'DELETE', null, token);
+        return response.data;
+    } catch (error: any) {
+        console.error('Error deleting news:', error.response?.data);
+        throw new Error(error.response?.data?.message || 'Failed to delete news');
+    }
+};
+
+const useDeleteNews = () => {
+    const queryClient = useQueryClient();
+    const { getToken } = useAuth();
+    const [token, setToken] = useState<string | null>(null);
+
+    useEffect(() => {
+        const fetchToken = async () => {
+            const userToken = await getToken();
+            setToken(userToken);
+        };
+        fetchToken();
+    }, [getToken]);
+
+    return useMutation({
+        mutationFn: async (newsId: string) => {
+            if (!token) {
+                throw new Error("Token is not available");
+            }
+            return DeleteNews(newsId, token);
+        },
+        onSuccess: () => {
+            message.success("Xóa tin tức Thành Công!");
+            queryClient.invalidateQueries({ queryKey: ["newsList"] });
+        },
+        onError: (error: any) => {
+            console.error(error.message || "Failed to delete news.");
+        },
+    });
+};
+
+export { useNewsList,useCreateNews,useDeleteNews };

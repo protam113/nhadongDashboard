@@ -121,19 +121,38 @@ const useDocsList = (page: number, filters: Filters = {}, refreshKey: number) =>
 
 
 interface NewDocs {
-    [key: string]: any;
-    image: File | string | null;// Hoặc bạn có thể định nghĩa các trường cụ thể mà bạn cần
+    title: string;
+    description: string;
+    content: string; // Mảng nội dung chi tiết
+    link: string;
+    category: string; // Mảng danh mục
+    image: File[] | string;
 }
 
 const CreateDocs = async (newDoc: NewDocs, token: string) => {
     const formData = new FormData();
 
     for (const key in newDoc) {
-        const value = newDoc[key];
-        if (Array.isArray(value)) {
-            value.forEach((v) => formData.append(key, v));
-        } else {
+        const value = newDoc[key as keyof NewDocs];
+
+        if (key === 'content') {
+            // Xử lý content nếu là object hoặc JSON string
+            formData.append(key, JSON.stringify(value));
+        } else if (key === 'category') {
+            // Gửi category là một chuỗi đơn, không cần phải là mảng
+            formData.append('category', value as string);
+        }
+        else if (key === 'image' && typeof value === 'string') {
+            // Nếu là URL hình ảnh
             formData.append(key, value);
+        } else if (key === 'image' && Array.isArray(value)) {
+            // Nếu là mảng hình ảnh tải lên
+            value.forEach((file) => {
+                formData.append('image', file);
+            });
+        } else if (value) {
+            // Thêm các trường khác
+            formData.append(key, value as string);
         }
     }
 

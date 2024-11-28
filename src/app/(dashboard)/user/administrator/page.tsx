@@ -1,18 +1,20 @@
 "use client";
 
-import React from "react";
+import React, {useState} from "react";
 import {Table, Spin, Pagination, Button} from "antd";
 import { useUserList } from "@/hooks/user/useUsers";
 import { useRouter } from "next/navigation";
+import {FaSync} from "react-icons/fa";
 
 const ManageUsersPage: React.FC = () => {
     const [currentPage, setCurrentPage] = React.useState(1);
     const router = useRouter(); // Hook for navigation
-
+    const [refreshKey, setRefreshKey] = useState(0);
     // Pass multiple roles as an array
     const { data, isLoading, isError, isFetching } = useUserList(currentPage, {
-        role: ["1", "2"],
-    });
+        role: ["5a09a8f0-cd62-4a52-aa83-e5655ba4ef1a", "56ac28ae-14e3-422d-acce-666dad4f8d15"],
+    },
+        refreshKey);
 
     if (isError) {
         return <div>Error fetching users</div>;
@@ -22,9 +24,17 @@ const ManageUsersPage: React.FC = () => {
         return <Spin size="large" />;
     }
 
+    const handleRefresh = () => {
+        setRefreshKey((prev) => prev + 1); // Refresh data manually
+    };
+
     const users = data?.results || [];
     const columns = [
-        { title: "ID", dataIndex: "id", key: "id" },
+        {
+            title: "ID",
+            key: "id",
+            render: (_: any, record: any, index: number) => index + 1, // This will display index + 1 as the ID
+        },
         { title: "Username", dataIndex: "username", key: "username" },
         { title: "First Name", dataIndex: "first_name", key: "first_name" },
         { title: "Last Name", dataIndex: "last_name", key: "last_name" },
@@ -42,7 +52,12 @@ const ManageUsersPage: React.FC = () => {
     return (
         <div>
             <div className="flex justify-between items-center mb-4">
-                <h1 className="mt-4 text-16 font-bold">Quản Lý Quản Trị Viên</h1>
+                <div>
+                <h1 className="mt-4 text-20 font-bold">Quản Lý Quản Trị Viên</h1>
+                <Button onClick={handleRefresh} style={{marginLeft: "8px"}}>
+                    <FaSync/> Làm mới
+                </Button>
+                </div>
                 <div className="flex space-x-4">
                     {/* Button with border and rounded corners */}
                     <Button

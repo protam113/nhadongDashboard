@@ -1,25 +1,16 @@
 'use client';
 
 import React, { useState } from 'react';
-import {Form, Input, Button, Upload, Card, Select, Checkbox, message, Image} from 'antd';
+import {Form, Input, Button, Upload, Card, Checkbox, message, Image} from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { RcFile } from 'antd/lib/upload';
 import { useCreateBlog } from '@/hooks/blog/useBlog';
 import { CategoriesList } from "@/lib/categoriesList";
 import {UploadFile, UploadProps} from "antd/lib/upload/interface";
-import { Progress } from 'antd';
+import ContentSection from "@/components/main/blog/ContentSection";
+import { Section, SectionField } from '@/types/types';
+import {useRouter} from "next/navigation";  // Import kiểu dữ liệu
 
-const { Option } = Select;
-
-// Define the structure for a SectionField and Section
-interface SectionField {
-    type: 'title' | 'description' | 'image' | 'content' | 'link';
-    value: string;
-}
-
-interface Section {
-    fields: SectionField[];
-}
 
 const CreateBlogPage: React.FC = () => {
     const [content, setContent] = useState<Section[]>([]);
@@ -29,7 +20,7 @@ const CreateBlogPage: React.FC = () => {
     const [blogData, setBlogData] = useState({
         title: '',
         description: '',
-        image: fileList[0]?.originFileObj ?? null,
+        image: [] as RcFile[],  // Đổi từ `null` thành mảng `File[]`
         content: [] as Section[],
         category: [] as string[],
         link: '',
@@ -40,6 +31,7 @@ const CreateBlogPage: React.FC = () => {
     const { mutate: createBlogMutation } = useCreateBlog();
     const [form] = Form.useForm();
     const { queueData, isLoading, isError } = CategoriesList(currentPage, "blog", refreshKey);
+    const router = useRouter();
 
     const handleCategoryChange = (checkedValues: string[]) => {
         setBlogData({ ...blogData, category: checkedValues });
@@ -51,9 +43,15 @@ const CreateBlogPage: React.FC = () => {
 
     const handleAddField = (index: number, fieldType: SectionField['type']) => {
         const newContent = [...content];
-        newContent[index].fields.push({ type: fieldType, value: '' });
+
+        // Thêm các trường nội dung dựa trên loại trường
+        if (fieldType === 'title' || fieldType === 'description' || fieldType === 'content') {
+            newContent[index].fields.push({ type: fieldType, value: '' });
+        }
+
         setContent(newContent);
     };
+
 
     const handleFieldChange = (value: string, sectionIndex: number, fieldIndex: number) => {
         const newContent = [...content];
@@ -62,19 +60,12 @@ const CreateBlogPage: React.FC = () => {
         setBlogData({ ...blogData, content: newContent });
     };
 
-    const handleImageUpload = (file: RcFile, sectionIndex: number, fieldIndex: number) => {
-        const newContent = [...content];
-        newContent[sectionIndex].fields[fieldIndex].value = URL.createObjectURL(file);
-        setContent(newContent);
-        setBlogData({ ...blogData, content: newContent });
-        return false;
-    };
 
     const handleChange: UploadProps["onChange"] = ({ fileList }) => {
         setFileList(fileList);
-        // Update blogData.image with the first file's originFileObj if it exists
-        setBlogData({ ...blogData, image: fileList[0]?.originFileObj ?? null });
+        setBlogData({ ...blogData, image: fileList.map(file => file.originFileObj as RcFile) });  // Lưu mảng file
     };
+
 
 
     const handlePreview = async (file: UploadFile) => {
@@ -104,21 +95,41 @@ const CreateBlogPage: React.FC = () => {
                 return;
             }
 
-            if (!blogData.image) {
+            if (blogData.image.length === 0) {  // Kiểm tra xem đã có ảnh chưa
                 message.error('Vui lòng tải lên một hình ảnh!');
                 setLoading(false);
                 return;
             }
 
-            createBlogMutation(blogData);
-            message.success('Thêm bài viết thành công!');
-            form.resetFields();
-            setContent([]); // Reset sections
+            // Định dạng content thành chuỗi JSON
+            const formattedContent = (blogData.content as Section[]).map((section) => {
+                const sectionData: Record<string, string> = {};
+                section.fields.forEach((field) => {
+                    sectionData[field.type] = field.value;
+                });
+
+                // Convert đối tượng thành chuỗi JSON, sau đó thay dấu " bằng dấu '
+                const jsonString = JSON.stringify(sectionData);
+                return jsonString.replace(/"/g, "'");  // Thay dấu " thành dấu '
+            });
+
+            // Nếu bạn muốn chỉ có một chuỗi JSON duy nhất cho tất cả phần nội dung
+            const contentString = formattedContent.join(", ");  // Nối tất cả các phần lại với nhau
+            const blogDataToSend = {
+                ...blogData,
+                content: `{${contentString}}`,  // Đặt trong dấu {}
+                image: blogData.image,  // Sử dụng mảng File[] của hình ảnh
+            };
+
+            console.log(blogDataToSend);
+            createBlogMutation(blogDataToSend);  // Gọi mutation để tạo blog
+            form.resetFields();  // Reset form sau khi tạo bài viết
+            setContent([]);  // Reset các phần nội dung
             setBlogData({
                 title: '',
                 description: '',
-                image: null,
-                content: [] as Section[],
+                image: [],  // Reset lại mảng ảnh
+                content: [],
                 category: [],
                 link: '',
             });
@@ -127,6 +138,7 @@ const CreateBlogPage: React.FC = () => {
             message.error('Có lỗi xảy ra khi thêm bài viết.');
         } finally {
             setLoading(false);
+            router.back();
         }
     };
 
@@ -198,33 +210,13 @@ const CreateBlogPage: React.FC = () => {
                     </Button>
 
                     {content.map((section, index) => (
-                        <Card key={index} style={{ marginBottom: '20px' }}>
-                            <h3>Phần {index + 1}</h3>
-                            <Select
-                                placeholder="Chọn loại trường để thêm"
-                                style={{ width: '100%', marginBottom: '10px' }}
-                                onChange={(value) => handleAddField(index, value as SectionField['type'])}
-                            >
-                                <Option value="title">Thêm tiêu đề</Option>
-                                <Option value="desc">Thêm mô tả</Option>
-                                <Option value="image">Thêm hình ảnh</Option>
-                                <Option value="content">Thêm nội dung chi tiết</Option>
-                            </Select>
-                            {section.fields.map((field, fieldIndex) => (
-                                <Form.Item key={fieldIndex} label={field.type}>
-                                    {field.type === 'image' ? (
-                                        <Upload beforeUpload={(file) => handleImageUpload(file, index, fieldIndex)} showUploadList={false}>
-                                            <Button icon={<PlusOutlined />}>Tải lên hình ảnh</Button>
-                                        </Upload>
-                                    ) : (
-                                        <Input
-                                            value={field.value}
-                                            onChange={(e) => handleFieldChange(e.target.value, index, fieldIndex)}
-                                        />
-                                    )}
-                                </Form.Item>
-                            ))}
-                        </Card>
+                        <ContentSection
+                            key={index}
+                            section={section}
+                            index={index}
+                            handleAddField={handleAddField}
+                            handleFieldChange={handleFieldChange}
+                        />
                     ))}
 
                     <Form.Item style={{ textAlign: 'center' }}>

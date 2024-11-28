@@ -8,7 +8,6 @@ import {useDeleteCategory} from "@/hooks/cateogry/useCategories";
 import { MdOutlineDelete } from "react-icons/md";
 import { FaRegEdit } from "react-icons/fa";
 import { EyeOutlined } from "@ant-design/icons";
-import NewsDetailsModal from "@/app/(dashboard)/news/NewsDetailsModal";
 import DocumentCategoriesTable from "@/app/(dashboard)/study/document/DocumentCategoriesTable";
 import DocumentQueueList from "@/app/(dashboard)/study/document/DocumentQueueTable";
 import {DocsList} from "@/lib/docslist";
@@ -23,7 +22,7 @@ const Documents: React.FC = () => {
     const [model] = useState<string>(""); // State to hold selected model
     const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
     const { mutate: deleteCategory } = useDeleteCategory();
-    const [selectedNews, setSelectedNews] = useState(null);
+    const [selectedDoc, setSelectedDoc] = useState(null);
     const [isModalVisible, setIsModalVisible] = useState(false);
 
     // Pass model into CategoriesList
@@ -111,15 +110,15 @@ const Documents: React.FC = () => {
     if (isLoading) return <Spin size="large" />;
     if (isError) return <div>Error loading queue data.</div>;
 
-    const handleViewDetails = (news: any) => {
-        setSelectedNews(news);
+    const handleViewDetails = (doc: any) => {
+        setSelectedDoc(doc);
         setIsModalVisible(true);
     };
 
     // Function to handle closing the modal
     const handleModalClose = () => {
         setIsModalVisible(false);
-        setSelectedNews(null);
+        setSelectedDoc(null);
     };
 
 
@@ -172,7 +171,7 @@ const Documents: React.FC = () => {
             <DocsDetailsModal
                 visible={isModalVisible}
                 onClose={handleModalClose}
-                news={selectedNews}
+                doc={selectedDoc}
             />
 
         </>

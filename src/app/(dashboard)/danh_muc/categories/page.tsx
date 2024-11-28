@@ -56,8 +56,8 @@ const Categories: React.FC = () => {
             title: "ID",
             dataIndex: "id",
             key: "id",
-            width: 100,
-            render: (text) => <span>{text}</span>,
+            width: 80,
+            render: (_, __, index) => <span>{index + 1}</span>,  // index + 1
         },
         {
             title: "Tên Thể Loại",

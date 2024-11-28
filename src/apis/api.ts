@@ -1,6 +1,8 @@
 //api/api.ts
 
 const baseURL = 'http://localhost:8000';
+const vStorage = 'https://hcm03.auth.vstorage.vngcloud.vn/v3/auth/tokens';
+
 
 const endpoints = {
 

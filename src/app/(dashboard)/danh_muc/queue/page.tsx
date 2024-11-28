@@ -53,11 +53,11 @@ const Queue: React.FC = () => {
 
     const columns: ColumnsType<any> = [
         {
-            title: 'ID',
-            dataIndex: 'id',
-            key: 'id',
-            width: 200,
-            render: (text) => <span>{text}</span>,
+            title: "ID",
+            dataIndex: "id",
+            key: "id",
+            width: 80,
+            render: (_, __, index) => <span>{index + 1}</span>,  // index + 1
         },
         {
             title: 'Created Date',

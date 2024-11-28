@@ -204,19 +204,6 @@ export const NavItems = () => {
                     name: "Tài Liệu ",
                     link: '/study/document',
                     key: '15',
-                    children: [
-                        {
-                            name: "Thể Loại",
-                            link: '/blog/blog_categories',
-                            key: '29',
-                            icon: <BiCategory/>,
-                        },
-                        {
-                            name: 'Quản Lý Sự Kiện',
-                            link: '/blog/blog_management',
-                            key: '30',
-                        },
-                    ]
                 },
                 {
                     name: "Thuong AI",

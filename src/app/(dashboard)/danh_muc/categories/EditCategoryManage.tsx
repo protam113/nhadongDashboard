@@ -6,13 +6,8 @@
  import { UploadFile, UploadProps } from "antd/lib/upload/interface";
  import { PlusOutlined } from "@ant-design/icons";
  import { useEditCategory } from "@/hooks/cateogry/useCategories";
- import { RcFile } from "antd/es/upload";
+ import { EditCategoryItem } from "@/types/types";
 
- // Định nghĩa kiểu EditCategoryItem
- interface EditCategoryItem {
-     name: string;
-     image: RcFile | null; // Chỉnh sửa kiểu file thành RcFile | null
- }
 
  const EditCategoryManage: React.FC<{ category: any }> = ({ category }) => {
      const [name, setName] = useState(category?.name || ""); // Hiển thị tên thể loại

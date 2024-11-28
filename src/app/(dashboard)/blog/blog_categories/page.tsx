@@ -11,6 +11,7 @@ import { MdOutlineDelete } from "react-icons/md";
 import { FaRegEdit } from "react-icons/fa";
 import CreateBlogCategory from "./CreateBlogCategory";
 import EditBlogCategory from "@/app/(dashboard)/blog/blog_categories/EditBlogCategory";
+import BlogCategoryModal from "@/app/(dashboard)/blog/blog_categories/BlogCategoryModal";
 
 const { Title } = Typography;
 
@@ -164,6 +165,8 @@ const BlogCategories: React.FC = () => {
                     <span style={{ margin: "0 8px" }}>Page {currentPage}</span>
                     <Button onClick={() => setCurrentPage((prev) => prev + 1)}>Next</Button>
                 </div>
+
+                <BlogCategoryModal/>
             </div>
 
             {/* Modal tạo thể loại */}

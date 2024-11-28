@@ -54,11 +54,11 @@ const NewsManagement: React.FC = () => {
             ),
         },
         {
-            title: "ID",
+            title: "STT",
             dataIndex: "id",
             key: "id",
             width: 60,
-            render: (text) => <span>{text}</span>,
+            render: (text, record, index) => <span>{index + 1}</span>,
         },
         {
             title: "Tiêu Đề",

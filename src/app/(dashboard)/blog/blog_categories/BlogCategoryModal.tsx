@@ -1,19 +1,19 @@
 "use client"; // Đảm bảo đây là client component
 
 import React, { useState } from 'react';
-import {Table, Button, Spin, Pagination} from 'antd';
-import { ReloadOutlined} from '@ant-design/icons'; // Icon từ Ant Design
+import { Table, Button, Spin, Pagination } from 'antd';
+import { ReloadOutlined } from '@ant-design/icons'; // Icon từ Ant Design
 import type { ColumnsType } from 'antd/es/table';
 import { UserQueue } from '@/lib/userQueue';
 
-const CategoriesQueueTable: React.FC = () => {
+const BlogCategoryModal: React.FC = () => {
     const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [refreshKey, setRefreshKey] = useState(0); // State để làm mới dữ liệu
     const [isRefreshing, setIsRefreshing] = useState(false); // State để kiểm tra trạng thái làm mới
 
     // Gọi hook `UserQueue` và thêm `refreshKey` làm dependency để làm mới dữ liệu
-    const { queueData, isLoading, isError, handleBulkUpdate } = UserQueue(currentPage,"category", refreshKey);
+    const { queueData, isLoading, isError, handleBulkUpdate } = UserQueue(currentPage, "category", refreshKey);
 
     // Xử lý làm mới dữ liệu
     const handleRefresh = () => {
@@ -22,16 +22,9 @@ const CategoriesQueueTable: React.FC = () => {
         setTimeout(() => setIsRefreshing(false), 1000); // Đặt lại trạng thái sau 1 giây (có thể điều chỉnh thời gian)
     };
 
-    const handleBulkApprove = async () => {
-        try {
-            // Gọi hàm handleBulkUpdate với status 'approved' và chờ kết quả
-            const response = await handleBulkUpdate(selectedKeys, 'approve');
-            console.log("Approve Response:", response);  // Log giá trị trả về từ API
-        } catch (error) {
-            console.error("Error during approval:", error);  // Log lỗi nếu có
-        }
-        console.log("Approve setSelectedKeys:", selectedKeys);
-        setSelectedKeys([]);  // Xóa các khóa đã chọn sau khi thực hiện
+    const handleBulkApprove = () => {
+        handleBulkUpdate(selectedKeys, 'approved');
+        setSelectedKeys([]);
     };
 
     const handleBulkReject = () => {
@@ -41,11 +34,11 @@ const CategoriesQueueTable: React.FC = () => {
 
     const columns: ColumnsType<any> = [
         {
-            title: "ID",
-            dataIndex: "id",
-            key: "id",
-            width: 80,
-            render: (_, __, index) => <span>{index + 1}</span>,  // index + 1
+            title: 'ID',
+            dataIndex: 'id',
+            key: 'id',
+            width: 50,
+            render: (_, __, index) => <span>{index + 1}</span>, // Display index + 1 as ID
         },
         {
             title: 'Ngày Tạo',
@@ -144,20 +137,19 @@ const CategoriesQueueTable: React.FC = () => {
 
                 return (
                     <span className={`${bgColor} text-white px-2 py-1 rounded`}>
-                    {text}
-                </span>
+                        {text}
+                    </span>
                 );
             },
         },
     ];
-
 
     if (isLoading) return <Spin size="large" />;
     if (isError) return <div>Error loading queue data.</div>;
 
     return (
         <div className="p-4">
-            <h1 className='text-16 font-bold mt-4'>Quản lý hàng đợi duyệt thể loại (Category)</h1>
+            <h1 className='text-16 font-bold mt-4'>Quản lý hàng đợi duyệt thể loại </h1>
             <div className="p-4">
                 <Button type="primary" onClick={handleBulkApprove} style={{ marginBottom: '16px' }}>
                     Chấp Thuận
@@ -203,4 +195,4 @@ const CategoriesQueueTable: React.FC = () => {
     );
 };
 
-export default CategoriesQueueTable;
+export default BlogCategoryModal;

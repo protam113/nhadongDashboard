@@ -12,7 +12,7 @@ import { useEffect, useState } from "react";
 import { message } from "antd";
 
 interface User {
-    id: number;
+    id: string;
     username: string;
     first_name: string;
     last_name: string;

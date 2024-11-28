@@ -10,7 +10,8 @@
     import { FaRegEdit } from "react-icons/fa";
     import {BlogList} from "@/lib/blogList";
     import BlogDetailsModal from "@/app/(dashboard)/blog/BlogDetailsModal";
-    import { EyeOutlined } from "@ant-design/icons";
+    import {EyeOutlined} from "@ant-design/icons";
+    import EditBlogModal from "@/app/(dashboard)/blog/blog_management/modal/EditBlogModal";
 
     const { Title } = Typography;
 
@@ -23,7 +24,18 @@
         const { mutate: deleteCategory } = useDeleteCategory();
         const [selectedBlog, setSelectedBlog] = useState(null); // State for selected blog
         const [isModalVisible , setIsModalVisible] = useState(false);
+        const [isDrawerVisible, setIsDrawerVisible] = useState(false); // Drawer visibility state
 
+
+        const handleEdit = (blog: any) => {
+            setSelectedBlog(blog); // Set blog to be edited
+            setIsDrawerVisible(true); // Open the drawer
+        };
+
+        const handleDrawerClose = () => {
+            setIsDrawerVisible(false); // Close the drawer
+            setSelectedBlog(null); // Clear selected blog
+        };
         // Pass model into CategoriesList
         const { queueData, isLoading, isError } = BlogList(currentPage, model, refreshKey);
 
@@ -58,7 +70,7 @@
                 dataIndex: "id",
                 key: "id",
                 width: 60,
-                render: (text) => <span>{text}</span>,
+                render: (text, record, index) => <span>{index + 1}</span>,
             },
             {
                 title: "Tiêu Đề",
@@ -102,7 +114,7 @@
                         <Button danger onClick={() => handleDelete(record.id)}>
                             <MdOutlineDelete className="text-albert-error" />
                         </Button>
-                        <Button>
+                        <Button type="primary" onClick={() => handleEdit(record)}>
                             <FaRegEdit />
                         </Button>
                     </>
@@ -174,6 +186,11 @@
                     visible={isModalVisible}
                     onClose={handleModalClose}
                     blog={selectedBlog}
+                />
+                <EditBlogModal
+                    open={isDrawerVisible}
+                    onClose={handleDrawerClose}
+                    blog={selectedBlog} // Pass selected blog to EditBlogModal
                 />
             </>
         );

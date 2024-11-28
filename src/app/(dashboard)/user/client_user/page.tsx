@@ -3,13 +3,16 @@
 
 import React
     // , { useState, useEffect }
-    from 'react';
-import {Table
+    , {useState} from 'react';
+import {
+    Table
     // , Typography, Button, Image
-    , Spin, Pagination} from 'antd';
+    , Spin, Pagination, Button
+} from 'antd';
 // import type { ColumnsType } from 'antd/es/table';
 // import { PlusOutlined } from '@ant-design/icons';
 import {useUserList} from "@/hooks/user/useUsers";
+import {FaSync} from "react-icons/fa";
 
 // const { Title } = Typography;
 
@@ -17,14 +20,15 @@ import {useUserList} from "@/hooks/user/useUsers";
 
 const UserPage: React.FC = () => {
     const [currentPage, setCurrentPage] = React.useState(1);
+     const [refreshKey, setRefreshKey] = useState(0);
     const {
         data,
         isLoading,
         isError,
         isFetching,
     } = useUserList(currentPage, {
-        role: ["3"]
-    }); // Truyền currentPage vào hook
+        role: ["dd8ef7c3-9b02-49f5-bfe9-962ecbe14f77"]
+    },refreshKey); // Truyền currentPage vào hook
     // Xử lý lỗi
     if (isError) {
         return <div>Error fetching users</div>;
@@ -35,12 +39,20 @@ const UserPage: React.FC = () => {
         return <Spin size="large" />;
     }
 
+
+    const handleRefresh = () => {
+        setRefreshKey((prev) => prev + 1); // Refresh data manually
+    };
     // Columns for the Ant Design Table
     const users = data?.results || []; // Dùng results trực tiếp từ dữ liệu
 
     // Cột hiển thị cho Table
     const columns = [
-        { title: "ID", dataIndex: "id", key: "id" },
+        {
+            title: "ID",
+            key: "id",
+            render: (_: any, record: any, index: number) => index + 1, // This will display index + 1 as the ID
+        },
         { title: "Username", dataIndex: "username", key: "username" },
         { title: "First Name", dataIndex: "first_name", key: "first_name" },
         { title: "Last Name", dataIndex: "last_name", key: "last_name" },
@@ -51,6 +63,9 @@ const UserPage: React.FC = () => {
     return (
         <div>
             <h1 className='mt-4 text-16 font-bold'>Quản Lý Người Dùng</h1>
+            <Button onClick={handleRefresh} style={{marginLeft: "8px"}}>
+                <FaSync/> Làm mới
+            </Button>
 
             <Table
                 dataSource={users}
