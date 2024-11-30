@@ -5,12 +5,12 @@ import { Table, Button, Typography, Spin,Modal  } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { FaSync } from "react-icons/fa"; // Import refresh icon
 import { useRouter } from "next/navigation";
-import {useDeleteCategory} from "@/hooks/cateogry/useCategories";
 import { MdOutlineDelete } from "react-icons/md";
 import { FaRegEdit } from "react-icons/fa";
 import BlogDetailsModal from "@/app/(dashboard)/blog/BlogDetailsModal";
 import { EyeOutlined } from "@ant-design/icons";
 import {NewsList} from "@/lib/newsList";
+import {useDeleteNews} from "@/hooks/new/useNews";
 
 const { Title } = Typography;
 
@@ -20,23 +20,23 @@ const NewsManagement: React.FC = () => {
     const [model] = useState<string>(""); // State to hold selected model
     const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
     const router = useRouter(); // Hook for navigation
-    const { mutate: deleteCategory } = useDeleteCategory();
+    const { mutate: deleteNews } = useDeleteNews();
     const [selectedBlog, setSelectedBlog] = useState(null); // State for selected blog
     const [isModalVisible, setIsModalVisible] = useState(false);
 
     // Pass model into CategoriesList
     const { queueData, isLoading, isError } = NewsList(currentPage, model, refreshKey);
 
-    const handleDelete = (categoryId: string) => {
+    const handleDelete = (newsId: string) => {
         // Show confirmation dialog before deletion
         Modal.confirm({
             title: 'Xác nhận xóa',
-            content: 'Bạn có chắc chắn muốn xóa thể loại này?',
+            content: 'Bạn có chắc chắn muốn xóa tin tức này?',
             okText: 'Xóa',
             okType: 'danger',
             cancelText: 'Hủy',
             onOk: () => {
-                deleteCategory(categoryId);
+                deleteNews(newsId);
             },
         });
     };
@@ -170,11 +170,11 @@ const NewsManagement: React.FC = () => {
                     <Button onClick={() => setCurrentPage((prev) => prev + 1)}>Next</Button>
                 </div>
             </div>
-            <BlogDetailsModal
-                visible={isModalVisible}
-                onClose={handleModalClose}
-                blog={selectedBlog}
-            />
+            {/*<BlogDetailsModal*/}
+            {/*    visible={isModalVisible}*/}
+            {/*    onClose={handleModalClose}*/}
+            {/*    blog={selectedBlog}*/}
+            {/*/>*/}
         </>
     );
 };

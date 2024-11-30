@@ -10,11 +10,12 @@ interface UserResponse {
     success: boolean;
 }
 
-export const UserList = (currentPage: number,is_active: string
+export const UserList = (currentPage: number,is_active: string,blocked: string
                           , refreshKey: number
 ) => {
     const { data, isLoading, isError, isFetching } = useUserList(currentPage, {
-        is_active: [is_active]
+        is_active: [is_active],
+        blocked: [blocked]
     },refreshKey);
     const queueData = data?.results || [];
     const { mutate: activeUser } = useActiveUser();

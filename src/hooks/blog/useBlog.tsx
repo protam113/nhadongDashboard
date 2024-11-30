@@ -212,7 +212,7 @@ const DeleteBlog = async (blogId: string, token: string) => {
 
 
     try {
-        const response = await handleAPI(`${endpoints.category.replace(":id", blogId)}`, 'DELETE', null, token);
+        const response = await handleAPI(`${endpoints.blog.replace(":id", blogId)}`, 'DELETE', null, token);
         return response.data;
     } catch (error: any) {
         console.error('Error deleting category:', error.response?.data);

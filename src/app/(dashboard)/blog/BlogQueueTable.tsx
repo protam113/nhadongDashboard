@@ -5,6 +5,7 @@ import { Table, Button, Spin, Pagination } from 'antd';
 import { ReloadOutlined, PlusOutlined, MinusOutlined } from '@ant-design/icons'; // Icon từ Ant Design
 import type { ColumnsType } from 'antd/es/table';
 import { UserQueue } from '@/lib/userQueue';
+import Heading from "@/components/design/Heading";
 
 const BlogQueueList: React.FC = () => {
     const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
@@ -162,7 +163,6 @@ const BlogQueueList: React.FC = () => {
 
     return (
         <div className="p-4">
-            <h1 className='text-16 font-bold mt-4'>Quản lý hàng đợi duyệt bài viết</h1>
             <div className="p-4">
                 <Button type="primary" onClick={handleBulkApprove} style={{ marginBottom: '16px' }}>
                     Chấp Thuận

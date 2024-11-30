@@ -8,12 +8,15 @@ import {MdDashboard
 import { FaNewspaper,FaFileAlt,FaChurch   } from "react-icons/fa";
 import { HiUserGroup } from "react-icons/hi2";
 import { SlNotebook ,SlCalender } from "react-icons/sl";
-import { IoMdSettings } from "react-icons/io";
 import { BiCategory } from "react-icons/bi";
 import { PiHandsPrayingBold } from "react-icons/pi";
 import { CgSandClock } from "react-icons/cg";
 import { HiOutlineNewspaper } from "react-icons/hi";
 import { RiCommunityLine } from "react-icons/ri";
+
+/**
+ 28,35
+ **/
 
 
 export const NavItems = () => {
@@ -40,6 +43,12 @@ export const NavItems = () => {
                     name: 'Admin & Manager',
                     link: '/user/administrator',
                     key: '8',
+                    icon: <MdOutlineAdminPanelSettings/>
+                },
+                {
+                    name: 'Block List',
+                    link: '/user/block_list',
+                    key: '27',
                     icon: <MdOutlineAdminPanelSettings/>
                 },
 
@@ -165,45 +174,23 @@ export const NavItems = () => {
             icon: <SlNotebook/>,
             children: [
                 {
-                    name: "Bài Học",
-                    link: '/study/lesson',
-                    key: '13',
-                    children: [
-                        {
-                            name: "Thể Loại",
-                            link: '/blog/blog_categories',
-                            key: '27',
-                            icon: <BiCategory/>,
-                        },
-                        {
-                            name: 'Quản Lý Sự Kiện',
-                            link: '/blog/blog_management',
-                            key: '28',
-                        },
-                    ]
-                },
-                {
-                    name: "Giáo Án",
-                    link: '/study/lesson_plan',
-                    key: '14',
-                    children: [
-                        {
-                            name: "Thể Loại",
-                            link: '/blog/blog_categories',
-                            key: '34',
-                            icon: <BiCategory/>,
-                        },
-                        {
-                            name: 'Quản Lý Sự Kiện',
-                            link: '/blog/blog_management',
-                            key: '35',
-                        },
-                    ]
-                },
-                {
                     name: "Tài Liệu ",
                     link: '/study/document',
                     key: '15',
+                    children: [
+                        {
+                            name: 'Quản Lý Tài Liệu',
+                            link: '/study/document/document_manager',
+                            key: '13',
+                            icon: <MdManageSearch/>,
+                        },
+                        {
+                            name: 'Thể Loại',
+                            link: '/study/document/document_categories',
+                            key: '14',
+                            icon: <MdManageSearch/>,
+                        },
+                    ]
                 },
                 {
                     name: "Thuong AI",
@@ -241,14 +228,8 @@ export const NavItems = () => {
         {
             name: 'Cộng Đoàn',
             link: '/cong_doan',
-            key: '39',
-            icon: <RiCommunityLine />,
-        },
-        {
-            name: 'Settings',
-            link: '/settings',
             key: '17',
-            icon: <IoMdSettings/>,
+            icon: <RiCommunityLine />,
         },
     ];
 

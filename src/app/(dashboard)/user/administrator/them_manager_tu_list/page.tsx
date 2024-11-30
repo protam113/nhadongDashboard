@@ -7,10 +7,20 @@ import { useUserList, useAddManager } from "@/hooks/user/useUsers";
 const UserAddToManagerPage: React.FC = () => {
     const { mutate: addManagerMutation } = useAddManager();
     const [loading, setLoading] = useState(false);
-    const [selectedUserId, setSelectedUserId] = useState<number | null>(null); // Selected user ID
+    const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
     const [showConfirmModal, setShowConfirmModal] = useState(false); // Show confirmation modal
     const [currentPage, setCurrentPage] = useState(1);
-    const { data, isLoading, isError, isFetching } = useUserList(currentPage, { role: ["3"] });
+    const [refreshKey] = useState(0);
+    const {
+        data,
+        isLoading,
+        isError,
+        isFetching,
+    } = useUserList(currentPage, {
+        role: ["dd8ef7c3-9b02-49f5-bfe9-962ecbe14f77"],
+        blocked: ["false"]
+    },refreshKey);
+
 
     if (isError) {
         return <div>Error fetching users</div>;
@@ -31,7 +41,7 @@ const UserAddToManagerPage: React.FC = () => {
 
         setLoading(true);
         const newUser = {
-            user: selectedUserId.toString(), // Ensure ID is passed as string
+            user: selectedUserId, // Chuyển trực tiếp selectedUserId vào
             role: 'manager'
         };
 
@@ -52,7 +62,13 @@ const UserAddToManagerPage: React.FC = () => {
     const users = data?.results || [];
 
     const columns = [
-        { title: "ID", dataIndex: "id", key: "id" },
+        {
+            title: "ID",
+            dataIndex: "id",
+            key: "id",
+            width: 60,
+            render: (text: any, record: any, index: any) => <span>{index + 1}</span>,
+        },
         { title: "Username", dataIndex: "username", key: "username" },
         { title: "First Name", dataIndex: "first_name", key: "first_name" },
         { title: "Last Name", dataIndex: "last_name", key: "last_name" },
@@ -61,12 +77,11 @@ const UserAddToManagerPage: React.FC = () => {
         {
             title: "Action",
             key: "action",
-            render: (_: any, record: { id: number }) => (
+            render: (_: any, record: { id: string }) => ( // id là string
                 <Button
                     type="primary"
                     onClick={() => {
-                        console.log('Selected User ID:', record.id);  // Debugging line
-                        setSelectedUserId(record.id);
+                        setSelectedUserId(record.id); // Giữ nguyên id là string
                         setShowConfirmModal(true); // Show confirmation modal
                     }}
                 >

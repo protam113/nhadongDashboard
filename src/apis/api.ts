@@ -14,6 +14,9 @@ const endpoints = {
     //web
     web: '/website/1/',
 
+    //user
+    blocked: '/user/block/',
+
     //current user lgin
     currentUser: '/user/detail/',
 
@@ -53,6 +56,13 @@ const endpoints = {
     commentBlog: '/blog/:id/comment/',
     replyComment: '/comment/:id/replies/',
     comment: '/comment/:id/',
+
+    //event
+
+    events: '/event/',
+    event: '/event/:id/',
+    eventForm: '/event/:id/form/',
+    eventRegister: '/event/:id/register',
 };
 
 export { baseURL, endpoints };

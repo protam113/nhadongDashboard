@@ -1,19 +1,19 @@
     "use client"; // Ensures this is a client component
 
     import React, { useState } from "react";
-    import { Table, Button, Typography, Spin,Modal  } from "antd";
+    import { Table, Button, Spin,Modal  } from "antd";
     import type { ColumnsType } from "antd/es/table";
     import { FaSync } from "react-icons/fa"; // Import refresh icon
     import { useRouter } from "next/navigation";
-    import {useDeleteCategory} from "@/hooks/cateogry/useCategories";
     import { MdOutlineDelete } from "react-icons/md";
     import { FaRegEdit } from "react-icons/fa";
     import {BlogList} from "@/lib/blogList";
     import BlogDetailsModal from "@/app/(dashboard)/blog/BlogDetailsModal";
     import {EyeOutlined} from "@ant-design/icons";
     import EditBlogModal from "@/app/(dashboard)/blog/blog_management/modal/EditBlogModal";
+    import {useDeleteBlog} from "@/hooks/blog/useBlog";
+    import Heading from "@/components/design/Heading";
 
-    const { Title } = Typography;
 
     const BlogManagement: React.FC = () => {
         const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
@@ -21,10 +21,10 @@
         const [model] = useState<string>(""); // State to hold selected model
         const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
         const router = useRouter(); // Hook for navigation
-        const { mutate: deleteCategory } = useDeleteCategory();
+        const { mutate: deleteBlog } = useDeleteBlog();
         const [selectedBlog, setSelectedBlog] = useState(null); // State for selected blog
-        const [isModalVisible , setIsModalVisible] = useState(false);
         const [isDrawerVisible, setIsDrawerVisible] = useState(false); // Drawer visibility state
+        const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
 
         const handleEdit = (blog: any) => {
@@ -32,10 +32,6 @@
             setIsDrawerVisible(true); // Open the drawer
         };
 
-        const handleDrawerClose = () => {
-            setIsDrawerVisible(false); // Close the drawer
-            setSelectedBlog(null); // Clear selected blog
-        };
         // Pass model into CategoriesList
         const { queueData, isLoading, isError } = BlogList(currentPage, model, refreshKey);
 
@@ -43,12 +39,12 @@
             // Show confirmation dialog before deletion
             Modal.confirm({
                 title: 'Xác nhận xóa',
-                content: 'Bạn có chắc chắn muốn xóa thể loại này?',
+                content: 'Bạn có chắc chắn muốn xóa bài viết này?',
                 okText: 'Xóa',
                 okType: 'danger',
                 cancelText: 'Hủy',
                 onOk: () => {
-                    deleteCategory(categoryId);
+                    deleteBlog(categoryId);
                 },
             });
         };
@@ -58,7 +54,7 @@
                 title: "Chi Tiết",
                 dataIndex: "full",
                 key: "full",
-                width: 150,
+                width: 100,
                 render: (_, record) => (
                     <Button onClick={() => handleViewDetails(record)}>
                         <EyeOutlined /> Xem Chi Tiết
@@ -128,13 +124,13 @@
 
         const handleViewDetails = (blog: any) => {
             setSelectedBlog(blog);
-            setIsModalVisible(true);
+            setIsDrawerOpen(true);
         };
 
-        // Function to handle closing the modal
-        const handleModalClose = () => {
-            setIsModalVisible(false);
+        const handleDrawerClose = () => {
+            setIsDrawerOpen(false);
             setSelectedBlog(null);
+            setIsDrawerVisible(false); // Close the drawer
         };
 
 
@@ -149,7 +145,7 @@
         return (
             <>
                 <div className="p-4">
-                    <Title level={2}>Quản Lý Bài Viết</Title>
+                    <Heading name="Quản Lý Bài Viết (Blog)" />
 
                     {/* Model selection */}
                     <div className="flex justify-between items-center mb-4">
@@ -183,8 +179,8 @@
                     </div>
                 </div>
                 <BlogDetailsModal
-                    visible={isModalVisible}
-                    onClose={handleModalClose}
+                    open={isDrawerOpen}
+                    onClose={handleDrawerClose}
                     blog={selectedBlog}
                 />
                 <EditBlogModal

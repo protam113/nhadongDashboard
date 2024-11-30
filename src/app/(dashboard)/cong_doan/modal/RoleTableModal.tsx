@@ -4,12 +4,9 @@ import React, { useState } from "react";
 import {Table, Spin, Alert, Pagination, Button, Modal} from "antd";
 import { useGroupRoleList } from "@/hooks/group/useGroup";
 import CreateRoleGroup from "@/app/(dashboard)/cong_doan/modal/createRoleGroupModal";
+import {Group} from "@/types/types";
 
-interface RoleTableModalProps {
-    groupId: string;
-}
-
-const RoleTableModal: React.FC<RoleTableModalProps> = ({ groupId }) => {
+const RoleTableModal: React.FC<Group> = ({ groupId }) => {
     const [currentPage, setCurrentPage] = useState(1);
     const [refreshKey, setRefreshKey] = useState(0); // State để làm mới dữ liệu
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);

@@ -1,28 +1,46 @@
 "use client";
 
 import React from "react";
-import { Modal, Typography, Divider,Button } from "antd";
+import { Typography, Divider, Button, Drawer} from "antd";
 
 const { Title, Paragraph } = Typography;
 
 interface NewsDetailsModalProps {
-    visible: boolean;
+    open: boolean;
     onClose: () => void;
     news: any | null; // Accept blog data type as any
 }
 
-const NewsDetailsModal: React.FC<NewsDetailsModalProps> = ({ visible, onClose, news }) => {
+const NewsDetailsModal: React.FC<NewsDetailsModalProps> = ({ open, onClose, news }) => {
     if (!news) return null; // Only render if blog is not null
 
+    const parseContent = (content: string) => {
+        let cleanedString = content.replace(/^"|"$/g, "")
+            .replace(/\\"/g, '"')
+            .replace(/'/g, '"');
+
+        if (cleanedString.startsWith("{{") && cleanedString.endsWith("}}")) {
+            cleanedString = cleanedString.slice(2, -2);
+        }
+
+        try {
+            const jsonObject = JSON.parse(`{${cleanedString}}`);
+            return jsonObject;
+        } catch (error) {
+            console.error("Error parsing content:", error);
+            return null;
+        }
+    };
+
+    const contentData = parseContent(news.content);
+
     return (
-        <Modal
-            visible={visible}
-            onCancel={onClose}
-            footer={null} // Tắt các nút mặc định
-            title="Thông Tin Chi Tiết Bài Viết"
+        <Drawer
+            open={open}
+            onClose={onClose}
+            title="Thông Tin Chi Tiết Tin Tưc"
             width={900}
-            bodyStyle={{padding: "24px"}} // Thêm padding cho nội dung modal
-            className="bg-white"
+            bodyStyle={{padding: "24px"}}
         >
             {/* Tiêu đề bài viết */}
             <Title level={3} className="text-3xl font-semibold text-gray-900 mb-4">{news.title}</Title>
@@ -34,10 +52,17 @@ const NewsDetailsModal: React.FC<NewsDetailsModalProps> = ({ visible, onClose, n
 
             {/* Nội dung bài viết */}
             <div className="mb-4">
-                <strong className="text-xl text-gray-900">Nội dung:</strong>
+                <strong className="text-gray-900">Nội dung:</strong>
                 <div className="space-y-4 mt-2">
-
-                    <p className="text-gray-600">{news.content}</p>
+                    {contentData && contentData.title && (
+                        <p className="text-gray-600 text-16 font-bold">{contentData.title}</p>
+                    )}
+                    {contentData && contentData.description && (
+                        <p className="text-gray-600 text-14">{contentData.description}</p>
+                    )}
+                    {contentData && contentData.content && (
+                        <p className="text-gray-600 text-14">{contentData.content}</p>
+                    )}
                 </div>
             </div>
 
@@ -91,7 +116,7 @@ const NewsDetailsModal: React.FC<NewsDetailsModalProps> = ({ visible, onClose, n
                     Đóng
                 </Button>
             </div>
-        </Modal>
+        </Drawer>
     );
 };
 

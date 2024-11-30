@@ -7,12 +7,15 @@ import React
 import {
     Table
     // , Typography, Button, Image
-    , Spin, Pagination, Button
+    , Spin, Pagination, Button, Modal, message
 } from 'antd';
 // import type { ColumnsType } from 'antd/es/table';
 // import { PlusOutlined } from '@ant-design/icons';
-import {useUserList} from "@/hooks/user/useUsers";
-import {FaSync} from "react-icons/fa";
+import {useBlockUser, useUserList} from "@/hooks/user/useUsers";
+import { FaSync} from "react-icons/fa";
+import UserDrawer from "@/components/drawer/userDrawer";
+import {EyeOutlined} from "@ant-design/icons";
+import Heading from "@/components/design/Heading";
 
 // const { Title } = Typography;
 
@@ -21,13 +24,19 @@ import {FaSync} from "react-icons/fa";
 const UserPage: React.FC = () => {
     const [currentPage, setCurrentPage] = React.useState(1);
      const [refreshKey, setRefreshKey] = useState(0);
+    const [drawerOpen, setDrawerOpen] = useState(false);
+    const [selectedUser, setSelectedUser] = useState(null);
+    const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
+    const { mutate } = useBlockUser();
+
     const {
         data,
         isLoading,
         isError,
         isFetching,
     } = useUserList(currentPage, {
-        role: ["dd8ef7c3-9b02-49f5-bfe9-962ecbe14f77"]
+        role: ["dd8ef7c3-9b02-49f5-bfe9-962ecbe14f77"],
+        blocked: ["false"]
     },refreshKey); // Truyền currentPage vào hook
     // Xử lý lỗi
     if (isError) {
@@ -38,6 +47,43 @@ const UserPage: React.FC = () => {
     if (isLoading) {
         return <Spin size="large" />;
     }
+
+    const handleBlock = (id: string) => {
+        Modal.confirm({
+            title: "Bạn có chắc chắn muốn  chặn người dùng này?",
+            onOk: () => {
+                mutate(
+                    { id: [id], status: "block" },
+                );
+            },
+        });
+    };
+
+    // Gỡ chặn danh sách người dùng
+    const handleBlockMultiple = () => {
+        if (selectedKeys.length === 0) {
+            message.warning("Vui lòng chọn ít nhất một người dùng để chặn.");
+            return;
+        }
+        Modal.confirm({
+            title: "Bạn có chắc chắn muốn  chặn các người dùng đã chọn?",
+            onOk: () => {
+                mutate(
+                    { id: selectedKeys, status: "block" },
+                );
+            },
+        });
+    };
+
+    const openDrawer = (user: any) => {
+        setSelectedUser(user); // Lưu thông tin người dùng
+        setDrawerOpen(true);  // Mở Drawer
+    };
+
+    const closeDrawer = () => {
+        setDrawerOpen(false); // Đóng Drawer
+        setSelectedUser(null); // Reset thông tin người dùng
+    };
 
 
     const handleRefresh = () => {
@@ -51,42 +97,114 @@ const UserPage: React.FC = () => {
         {
             title: "ID",
             key: "id",
+            width: 80,
             render: (_: any, record: any, index: number) => index + 1, // This will display index + 1 as the ID
         },
-        { title: "Username", dataIndex: "username", key: "username" },
-        { title: "First Name", dataIndex: "first_name", key: "first_name" },
-        { title: "Last Name", dataIndex: "last_name", key: "last_name" },
-        { title: "Email", dataIndex: "email", key: "email" },
-        { title: "Phone Number", dataIndex: "phone_number", key: "phone_number" },
+        {
+            title: "Username",
+            dataIndex: "username",
+            key: "username",
+            width: 150,
+        },
+        {
+            title: "Name",
+            children: [
+                {
+                    title: "First Name",
+                    dataIndex: "first_name",
+                    key: "first_name",
+                    width: 150,
+                },
+                {
+                    title: "Last Name",
+                    dataIndex: "last_name",
+                    key: "last_name",
+                    width: 150,
+                },
+            ],
+        },
+        {
+            title: "Email",
+            dataIndex: "email",
+            key: "email",
+            width: 300,
+        },
+        {
+            title: "Phone Number",
+            dataIndex: "phone_number",
+            key: "phone_number",
+            width: 200,
+        },
+        {
+            title: "Thao Tác",
+            dataIndex: "action",
+            key: "action",
+            width: 100,
+            render: (_:any, record: any) => (
+                <>
+                    <Button onClick={() => openDrawer(record)}>
+                        <EyeOutlined /> Xem Chi Tiết
+                    </Button>
+                    <Button
+                        type="primary"
+                        danger
+                        onClick={() => handleBlock(record.id)}
+                    >
+                        Chặn
+                    </Button>
+                </>
+            ),
+        },
     ];
 
     return (
-        <div>
-            <h1 className='mt-4 text-16 font-bold'>Quản Lý Người Dùng</h1>
-            <Button onClick={handleRefresh} style={{marginLeft: "8px"}}>
-                <FaSync/> Làm mới
-            </Button>
-
-            <Table
-                dataSource={users}
-                columns={columns}
-                rowKey="id"
-                pagination={false}
-            />
-            <div className="flex justify-center mt-4">
-                <Pagination
-                    current={currentPage} // Trang hiện tại
-                    pageSize={20}
-                    total={data?.count || 0} // Tổng số người dùng
-                    onChange={(page) => {
-                        setCurrentPage(page); // Cập nhật trang hiện tại
+        <>
+            <div>
+                <Heading name="Quản lý danh sách Người dùng " />
+                <Button onClick={handleRefresh} style={{marginLeft: "8px"}}>
+                    <FaSync/> Làm mới
+                </Button>
+                <div className="mb-4 flex justify-between">
+                    <Button
+                        type="primary"
+                        danger
+                        disabled={selectedKeys.length === 0}
+                        onClick={handleBlockMultiple}
+                    >
+                         Chặn Danh Sách
+                    </Button>
+                </div>
+                <Table
+                    dataSource={users}
+                    columns={columns}
+                    rowKey="id"
+                    pagination={false}
+                    rowSelection={{
+                        selectedRowKeys: selectedKeys,
+                        onChange: (selectedRowKeys) =>
+                            setSelectedKeys(selectedRowKeys as string[]),
                     }}
-                    showSizeChanger={false}
                 />
-            </div>
+                <div className="flex justify-center mt-4">
+                    <Pagination
+                        current={currentPage} // Trang hiện tại
+                        pageSize={20}
+                        total={data?.count || 0} // Tổng số người dùng
+                        onChange={(page) => {
+                            setCurrentPage(page); // Cập nhật trang hiện tại
+                        }}
+                        showSizeChanger={false}
+                    />
+                </div>
                 {isFetching && <Spin size="small"/>} {/* Hiển thị loading khi đang tải dữ liệu */}
-        </div>
-            );
-            };
+            </div>
+            <UserDrawer
+                open={drawerOpen}
+                onClose={closeDrawer}
+                userInfo={selectedUser}
+            />
+        </>
+    );
+};
 
-            export default UserPage;
+export default UserPage;

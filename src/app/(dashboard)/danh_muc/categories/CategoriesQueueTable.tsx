@@ -65,7 +65,7 @@ const CategoriesQueueTable: React.FC = () => {
             title: 'Nội Dung',
             dataIndex: 'data',
             key: 'data',
-            width: 400,
+            width: 350,
             render: (data) => {
                 // Kiểm tra nếu có cả `new_data` và `old_data`
                 const newData = data?.new_data;

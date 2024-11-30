@@ -90,6 +90,17 @@ const config: Config = {
         28: "28px",
         30: "30px",
       },
+      extend: {
+        animation: {
+          heartbeat: "heartbeat 1.5s ease-in-out infinite",
+        },
+        keyframes: {
+          heartbeat: {
+            "0%, 100%": { transform: "scale(1)" },
+            "50%": { transform: "scale(1.2)" },
+          },
+        },
+      },
     },
   },
   plugins: [],

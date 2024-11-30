@@ -4,6 +4,7 @@ import {Table, Pagination, Spin} from "antd";
 import { useUserList } from "@/hooks/user/useUsers";
 import { useRoleList } from "@/hooks/role/useRole";
 import UserQueueList from "@/app/(dashboard)/user/queueList";
+import Heading from "@/components/design/Heading";
 
 const Role = () => {
     const [currentPage] = React.useState(1);
@@ -29,14 +30,19 @@ const Role = () => {
 
     // Cột hiển thị cho Table
     const columns = [
-        { title: "ID", dataIndex: "id", key: "id" },
+        {
+            title: "ID",
+            dataIndex: "id",
+            key: "id" ,
+            render: (_: any, record: any, index: number) => index + 1, // This will display index + 1 as the ID
+
+        },
         { title: "Role", dataIndex: "name", key: "name" },
         { title: "Mô tả", dataIndex: "description", key: "description" },
     ];
 
     return (
         <div>
-            <h1 className='text-16 font-bold'>Role Table</h1>
             <Table
                 dataSource={roles}
                 columns={columns}
@@ -50,13 +56,13 @@ const Role = () => {
 
 const User = () => {
     const [currentPage, setCurrentPage] = React.useState(1);
-    const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
+    const [refreshKey] = useState(0); // State to refresh data
     const {
         data,
         isLoading,
         isError,
         isFetching,
-    } = useUserList(currentPage,refreshKey); // Truyền currentPage vào hook
+    } = useUserList(currentPage, {},refreshKey); // Truyền currentPage vào hook
 
     // Xử lý lỗi
     if (isError) {
@@ -73,7 +79,13 @@ const User = () => {
 
     // Cột hiển thị cho Table
     const columns = [
-        { title: "ID", dataIndex: "id", key: "id" },
+        {
+            title: "ID",
+            dataIndex: "id",
+            key: "id",
+            render: (_: any, record: any, index: number) => index + 1, // This will display index + 1 as the ID
+
+        },
         { title: "Username", dataIndex: "username", key: "username" },
         { title: "Họ và Tên Đệm", dataIndex: "first_name", key: "first_name" },
         { title: "Tên", dataIndex: "last_name", key: "last_name" },
@@ -83,8 +95,9 @@ const User = () => {
 
     return (
         <div>
+            <Heading name="Role" />
             <Role/>
-            <h1 className='mt-4 text-16 font-bold'>User Page</h1>
+            <Heading name="Quản Lý Người Dùng" />
 
             <Table
                 dataSource={users}

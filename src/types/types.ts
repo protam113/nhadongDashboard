@@ -33,3 +33,7 @@ export interface EditCategoryItem {
     name: string;
     image: RcFile | null; // Chỉnh sửa kiểu file thành RcFile | null
 }
+
+export interface Group {
+    groupId: string;
+}

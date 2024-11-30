@@ -59,12 +59,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const logout = () => {
         if (typeof window !== 'undefined') {
+            // Xóa thông tin từ localStorage và cookie
             localStorage.removeItem('token');
-            removeCookie('refresh')
+            removeCookie('refresh');
+            localStorage.removeItem('user_info');
         }
 
+        // Cập nhật trạng thái xác thực
         setIsAuthenticated(false);
+
+        // Tải lại toàn bộ thông tin trên trang
+        // Hoặc điều hướng người dùng về trang đăng nhập
+        window.location.reload(); // Cách 1: Reload toàn bộ trang
+        // window.location.href = '/login'; // Cách 2: Chuyển hướng đến trang login
     };
+
 
     const getToken = () => {
         return typeof window !== 'undefined' ? localStorage.getItem('token') : null;

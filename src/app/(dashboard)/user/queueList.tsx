@@ -5,19 +5,27 @@ import {Table, Button, Spin, Pagination} from 'antd';
 import { PlusOutlined, MinusOutlined } from '@ant-design/icons'; // Icon từ Ant Design
 import type { ColumnsType } from 'antd/es/table';
 import {UserList} from "@/lib/userList";
+import Heading from "@/components/design/Heading";
 
 const UserQueueList: React.FC = () => {
     const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [seeMore, setSeeMore] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
-
+    const [is_active, setIs_active] = useState<string>("false");
+    const [blocked] = useState<string>("false");
     // Gọi hook `UserQueue` và thêm `refreshKey` làm dependency để làm mới dữ liệu
     const { queueData, isLoading, isError, handleActiveUser } = UserList(
         currentPage,
-        "false",
+        is_active,
+        blocked,
         refreshKey// Truyền "false" cho is_active
     );
+
+    const handleModelChange = (value: string) => {
+        setIs_active(value);
+        setRefreshKey((prev) => prev + 1); // Refresh data when model changes
+    };
 
 
     const handleBulkApprove = () => {
@@ -36,7 +44,7 @@ const UserQueueList: React.FC = () => {
             dataIndex: 'id',
             key: 'id',
             width: 100,
-            render: (text) => <span>{text}</span>,
+            render: (_: any, record: any, index: number) => index + 1, // This will display index + 1 as the ID
         },
         // {
         //     title: 'Ngày Tạo',
@@ -161,7 +169,8 @@ const UserQueueList: React.FC = () => {
 
     return (
         <div className="p-4">
-            <h1 className='text-16 font-bold mt-4'>Quản lý hàng đợi duyệt người dùng</h1>
+            <Heading name="Quản lý hàng đợi duyệt người dùng" />
+
             <div className="p-4">
             <Button type="primary" onClick={handleBulkApprove} style={{ marginBottom: '16px' }}>
                 Chấp Thuận

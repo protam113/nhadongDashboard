@@ -19,7 +19,8 @@ interface User {
     email: string;
     phone_number: string | null;
     profile_image: string;
-    role: string;
+    is_active: boolean;
+    blocked: boolean;
 }
 
 interface FetchUserListResponse {
@@ -296,5 +297,58 @@ const useActiveUser = () => {
     });
 };
 
+/**
+ Hàm xử lý khóa và mở khóa user
+ **/
 
-export { useUserList,useCreateManager,useAddManager,useActiveUser };
+interface BlockedUser {
+    id: string[];
+    status: string;
+}
+
+const blockUserAPI = async (blockUser: BlockedUser, token: string) => {
+    if (!token) throw new Error("No token available");
+
+    const formData = new FormData();
+    Object.entries(blockUser).forEach(([key, value]) => {
+        if (Array.isArray(value)) {
+            value.forEach((v) => formData.append(key, v));
+        } else if (value !== undefined && value !== null) {
+            formData.append(key, value.toString());
+        }
+    });
+
+    try {
+        const response = await handleAPI(`${endpoints.blocked}`, 'POST', formData, token);
+        return response.data;
+    } catch (error: any) {
+        console.error('Error blocking user:', error.response?.data);
+        throw new Error(error.response?.data?.message || 'Failed to block user');
+    }
+};
+
+const useBlockUser = () => {
+    const queryClient = useQueryClient();
+    const { getToken } = useAuth();
+
+    return useMutation({
+        mutationFn: async (blockUser: BlockedUser) => {
+            const token = await getToken();
+            if (!token) {
+                throw new Error("Token is not available");
+            }
+            return blockUserAPI(blockUser, token);
+        },
+        onSuccess: () => {
+            message.success("Người dùng đã bị chặn thành công!");
+            queryClient.invalidateQueries({ queryKey: ["userQueueList"] });
+        },
+        onError: (error: any) => {
+            message.error(error.message || "Không thể chặn người dùng.");
+        },
+    });
+};
+
+
+
+export { useUserList,useCreateManager,useAddManager,useActiveUser,useBlockUser };

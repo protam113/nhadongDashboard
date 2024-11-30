@@ -9,7 +9,7 @@ import {useDocsList} from "@/hooks/document/useDocs";
 
 export const DocsList = (currentPage: number, model: string, refreshKey: number) => {
     const { data, isLoading, isError } = useDocsList(currentPage,
-        {model: [],} // Use the model chosen by the user
+        {category: [model],} // Use the model chosen by the user
         ,refreshKey);
 
 

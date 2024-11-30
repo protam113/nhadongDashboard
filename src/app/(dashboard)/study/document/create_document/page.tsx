@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import {Form, Input, Button, Upload, Card, Select, message, Image} from 'antd';
+import {Form, Input, Button, Upload, Card, Select, message, Image, Alert} from 'antd';
 import { PlusOutlined } from '@ant-design/icons';
 import { RcFile } from 'antd/lib/upload';
 import { CategoriesList } from "@/lib/categoriesList";
@@ -10,6 +10,7 @@ import ContentSection from "@/components/main/blog/ContentSection";
 import { Section, SectionField } from '@/types/types';
 import {useRouter} from "next/navigation";
 import {useCreateDoc} from "@/hooks/document/useDocs";
+import TextArea from "antd/es/input/TextArea";
 
 const Page: React.FC = () => {
     const [content, setContent] = useState<Section[]>([]);
@@ -153,12 +154,14 @@ const Page: React.FC = () => {
                         />
                     </Form.Item>
                     <Form.Item label="Mô tả" name="description" rules={[{ required: true, message: 'Vui lòng nhập mô tả!' }]}>
-                        <Input
+                        <TextArea
                             value={blogData.description}
                             onChange={(e) => setBlogData({ ...blogData, description: e.target.value })}
+                            placeholder="Nhập Thông Tin Về Tài Liệu"
+                            autoSize={{ minRows: 3, maxRows: 5 }}
                         />
                     </Form.Item>
-                    <Form.Item label="Hình ảnh chính">
+                    <Form.Item label="Hình ảnh tài liệu">
                         <Upload
                             listType="picture-card"
                             fileList={fileList}
@@ -180,14 +183,21 @@ const Page: React.FC = () => {
                             />
                         )}
                     </Form.Item>
-                    <Form.Item label="Link" name="Link">
+                    <Form.Item label="Link (Tham Khảo)" name="Link">
                         <Input
                             value={blogData.link}
                             onChange={(e) => setBlogData({ ...blogData, link: e.target.value })}
                         />
                     </Form.Item>
+                    <Alert
+                        message="Hãy chọn 1 thể loại đi kèm theo tài liệu."
+                        type="warning"
+                        showIcon
+                        className="mb-4"
+                    />
 
-                    <Form.Item label="Thể loại">
+                    <hr className='mt-4'/>
+                    <Form.Item label="Thể loại" >
                         {isLoading ? (
                             <p>Đang tải thể loại...</p>
                         ) : isError ? (

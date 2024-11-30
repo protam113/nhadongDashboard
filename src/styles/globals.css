@@ -68,3 +68,35 @@ body {
     text-wrap: balance;
   }
 }
+
+/* styles/loading.module.css */
+.loading-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+  background-color: #142857; /* Màu nền */
+}
+
+.logo-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  animation: heartbeat 1.5s ease-in-out infinite;
+}
+
+.logo {
+  width: 128px;
+  height: 128px;
+}
+
+@keyframes heartbeat {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.2);
+  }
+}
+

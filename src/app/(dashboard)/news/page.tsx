@@ -1,12 +1,9 @@
 "use client"; // Ensures this is a client component
 
 import React, { useState } from "react";
-import { Table, Button, Typography, Spin,Modal  } from "antd";
+import { Table, Button, Typography, Spin  } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { FaSync } from "react-icons/fa"; // Import refresh icon
-import {useDeleteCategory} from "@/hooks/cateogry/useCategories";
-import { MdOutlineDelete } from "react-icons/md";
-import { FaRegEdit } from "react-icons/fa";
 import { EyeOutlined } from "@ant-design/icons";
 import {NewsList} from "@/lib/newsList";
 import NewsQueueList from "@/app/(dashboard)/news/NewsQueueTable";
@@ -19,26 +16,13 @@ const News: React.FC = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const [model] = useState<string>(""); // State to hold selected model
     const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
-    const { mutate: deleteCategory } = useDeleteCategory();
     const [selectedNews, setSelectedNews] = useState(null);
-    const [isModalVisible, setIsModalVisible] = useState(false);
+    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
     // Pass model into CategoriesList
     const { queueData, isLoading, isError } = NewsList(currentPage, model, refreshKey);
 
-    const handleDelete = (categoryId: string) => {
-        // Show confirmation dialog before deletion
-        Modal.confirm({
-            title: 'Xác nhận xóa',
-            content: 'Bạn có chắc chắn muốn xóa thể loại này?',
-            okText: 'Xóa',
-            okType: 'danger',
-            cancelText: 'Hủy',
-            onOk: () => {
-                deleteCategory(categoryId);
-            },
-        });
-    };
+
 
     const columns: ColumnsType<any> = [
         {
@@ -57,7 +41,7 @@ const News: React.FC = () => {
             dataIndex: "id",
             key: "id",
             width: 60,
-            render: (text) => <span>{text}</span>,
+            render: (text, record, index) => <span>{index + 1}</span>,
         },
         {
             title: "Tiêu Đề",
@@ -91,22 +75,6 @@ const News: React.FC = () => {
                     </span>
             ),
         },
-        {
-            title: "Action",
-            dataIndex: "action",
-            key: "action",
-            width: 100,
-            render: (_, record) => (
-                <>
-                    <Button danger onClick={() => handleDelete(record.id)}>
-                        <MdOutlineDelete className="text-albert-error" />
-                    </Button>
-                    <Button>
-                        <FaRegEdit />
-                    </Button>
-                </>
-            ),
-        },
     ];
 
 
@@ -115,12 +83,12 @@ const News: React.FC = () => {
 
     const handleViewDetails = (news: any) => {
         setSelectedNews(news);
-        setIsModalVisible(true);
+        setIsDrawerOpen(true);
     };
 
     // Function to handle closing the modal
     const handleModalClose = () => {
-        setIsModalVisible(false);
+        setIsDrawerOpen(false);
         setSelectedNews(null);
     };
 
@@ -164,7 +132,7 @@ const News: React.FC = () => {
                 <NewsQueueList/>
             </div>
             <NewsDetailsModal
-                visible={isModalVisible}
+                open={isDrawerOpen}
                 onClose={handleModalClose}
                 news={selectedNews}
             />

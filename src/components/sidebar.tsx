@@ -57,12 +57,15 @@ const SidebarComponent: React.FC<{ collapsed: boolean }> = ({ collapsed }) => {
     return (
         <Sider trigger={null} collapsible collapsed={collapsed} style={siderStyle}>
             <div style={{ textAlign: 'center', margin: '18px 0' }}>
+                <Link href='/'>
                 <Image
                     src={Logo}
                     className={`w-full h-auto ${collapsed ? 'max-h-[40px]' : 'max-h-[70px]'} object-contain`}
                     alt="Logo"
                 />
-                {/*{!collapsed && (*/}
+            </Link>
+
+            {/*{!collapsed && (*/}
                 {/*    <p className='text-white text-14 font-bold'>Champagnat Dashboard</p>*/}
                 {/*)}*/}
             </div>

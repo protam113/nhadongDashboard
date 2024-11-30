@@ -1,29 +1,28 @@
 "use client";
 
 import React from "react";
-import { Modal, Typography, Divider, Button, Image } from "antd";
+import { Drawer, Typography, Divider, Button, Image } from "antd";
 import RoleTableModal from "@/app/(dashboard)/cong_doan/modal/RoleTableModal";
+import GroupMemberTable from "@/components/table/groupMemberTable";
 
 const { Title } = Typography;
 
 interface GroupDetail {
-    visible: boolean;
+    open: boolean;
     onClose: () => void;
     group: any | null; // Accept blog data type as any
 }
 
-const GroupDetailModal: React.FC<GroupDetail> = ({ visible, onClose, group }) => {
+const GroupDetailModal: React.FC<GroupDetail> = ({ open, onClose, group }) => {
     if (!group) return null;
 
     return (
-        <Modal
-            visible={visible}
-            onCancel={onClose}
-            footer={null} // Tắt các nút mặc định
+        <Drawer
+            open={open}
+            onClose={onClose}
             title="Thông Tin Chi Tiết Bài Viết"
             width={900}
-            bodyStyle={{ padding: "24px" }} // Thêm padding cho nội dung modal
-            className="bg-white"
+            bodyStyle={{ padding: "24px" }}
         >
             {group.image && (
                 <div className="mb-4 flex justify-center">
@@ -58,6 +57,8 @@ const GroupDetailModal: React.FC<GroupDetail> = ({ visible, onClose, group }) =>
             {/* Danh sách vai trò */}
             <Divider />
             <RoleTableModal groupId={group.id} /> {/* Truyền groupId vào RoleTableModal */}
+            
+            <GroupMemberTable groupId={group.id} />
 
             {/* Nút đóng */}
             <div className="flex justify-end mt-4">
@@ -65,7 +66,7 @@ const GroupDetailModal: React.FC<GroupDetail> = ({ visible, onClose, group }) =>
                     Đóng
                 </Button>
             </div>
-        </Modal>
+        </Drawer>
     );
 };
 

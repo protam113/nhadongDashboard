@@ -11,6 +11,7 @@
     import BlogDetailsModal from "@/app/(dashboard)/blog/BlogDetailsModal";
     import { EyeOutlined } from "@ant-design/icons";
     import BlogQueueList from "@/app/(dashboard)/blog/BlogQueueTable";
+    import Heading from "@/components/design/Heading";
 
     const { Title } = Typography;
 
@@ -21,7 +22,7 @@
         const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
         const { mutate: deleteCategory } = useDeleteCategory();
         const [selectedBlog, setSelectedBlog] = useState(null); // State for selected blog
-        const [isModalVisible, setIsModalVisible] = useState(false);
+        const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
         // Pass model into CategoriesList
         const { queueData, isLoading, isError } = BlogList(currentPage, model, refreshKey);
@@ -57,7 +58,7 @@
                 dataIndex: "id",
                 key: "id",
                 width: 60,
-                render: (text) => <span>{text}</span>,
+                render: (_: any, record: any, index: number) => index + 1, // This will display index + 1 as the ID
             },
             {
                 title: "Tiêu Đề",
@@ -115,12 +116,11 @@
 
         const handleViewDetails = (blog: any) => {
             setSelectedBlog(blog);
-            setIsModalVisible(true);
+            setIsDrawerOpen(true);
         };
 
-        // Function to handle closing the modal
-        const handleModalClose = () => {
-            setIsModalVisible(false);
+        const handleDrawerClose = () => {
+            setIsDrawerOpen(false);
             setSelectedBlog(null);
         };
 
@@ -132,7 +132,7 @@
         return (
             <>
             <div className="p-4">
-                <Title level={2}>Quản Lý Bài Viết</Title>
+                <Heading name="Quản Lý Bài Viêt" />
 
                 {/* Model selection */}
                 <div className="flex justify-between items-center mb-4">
@@ -161,11 +161,12 @@
                     <span style={{margin: "0 8px"}}>Page {currentPage}</span>
                     <Button onClick={() => setCurrentPage((prev) => prev + 1)}>Next</Button>
                 </div>
+                <Heading name="Quản lý hàng đợi duyệt bài viết" />
                 <BlogQueueList/>
             </div>
                 <BlogDetailsModal
-                    visible={isModalVisible}
-                    onClose={handleModalClose}
+                    open={isDrawerOpen}
+                    onClose={handleDrawerClose}
                     blog={selectedBlog}
                 />
             </>

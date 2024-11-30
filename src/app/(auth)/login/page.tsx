@@ -25,7 +25,7 @@ export default function LoginPage() {
         }
     };
     return (
-        <div className="font-[sans-serif] bg-primary-500">
+        <div className="bg-primary-900">
             <div className="min-h-screen flex flex-col items-center justify-center py-6 px-4">
                 <div className="grid md:grid-cols-2 items-center gap-4 max-w-6xl w-full">
                     <div className="border border-gray-300 bg-white rounded-lg p-6 max-w-md max-md:mx-auto">
