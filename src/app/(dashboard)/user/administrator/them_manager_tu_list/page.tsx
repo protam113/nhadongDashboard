@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Table, Spin, Pagination, message, Button, Modal } from 'antd';
 import { useUserList, useAddManager } from "@/hooks/user/useUsers";
+import Heading from "@/components/design/Heading";
 
 const UserAddToManagerPage: React.FC = () => {
     const { mutate: addManagerMutation } = useAddManager();
@@ -93,7 +94,8 @@ const UserAddToManagerPage: React.FC = () => {
 
     return (
         <div>
-            <h1 className='mt-4 text-16 font-bold'>Quản Lý Người Dùng</h1>
+            <Heading name="Danh sách người dùng  "/>
+
 
             <Table
                 dataSource={users}

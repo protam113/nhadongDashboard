@@ -9,7 +9,12 @@ import { CategoriesList } from "@/lib/categoriesList";
 import {UploadFile, UploadProps} from "antd/lib/upload/interface";
 import ContentSection from "@/components/main/blog/ContentSection";
 import { Section, SectionField } from '@/types/types';
-import {useRouter} from "next/navigation";  // Import kiểu dữ liệu
+import {useRouter} from "next/navigation";
+import BackButton from "@/components/Button/BackButton";
+import Heading from "@/components/design/Heading";  // Import kiểu dữ liệu
+
+
+const { TextArea } = Input;
 
 
 const CreateBlogPage: React.FC = () => {
@@ -145,7 +150,11 @@ const CreateBlogPage: React.FC = () => {
 
     return (
         <div style={{ padding: '20px', maxWidth: '800px', margin: '0 auto' }}>
-            <Card title="Tạo Blog" bordered={false}>
+            <BackButton/>
+
+            <Heading name="tạo bài viết mới  "/>
+
+            <Card bordered={false}>
                 <Form form={form} layout="vertical" onFinish={handleSaveBlog}>
                     <Form.Item label="Tiêu đề" name="title" rules={[{ required: true, message: 'Vui lòng nhập tiêu đề!' }]}>
                         <Input
@@ -154,7 +163,8 @@ const CreateBlogPage: React.FC = () => {
                         />
                     </Form.Item>
                     <Form.Item label="Mô tả" name="description" rules={[{ required: true, message: 'Vui lòng nhập mô tả!' }]}>
-                        <Input
+                        <TextArea
+
                             value={blogData.description}
                             onChange={(e) => setBlogData({ ...blogData, description: e.target.value })}
                         />

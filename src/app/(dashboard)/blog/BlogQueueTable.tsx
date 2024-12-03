@@ -5,7 +5,6 @@ import { Table, Button, Spin, Pagination } from 'antd';
 import { ReloadOutlined, PlusOutlined, MinusOutlined } from '@ant-design/icons'; // Icon từ Ant Design
 import type { ColumnsType } from 'antd/es/table';
 import { UserQueue } from '@/lib/userQueue';
-import Heading from "@/components/design/Heading";
 
 const BlogQueueList: React.FC = () => {
     const [selectedKeys, setSelectedKeys] = useState<number[]>([]);

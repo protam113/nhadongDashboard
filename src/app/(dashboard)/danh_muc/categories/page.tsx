@@ -11,6 +11,7 @@ import { MdOutlineDelete } from "react-icons/md";
 import { FaRegEdit } from "react-icons/fa";
 import CategoriesQueueTable from "@/app/(dashboard)/danh_muc/categories/CategoriesQueueTable";
 import EditBlogCategory from "@/app/(dashboard)/blog/blog_categories/EditBlogCategory";
+import Heading from "@/components/design/Heading";
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -126,7 +127,7 @@ const Categories: React.FC = () => {
     return (
         <>
         <div className="p-4">
-            <Title level={2}>Quản Lý Thể Loại</Title>
+            <Heading name="quản lý toàn bộ thể loại  "/>
 
             {/* Model selection */}
             <div className="flex justify-between items-center mb-4">

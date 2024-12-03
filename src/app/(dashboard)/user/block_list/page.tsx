@@ -6,6 +6,7 @@ import type { ColumnsType } from "antd/es/table";
 import { UserList } from "@/lib/userList";
 import Heading from "@/components/design/Heading";
 import { useBlockUser } from "@/hooks/user/useUsers";
+import BackButton from "@/components/Button/BackButton";
 
 const Page: React.FC = () => {
     const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
@@ -102,6 +103,7 @@ const Page: React.FC = () => {
 
     return (
         <div className="p-4">
+            <BackButton/>
             <Heading name="Quản lý danh sách chặn " />
             <div className="mb-4 flex justify-between">
                 <Button

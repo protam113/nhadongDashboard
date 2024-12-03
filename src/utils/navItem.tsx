@@ -15,7 +15,7 @@ import { HiOutlineNewspaper } from "react-icons/hi";
 import { RiCommunityLine } from "react-icons/ri";
 
 /**
- 28,35
+35
  **/
 
 
@@ -154,9 +154,15 @@ export const NavItems = () => {
             icon: <MdOutlineEventAvailable/>,
             children: [
                 {
-                    name: "Thể Loại",
-                    link: '/event/event_categories',
+                    name: "Ơn Gọi",
+                    link: '/event/vocation_list',
                     key: '24',
+                    icon: <BiCategory/>,
+                },
+                {
+                    name: "Sự Kiện",
+                    link: '/event/event_list',
+                    key: '28',
                     icon: <BiCategory/>,
                 },
             ]

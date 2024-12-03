@@ -3,14 +3,7 @@
 import { useCookie } from '@/hooks/useCookie';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { baseURL, endpoints } from '@/apis/api';
-
-interface AuthContextType {
-    isAuthenticated: boolean;
-    loading: boolean;
-    login: (username: string, password: string) => Promise<void>;
-    logout: () => void;
-    getToken: () => string | null; // Thêm getToken vào kiểu AuthContextType
-}
+import {AuthContextType} from "@/types/types";
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 

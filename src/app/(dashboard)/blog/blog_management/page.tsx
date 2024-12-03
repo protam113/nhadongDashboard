@@ -4,7 +4,6 @@
     import { Table, Button, Spin,Modal  } from "antd";
     import type { ColumnsType } from "antd/es/table";
     import { FaSync } from "react-icons/fa"; // Import refresh icon
-    import { useRouter } from "next/navigation";
     import { MdOutlineDelete } from "react-icons/md";
     import { FaRegEdit } from "react-icons/fa";
     import {BlogList} from "@/lib/blogList";
@@ -13,6 +12,7 @@
     import EditBlogModal from "@/app/(dashboard)/blog/blog_management/modal/EditBlogModal";
     import {useDeleteBlog} from "@/hooks/blog/useBlog";
     import Heading from "@/components/design/Heading";
+    import PushButton from "@/components/Button/PushButton";
 
 
     const BlogManagement: React.FC = () => {
@@ -20,7 +20,6 @@
         const [currentPage, setCurrentPage] = useState(1);
         const [model] = useState<string>(""); // State to hold selected model
         const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
-        const router = useRouter(); // Hook for navigation
         const { mutate: deleteBlog } = useDeleteBlog();
         const [selectedBlog, setSelectedBlog] = useState(null); // State for selected blog
         const [isDrawerVisible, setIsDrawerVisible] = useState(false); // Drawer visibility state
@@ -138,9 +137,6 @@
             setRefreshKey((prev) => prev + 1); // Refresh data manually
         };
 
-        const handleCreateBLog = () => {
-            router.push("/blog/blog_management/create_blog"); // Navigate to the create category page
-        };
 
         return (
             <>
@@ -152,9 +148,8 @@
                         <Button onClick={handleRefresh} style={{marginLeft: "8px"}}>
                             <FaSync/> Làm mới
                         </Button>
-                        <Button type="primary" onClick={handleCreateBLog}>
-                            Tạo Bài Viết
-                        </Button>
+                        <PushButton href="/blog/blog_management/create_blog" label={"Tạo Bài Viêt"} />
+
                     </div>
 
                     <div className="overflow-auto" style={{maxHeight: "800px"}}>

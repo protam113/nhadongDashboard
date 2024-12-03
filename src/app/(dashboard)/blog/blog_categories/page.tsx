@@ -2,7 +2,7 @@
 
 
 import React, { useState } from "react";
-import { Table, Button, Typography, Spin, Modal, Image } from "antd";
+import { Table, Button, Spin, Modal, Image } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { FaSync } from "react-icons/fa";
 import { CategoriesList } from "@/lib/categoriesList";
@@ -12,8 +12,8 @@ import { FaRegEdit } from "react-icons/fa";
 import CreateBlogCategory from "./CreateBlogCategory";
 import EditBlogCategory from "@/app/(dashboard)/blog/blog_categories/EditBlogCategory";
 import BlogCategoryModal from "@/app/(dashboard)/blog/blog_categories/BlogCategoryModal";
+import Heading from "@/components/design/Heading";
 
-const { Title } = Typography;
 
 
 const BlogCategories: React.FC = () => {
@@ -131,7 +131,7 @@ const BlogCategories: React.FC = () => {
     return (
         <>
             <div className="p-4">
-                <Title level={2}>Quản Lý Thể Loại Bài Viết</Title>
+                <Heading name="quản lý thể loại bài viết  "/>
 
                 <div className="flex justify-between items-center mb-4">
                     <Button onClick={handleRefresh}>

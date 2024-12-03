@@ -35,7 +35,7 @@ const UserPage: React.FC = () => {
         isError,
         isFetching,
     } = useUserList(currentPage, {
-        role: ["dd8ef7c3-9b02-49f5-bfe9-962ecbe14f77"],
+        role: ["395b5f6e-d180-4c9b-a52c-9e9f6ad98bcf"],
         blocked: ["false"]
     },refreshKey); // Truyền currentPage vào hook
     // Xử lý lỗi

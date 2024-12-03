@@ -14,6 +14,7 @@ import EditGroup from "@/app/(dashboard)/cong_doan/modal/EditGroupModal";
 import {EyeOutlined} from "@ant-design/icons";
 import GroupDetailModal from "@/app/(dashboard)/cong_doan/modal/GroupDetailModal";
 import BackButton from "@/components/Button/BackButton";
+import Heading from "@/components/design/Heading";
 
 const { Title } = Typography;
 
@@ -170,7 +171,7 @@ const Groups: React.FC = () => {
         <>
             <div className="p-4">
                 <BackButton/>
-                <Title level={2}>Quản Lý Cộng Đoàn</Title>
+                <Heading name="quản lý cộng đoàn  "/>
 
                 {/* Model selection */}
                 <div className="flex justify-between items-center mb-4">

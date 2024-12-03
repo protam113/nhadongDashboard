@@ -3,7 +3,8 @@
 import React, { useState } from 'react';
 import { Form, Input, Button, Card, message, Row, Col } from 'antd';
 import { UserAddOutlined } from '@ant-design/icons';
-import { useCreateManager } from "@/hooks/user/useUsers"; // Giả sử hook này đã được định nghĩa
+import { useCreateManager } from "@/hooks/user/useUsers";
+import Heading from "@/components/design/Heading"; // Giả sử hook này đã được định nghĩa
 
 const AddUserPage: React.FC = () => {
     const [form] = Form.useForm();
@@ -27,7 +28,9 @@ const AddUserPage: React.FC = () => {
     };
     return (
         <div style={{ margin: '0 auto'}}>
-            <Card title="Thêm Quản Trị Viên" bordered={true}
+            <Heading name="tạo quản trị viên  "/>
+
+            <Card bordered={true}
                   style={{textAlign: 'center'}}>
                 <Form
                     form={form}

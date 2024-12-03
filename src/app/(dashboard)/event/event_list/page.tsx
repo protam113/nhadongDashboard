@@ -9,13 +9,17 @@ import NewsQueueList from "@/app/(dashboard)/news/NewsQueueTable";
 import NewsDetailsModal from "@/app/(dashboard)/news/NewsDetailsModal";
 import {EventList} from "@/lib/eventList";
 import Heading from "@/components/design/Heading";
+import {useRouter} from "next/navigation";
+import PushButton from "@/components/Button/PushButton";
 
 const { Title } = Typography;
 
 const Page: React.FC = () => {
+    const router = useRouter(); // Hook for navigation
+
     const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [category] = useState<string>(""); // State to hold selected model
+    const [category] = useState<string>("event"); // State to hold selected model
     const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
     const [selectedNews, setSelectedNews] = useState(null);
     const [isDrawerOpen, setIsDrawerOpen] = useState(false);
@@ -101,13 +105,14 @@ const Page: React.FC = () => {
     return (
         <>
             <div className="p-4">
-                <Heading name="Quản lý danh sách Event & Ơn Gọi  " />
+                <Heading name="Quản lý danh sách Event  "/>
 
                 {/* Model selection */}
                 <div className="flex justify-between items-center mb-4">
                     <Button onClick={handleRefresh} style={{marginLeft: "8px"}}>
                         <FaSync/> Làm mới
                     </Button>
+                   <PushButton href="/event/event_list/create_event" label={"Tạo Sự Kiện"} />
                 </div>
 
                 <div className="overflow-auto" style={{maxHeight: "800px"}}>
@@ -124,7 +129,8 @@ const Page: React.FC = () => {
                     />
                 </div>
                 <div style={{marginTop: "16px", textAlign: "center"}}>
-                    <Button disabled={currentPage === 1} onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}>
+                    <Button disabled={currentPage === 1}
+                            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}>
                         Previous
                     </Button>
                     <span style={{margin: "0 8px"}}>Page {currentPage}</span>

@@ -85,7 +85,7 @@ const GroupMember: React.FC<Group> = ({ groupId }) => {
             render: (text) => <span>{text}</span>,
         },
         {
-            title: "Ngày Khấn Đầu Tiên",
+            title: "Ngày Khấn Tạm",
             dataIndex: "first_vows_date",
             key: "first_vows_date",
             width: 150,

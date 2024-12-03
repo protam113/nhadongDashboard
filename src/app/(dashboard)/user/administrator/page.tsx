@@ -30,7 +30,7 @@ const ManageUsersPage: React.FC = () => {
     const { data, isLoading, isError, isFetching } = useUserList(
         currentPage,
         {
-            role: selectedRole ? [selectedRole] : ["5a09a8f0-cd62-4a52-aa83-e5655ba4ef1a", "56ac28ae-14e3-422d-acce-666dad4f8d15"], // Default roles if no selection
+            role: selectedRole ? [selectedRole] : ["9c694bfc-6f29-48a2-b66b-fdc9cd65c362", "f146ab60-321f-4a3b-aab4-997331dce4f5"], // Default roles if no selection
         },
         refreshKey
     );

@@ -5,6 +5,7 @@ import {Table, Button, Typography, Spin, Select} from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useQueueManagement } from '@/logic/queueLogic';
 import {MinusOutlined, PlusOutlined, ReloadOutlined} from "@ant-design/icons";
+import Heading from "@/components/design/Heading";
 
 const { Title } = Typography;
 const { Option } = Select;
@@ -200,7 +201,7 @@ const Queue: React.FC = () => {
 
     return (
         <div className="p-4">
-            <Title level={2}>Quản Lý Hàng Đợi Duyệt</Title>
+            <Heading name="quản lý hàng đợi  "/>
                 <Button type="primary" onClick={handleBulkApprove} style={{ marginBottom: '16px' }}>
                     Approve Selected
                 </Button>

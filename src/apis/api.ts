@@ -1,7 +1,16 @@
 //api/api.ts
 
+/**
+ Base URL
+ **/
+
+
 const baseURL = 'http://localhost:8000';
-const vStorage = 'https://hcm03.auth.vstorage.vngcloud.vn/v3/auth/tokens';
+// const vStorage = 'https://hcm03.auth.vstorage.vngcloud.vn/v3/auth/tokens';
+
+/**
+End Points aPI
+ **/
 
 
 const endpoints = {
@@ -19,6 +28,7 @@ const endpoints = {
 
     //current user lgin
     currentUser: '/user/detail/',
+    updateProfile: '/user/update-profile/',
 
     //queue
     queues: '/queue/',

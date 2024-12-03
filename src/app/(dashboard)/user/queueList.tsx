@@ -2,17 +2,16 @@
 
 import React, { useState } from 'react';
 import {Table, Button, Spin, Pagination} from 'antd';
-import { PlusOutlined, MinusOutlined } from '@ant-design/icons'; // Icon từ Ant Design
 import type { ColumnsType } from 'antd/es/table';
 import {UserList} from "@/lib/userList";
 import Heading from "@/components/design/Heading";
+import {FaSync} from "react-icons/fa";
 
 const UserQueueList: React.FC = () => {
     const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
-    const [seeMore, setSeeMore] = useState(false);
     const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
-    const [is_active, setIs_active] = useState<string>("false");
+    const [is_active] = useState<string>("false");
     const [blocked] = useState<string>("false");
     // Gọi hook `UserQueue` và thêm `refreshKey` làm dependency để làm mới dữ liệu
     const { queueData, isLoading, isError, handleActiveUser } = UserList(
@@ -22,15 +21,14 @@ const UserQueueList: React.FC = () => {
         refreshKey// Truyền "false" cho is_active
     );
 
-    const handleModelChange = (value: string) => {
-        setIs_active(value);
-        setRefreshKey((prev) => prev + 1); // Refresh data when model changes
-    };
-
 
     const handleBulkApprove = () => {
         handleActiveUser(selectedKeys, 'approved');
         setSelectedKeys([]);
+    };
+
+    const handleRefresh = () => {
+        setRefreshKey((prev) => prev + 1); // Refresh data manually
     };
 
     // const handleBulkReject = () => {
@@ -40,126 +38,30 @@ const UserQueueList: React.FC = () => {
 
     const columns: ColumnsType<any> = [
         {
-            title: 'ID',
-            dataIndex: 'id',
-            key: 'id',
+            title: "ID",
+            dataIndex: "id",
+            key: "id",
             width: 100,
-            render: (_: any, record: any, index: number) => index + 1, // This will display index + 1 as the ID
-        },
-        // {
-        //     title: 'Ngày Tạo',
-        //     dataIndex: 'created_date',
-        //     key: 'created_date',
-        //     width: 150,
-        //     render: (text) => <span>{new Date(text).toLocaleString()}</span>,
-        // },
-        // {
-        //     title: 'Ngày Cập Nhật',
-        //     dataIndex: 'updated_date',
-        //     key: 'updated_date',
-        //     width: 150,
-        //     render: (text) => <span>{new Date(text).toLocaleString()}</span>,
-        // },
-        {
-            title: 'Nội Dung',
-            dataIndex: 'data',
-            key: 'data',
-            width: 400,
-            render: (text) => {
-                let dataObject;
-                try {
-                    // Kiểm tra xem text có phải là chuỗi JSON không
-                    if (typeof text === 'string') {
-                        dataObject = JSON.parse(
-                            text.replace(/'/g, '"').replace(/False/g, 'false').replace(/True/g, 'true')
-                        );
-                    } else {
-                        dataObject = {};
-                    }
-                } catch (error) {
-                    console.error('Invalid JSON:', error);
-                    dataObject = {};
-                }
-
-                const content = [
-                    `Username: ${dataObject.username || ''}`,
-                    `Email: ${dataObject.email || ''}`,
-                    `Phone Number: ${dataObject.phone_number || ''}`,
-                    `First Name: ${dataObject.first_name || ''}`,
-                    `Last Name: ${dataObject.last_name || ''}`,
-                    `Is Active: ${dataObject.is_active ? 'Yes' : 'No'}`,
-                    `Date Joined: ${dataObject.date_joined || ''}`,
-                    `Profile Image: ${dataObject.profile_image || ''}`,
-                ];
-
-                return (
-                    <div>
-                        {content.slice(0, seeMore ? content.length : 4).map((item, index) => (
-                            <p key={index}>{item}</p>
-                        ))}
-                        {content.length > 4 && (
-                            <Button
-                                type="link"
-                                onClick={() => setSeeMore(!seeMore)}
-                                className="mt-1"
-                                icon={seeMore ? <MinusOutlined/> : <PlusOutlined/>}
-                            />
-                        )}
-                    </div>
-                );
-            },
+            render: (_: any, record: any, index: number) => index + 1, // Hiển thị chỉ số + 1
         },
         {
-            title: 'Hình Thức',
-            dataIndex: 'description',
-            key: 'description',
+            title: "Username",
+            dataIndex: "username",
+            key: "username",
             width: 150,
-            render: (text) => <span>{text}</span>,
         },
         {
-            title: 'Hành Động',
-            dataIndex: 'action',
-            key: 'action',
+            title: "Email",
+            dataIndex: "email",
+            key: "email",
+            width: 200,
+        },
+        {
+            title: "Kích Hoạt",
+            dataIndex: "is_active",
+            key: "is_active",
             width: 150,
-            filters: [
-                { text: 'Create', value: 'create' },
-                { text: 'Edit', value: 'edit' },
-                { text: 'Delete', value: 'delete' },
-            ],
-            onFilter: (value, record) => record.action.includes(value),
-            render: (text) => <span>{text}</span>,
-        },
-        {
-            title: 'Trạng Thái',
-            dataIndex: 'status',
-            key: 'status',
-            width: 100,
-            filters: [
-                { text: 'Pending', value: 'pending' },
-                { text: 'Approve', value: 'approve' },
-                { text: 'Reject', value: 'reject' },
-                { text: 'Error', value: 'error' },
-            ],
-            onFilter: (value, record) => record.status.includes(value),
-            render: (text) => {
-                let bgColor;
-
-                if (text === 'pending') {
-                    bgColor = 'bg-albert-warning';
-                } else if (text === 'approve') {
-                    bgColor = 'bg-albert-success';
-                } else if (text === 'reject') {
-                    bgColor = 'bg-albert-error';
-                } else if (text === 'error') {
-                    bgColor = 'bg-red-600'; // Customize as needed for 'error'
-                }
-
-                return (
-                    <span className={`${bgColor} text-white px-2 py-1 rounded`}>
-                    {text}
-                </span>
-                );
-            },
+            render: (isActive) => (isActive ? "Yes" : "No"),
         },
     ];
 
@@ -169,37 +71,39 @@ const UserQueueList: React.FC = () => {
 
     return (
         <div className="p-4">
-            <Heading name="Quản lý hàng đợi duyệt người dùng" />
+            <Heading name="Quản lý hàng đợi duyệt người dùng"/>
+                <div className="mb-4 flex justify-between">
+                    <Button onClick={handleRefresh} style={{marginLeft: "8px"}}>
+                        <FaSync/> Làm mới
+                    </Button>
+                    <Button type="primary" onClick={handleBulkApprove} style={{marginBottom: '16px'}}>
+                        Chấp Thuận
+                    </Button>
+                </div>
+                <div className="overflow-auto" style={{maxHeight: '800px'}}>
+                    <Table
+                        columns={columns}
+                        dataSource={queueData}
+                        rowKey="id"
+                        pagination={false}
+                        scroll={{y: 500}}
+                        rowSelection={{
+                            selectedRowKeys: selectedKeys,
+                            onChange: (selectedRowKeys) => setSelectedKeys(selectedRowKeys as number[]),
+                        }}
+                    />
+                </div>
+                <div className="flex justify-center mt-4">
+                    <Pagination
+                        current={currentPage} // Trang hiện tại
+                        onChange={(page) => {
+                            setCurrentPage(page); // Cập nhật trang hiện tại
+                        }}
+                        showSizeChanger={false}
+                    />
+                </div>
+            </div>
+            );
+            };
 
-            <div className="p-4">
-            <Button type="primary" onClick={handleBulkApprove} style={{ marginBottom: '16px' }}>
-                Chấp Thuận
-            </Button>
-            </div>
-            <div className="overflow-auto" style={{ maxHeight: '800px' }}>
-                <Table
-                    columns={columns}
-                    dataSource={queueData}
-                    rowKey="id"
-                    pagination={false}
-                    scroll={{ y: 500 }}
-                    rowSelection={{
-                        selectedRowKeys: selectedKeys,
-                        onChange: (selectedRowKeys) => setSelectedKeys(selectedRowKeys as number[]),
-                    }}
-                />
-            </div>
-            <div className="flex justify-center mt-4">
-                <Pagination
-                    current={currentPage} // Trang hiện tại
-                    onChange={(page) => {
-                        setCurrentPage(page); // Cập nhật trang hiện tại
-                    }}
-                    showSizeChanger={false}
-                />
-            </div>
-        </div>
-    );
-};
-
-export default UserQueueList;
+            export default UserQueueList;
