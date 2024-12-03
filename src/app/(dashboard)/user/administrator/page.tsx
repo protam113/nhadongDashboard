@@ -22,9 +22,10 @@ const ManageUsersPage: React.FC = () => {
     const [showConfirmModal, setShowConfirmModal] = useState(false);
     const [loading, setLoading] = useState(false);
     const [selectedRole, setSelectedRole] = useState<string | null>(null); // State for selected role
-
+    
     // Fetch roles
     const { roles, isLoading: roleLoading, isError: roleError } = RoleList(currentPage);
+
 
     // Fetch users with selected role (default to admin and manager roles)
     const { data, isLoading, isError, isFetching } = useUserList(
@@ -34,6 +35,14 @@ const ManageUsersPage: React.FC = () => {
         },
         refreshKey
     );
+
+    if (roleLoading) {
+        return <Spin size="large" />;
+    }
+    if (roleError) {
+        return <Alert message="Không thể tải danh sách vai trò!" type="error" showIcon />;
+    }
+    
 
     if (isError) {
         return <div>Error fetching users</div>;

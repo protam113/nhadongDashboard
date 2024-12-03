@@ -5,7 +5,6 @@ import { Input, Select, Upload, Button, Image, message, Form } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { RcFile } from "antd/lib/upload";
-import { MdArrowBackIos } from "react-icons/md";
 import { useCreateEvent } from "@/hooks/event/useEvent";
 import {UploadFile} from "antd/lib/upload/interface";
 import Heading from "@/components/design/Heading";

@@ -1,7 +1,7 @@
 "use client"; // Ensures this is a client component
 
 import React, { useState } from "react";
-import {Table, Button, Typography, Spin, Modal, Image} from "antd";
+import {Table, Button, Spin, Modal, Image} from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { FaSync } from "react-icons/fa"; // Import refresh icon
 import { MdOutlineDelete } from "react-icons/md";
@@ -16,7 +16,6 @@ import GroupDetailModal from "@/app/(dashboard)/cong_doan/modal/GroupDetailModal
 import BackButton from "@/components/Button/BackButton";
 import Heading from "@/components/design/Heading";
 
-const { Title } = Typography;
 
 const Groups: React.FC = () => {
     const [selectedKeys, setSelectedKeys] = useState<number[]>([]);

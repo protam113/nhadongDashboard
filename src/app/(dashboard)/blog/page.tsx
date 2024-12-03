@@ -1,7 +1,7 @@
     "use client"; // Ensures this is a client component
 
     import React, { useState } from "react";
-    import { Table, Button, Typography, Spin,Modal  } from "antd";
+    import { Table, Button, Spin,Modal  } from "antd";
     import type { ColumnsType } from "antd/es/table";
     import { FaSync } from "react-icons/fa"; // Import refresh icon
     import {useDeleteCategory} from "@/hooks/cateogry/useCategories";
@@ -12,8 +12,6 @@
     import { EyeOutlined } from "@ant-design/icons";
     import BlogQueueList from "@/app/(dashboard)/blog/BlogQueueTable";
     import Heading from "@/components/design/Heading";
-
-    const { Title } = Typography;
 
     const Blogs: React.FC = () => {
         const [selectedKeys, setSelectedKeys] = useState<number[]>([]);

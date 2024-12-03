@@ -90,6 +90,7 @@ const CreateNewsCategoryModal: React.FC = () => {
 
             {previewImage && (
                 <Image
+                    alt="Hình ảnh xem trước bài viết"
                     wrapperStyle={{ display: 'none' }}
                     preview={{
                         visible: previewOpen,

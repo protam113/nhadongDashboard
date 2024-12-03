@@ -129,6 +129,7 @@ const CreateGroup: React.FC<{ onLoadingChange: (isLoading: boolean, progress: nu
 
             {previewImage && (
                 <Image
+                    alt="Hình ảnh xem trước bài viết"
                     wrapperStyle={{ display: 'none' }}
                     preview={{
                         visible: previewOpen,

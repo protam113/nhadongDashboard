@@ -3,9 +3,7 @@
 
 import "../styles/globals.css";
 import { AntdRegistry } from '@ant-design/nextjs-registry';
-import { AuthProvider } from '@/context/authContext';
 import ReactQueryProvider from "@/app/ReactQueryProvider";
-import { UserProvider } from "@/context/userProvider";
 import { appInfo, metadata } from "@/constants/appInfos";
 
 export default function RootLayout({
@@ -14,8 +12,6 @@ export default function RootLayout({
     children: React.ReactNode;
 }) {
     return (
-        <AuthProvider>
-            <UserProvider>
                 <ReactQueryProvider>
                     <html lang="en">
                     <head>
@@ -31,7 +27,5 @@ export default function RootLayout({
                     </body>
                     </html>
                 </ReactQueryProvider>
-            </UserProvider>
-        </AuthProvider>
     );
 }

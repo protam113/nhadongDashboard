@@ -5,10 +5,10 @@
 import {useActiveUser, useUserList} from "@/hooks/user/useUsers";
 import { message } from "antd";
 
-interface UserResponse {
-    data: any;  // Thay thế `any` bằng kiểu cụ thể nếu biết rõ kiểu dữ liệu trả về
-    success: boolean;
-}
+// interface UserResponse {
+//     data: any;  // Thay thế `any` bằng kiểu cụ thể nếu biết rõ kiểu dữ liệu trả về
+//     success: boolean;
+// }
 
 export const UserList = (currentPage: number,is_active: string,blocked: string
                           , refreshKey: number
@@ -31,7 +31,7 @@ export const UserList = (currentPage: number,is_active: string,blocked: string
             status: status,
         };
         activeUser(browseManager, {
-            onSuccess: (response: UserResponse) => {
+            onSuccess: () => {
                 message.success("Response from browseQueue:");  // Log phản hồi từ browseQueue
             },
             onError: (error: any) => {

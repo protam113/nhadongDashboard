@@ -1,25 +1,21 @@
 "use client"; // Ensures this is a client component
 
 import React, { useState } from "react";
-import { Table, Button, Typography, Spin  } from "antd";
+import { Table, Button, Spin  } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { FaSync } from "react-icons/fa"; // Import refresh icon
 import { EyeOutlined } from "@ant-design/icons";
-import NewsQueueList from "@/app/(dashboard)/news/NewsQueueTable";
-import NewsDetailsModal from "@/app/(dashboard)/news/NewsDetailsModal";
+
 import {EventList} from "@/lib/eventList";
 import Heading from "@/components/design/Heading";
 import PushButton from "@/components/Button/PushButton";
 
-const { Title } = Typography;
 
 const Page: React.FC = () => {
     const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
     const [currentPage, setCurrentPage] = useState(1);
     const [category] = useState<string>("vocation"); // State to hold selected model
     const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
-    const [selectedNews, setSelectedNews] = useState(null);
-    const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
     // Pass model into CategoriesList
     const { queueData, isLoading, isError } = EventList(currentPage, category, refreshKey);
@@ -32,8 +28,8 @@ const Page: React.FC = () => {
             dataIndex: "full",
             key: "full",
             width: 150,
-            render: (_, record) => (
-                <Button onClick={() => handleViewDetails(record)}>
+            render: () => (
+                <Button>
                     <EyeOutlined /> Xem Chi Tiết
                 </Button>
             ),
@@ -83,10 +79,10 @@ const Page: React.FC = () => {
     if (isLoading) return <Spin size="large" />;
     if (isError) return <div>Error loading queue data.</div>;
 
-    const handleViewDetails = (news: any) => {
-        setSelectedNews(news);
-        setIsDrawerOpen(true);
-    };
+    // const handleViewDetails = (news: any) => {
+    //     setSelectedNews(news);
+    //     setIsDrawerOpen(true);
+    // };
 
     // // Function to handle closing the modal
     // const handleModalClose = () => {

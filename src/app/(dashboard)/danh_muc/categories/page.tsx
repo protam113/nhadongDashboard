@@ -1,7 +1,7 @@
 "use client"; // Ensures this is a client component
 
 import React, { useState } from "react";
-import { Table, Button, Typography, Spin, Select,Modal,Image  } from "antd";
+import { Table, Button, Spin, Select,Modal,Image  } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { FaSync } from "react-icons/fa"; // Import refresh icon
 import { CategoriesList } from "@/lib/categoriesList";
@@ -13,7 +13,6 @@ import CategoriesQueueTable from "@/app/(dashboard)/danh_muc/categories/Categori
 import EditBlogCategory from "@/app/(dashboard)/blog/blog_categories/EditBlogCategory";
 import Heading from "@/components/design/Heading";
 
-const { Title } = Typography;
 const { Option } = Select;
 
 const Categories: React.FC = () => {

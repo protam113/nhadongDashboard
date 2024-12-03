@@ -1,13 +1,12 @@
 "use client"; // Đảm bảo đây là client component
 
 import React, { useState } from 'react';
-import {Table, Button, Typography, Spin, Select} from 'antd';
+import {Table, Button, Spin, Select} from 'antd';
 import type { ColumnsType } from 'antd/es/table';
 import { useQueueManagement } from '@/logic/queueLogic';
 import {MinusOutlined, PlusOutlined, ReloadOutlined} from "@ant-design/icons";
 import Heading from "@/components/design/Heading";
 
-const { Title } = Typography;
 const { Option } = Select;
 
 

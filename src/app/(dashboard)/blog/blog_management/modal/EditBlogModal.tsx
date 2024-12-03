@@ -29,25 +29,22 @@ const EditBlogModal: React.FC<EditBlogModalProps> = ({ open, onClose, blog }) =>
     const [form] = Form.useForm();
     const [fileList, setFileList] = useState<UploadFile[]>([]);
     const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
-    const [previewImage, setPreviewImage] = useState<string>("");
+    const [previewImage] = useState<string>("");
     const [previewOpen, setPreviewOpen] = useState<boolean>(false);
     const { queueData, isLoading, isError } = CategoriesList(1, "blog", 0);
     const { mutate: editBlogMutation } = useEditBlog();
 
     useEffect(() => {
         if (blog) {
-            // Lấy danh sách ID thể loại đã chọn
             const categoryIds = blog.categories?.map((category) => category.id.toString()) || [];
-
-            // Gán dữ liệu ban đầu vào form
+    
             form.setFieldsValue({
                 name: blog.title,
                 description: blog.description,
                 link: blog.link,
                 categories: categoryIds,
             });
-
-            // Xử lý hình ảnh cho Upload
+    
             if (blog.image) {
                 setFileList([
                     {
@@ -58,12 +55,11 @@ const EditBlogModal: React.FC<EditBlogModalProps> = ({ open, onClose, blog }) =>
                     },
                 ]);
             }
-
-            // Gán thể loại đã chọn
+    
             setSelectedCategories(categoryIds);
         }
-    }, [blog]);
-
+    }, [blog, form]);
+    
     const handleCategoryChange = (checkedValues: string[]) => {
         setSelectedCategories(checkedValues);
     };
@@ -151,6 +147,7 @@ const EditBlogModal: React.FC<EditBlogModalProps> = ({ open, onClose, blog }) =>
                             </Upload>
                             {previewImage && (
                                 <Image
+                                    alt="Hình ảnh xem trước bài viết"
                                     wrapperStyle={{ display: "none" }}
                                     preview={{
                                         visible: previewOpen,

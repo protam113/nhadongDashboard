@@ -1,5 +1,5 @@
 import React from 'react';
-import { Avatar, Card, Button } from 'antd';
+import { Avatar, Card } from 'antd';
 import { MailOutlined, PhoneOutlined, UserOutlined } from '@ant-design/icons';
 import { FaUserShield } from 'react-icons/fa';
 import { useUser } from "@/context/userProvider";

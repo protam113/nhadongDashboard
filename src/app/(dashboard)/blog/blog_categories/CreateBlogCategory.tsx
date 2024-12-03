@@ -96,6 +96,7 @@ const CreateBlogCategory: React.FC<{ onLoadingChange: (isLoading: boolean, progr
 
             {previewImage && (
                 <Image
+                    alt="Hình ảnh xem trước bài viết"
                     wrapperStyle={{ display: 'none' }}
                     preview={{
                         visible: previewOpen,

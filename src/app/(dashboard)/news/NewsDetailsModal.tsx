@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { Typography, Divider, Button, Drawer} from "antd";
+import { Typography, Divider, Button, Drawer, Image, Avatar} from "antd";
 
 const { Title, Paragraph } = Typography;
 
@@ -76,7 +76,7 @@ const NewsDetailsModal: React.FC<NewsDetailsModalProps> = ({ open, onClose, news
             {/* Hình ảnh bài viết */}
             {news.image && (
                 <div className="mb-4">
-                    <img src={news.image} alt="Blog Image" className="w-full h-auto rounded-xl shadow-lg"/>
+                    <Image src={news.image} alt="Blog Image" className="w-full h-auto rounded-xl shadow-lg"/>
                 </div>
             )}
 
@@ -93,7 +93,7 @@ const NewsDetailsModal: React.FC<NewsDetailsModalProps> = ({ open, onClose, news
             <Divider/>
             <div className="flex items-center mt-4">
                 {news.user.profile_image && (
-                    <img src={news.user.profile_image} alt="Profile"
+                    <Avatar src={news.user.profile_image} alt="Profile"
                          className="w-16 h-16 rounded-full object-cover mr-4"/>
                 )}
                 <div>

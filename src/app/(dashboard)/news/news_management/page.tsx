@@ -7,7 +7,6 @@ import { FaSync } from "react-icons/fa"; // Import refresh icon
 import { useRouter } from "next/navigation";
 import { MdOutlineDelete } from "react-icons/md";
 import { FaRegEdit } from "react-icons/fa";
-import BlogDetailsModal from "@/app/(dashboard)/blog/BlogDetailsModal";
 import { EyeOutlined } from "@ant-design/icons";
 import {NewsList} from "@/lib/newsList";
 import {useDeleteNews} from "@/hooks/new/useNews";
@@ -21,8 +20,6 @@ const NewsManagement: React.FC = () => {
     const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
     const router = useRouter(); // Hook for navigation
     const { mutate: deleteNews } = useDeleteNews();
-    const [selectedBlog, setSelectedBlog] = useState(null); // State for selected blog
-    const [isModalVisible, setIsModalVisible] = useState(false);
 
     // Pass model into CategoriesList
     const { queueData, isLoading, isError } = NewsList(currentPage, model, refreshKey);
@@ -47,8 +44,8 @@ const NewsManagement: React.FC = () => {
             dataIndex: "full",
             key: "full",
             width: 150,
-            render: (_, record) => (
-                <Button onClick={() => handleViewDetails(record)}>
+            render: () => (
+                <Button >
                     <EyeOutlined /> Xem Chi Tiết
                 </Button>
             ),
@@ -113,17 +110,6 @@ const NewsManagement: React.FC = () => {
 
     if (isLoading) return <Spin size="large" />;
     if (isError) return <div>Error loading queue data.</div>;
-
-    const handleViewDetails = (blog: any) => {
-        setSelectedBlog(blog);
-        setIsModalVisible(true);
-    };
-
-    // Function to handle closing the modal
-    const handleModalClose = () => {
-        setIsModalVisible(false);
-        setSelectedBlog(null);
-    };
 
 
     const handleRefresh = () => {

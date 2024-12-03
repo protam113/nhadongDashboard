@@ -1,36 +1,56 @@
-// src/layout/DashboardLayout.tsx
 'use client';
 
-import DefaultLayout from "@/components/layout/DefautLayout";
+import DefaultLayout from '@/components/layout/DefautLayout';
 import React, { useEffect, useState } from 'react';
-import { useAuth } from '@/context/authContext';
+import { useAuthStore } from '@/store/authStore';
 import { useRouter } from 'next/navigation';
-import Loading from "@/components/design/Loading";
+import Loading from '@/components/design/Loading';
+import { UserProvider } from "@/context/userProvider";
 
-export default function DashboardLayout({
-                                            children,
-                                        }: Readonly<{
-    children: React.ReactNode;
-}>) {
-    const { isAuthenticated, loading } = useAuth();
-    const router = useRouter();
-    const [isLoading, setIsLoading] = useState(true);
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const { isAuthenticated, loading, checkAuth } = useAuthStore();
+  const router = useRouter();
+  const [tokenChecked, setTokenChecked] = useState(false); // Trạng thái kiểm tra token
 
-    useEffect(() => {
-        if (!loading && !isAuthenticated) {
-            router.push('/login'); // Điều hướng tới trang đăng nhập nếu chưa đăng nhập
-        } else {
-            setIsLoading(false); // Khi xác thực xong thì ẩn loading
-        }
-    }, [isAuthenticated, loading, router]);
+  // Kiểm tra trạng thái xác thực khi mount
+  useEffect(() => {
+    checkAuth(); // Kiểm tra xác thực khi mount trang
+  }, []);  // Chỉ chạy 1 lần khi trang load lại
 
-    if (loading || isLoading) {
-        return <Loading />; // Hiển thị Loading trong khi đang xác thực
+  // Cập nhật tokenChecked sau khi kiểm tra xong
+  useEffect(() => {
+    if (!loading) {
+      setTokenChecked(true); // Token đã được kiểm tra
     }
+  }, [loading]);
 
-    return (
-        <DefaultLayout>
-            {children}
-        </DefaultLayout>
-    );
+  useEffect(() => {
+    console.log('Checking loading and authentication...');
+    console.log('Loading:', loading);
+    console.log('Authenticated:', isAuthenticated);
+    console.log('Token:', localStorage.getItem('token'));
+
+    // Chỉ thực hiện chuyển hướng khi trạng thái loading đã hoàn tất và chưa xác thực
+    if (tokenChecked) {
+      if (isAuthenticated) {
+        // Không chuyển hướng nếu đã xác thực
+        console.log('User is authenticated, no redirect needed');
+      } else {
+        // Nếu chưa xác thực, chuyển hướng về login
+        console.log('User not authenticated, redirecting to login');
+        router.replace('/login');
+      }
+    }
+  }, [isAuthenticated, loading, router, tokenChecked]);
+
+  // Nếu đang loading, hiển thị Loading spinner
+  if (loading || !tokenChecked) {
+    return <Loading />;
+  }
+
+  return (
+    <UserProvider>
+      <DefaultLayout>{children}</DefaultLayout>
+    </UserProvider>
+  );
 }

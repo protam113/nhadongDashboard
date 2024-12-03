@@ -62,8 +62,9 @@ export interface EditCategoryItem {
     image: RcFile | null; // Chỉnh sửa kiểu file thành RcFile | null
 }
 
-
-
+export interface Group {
+    groupId: string;
+}
 
 /**
  New Event Interface

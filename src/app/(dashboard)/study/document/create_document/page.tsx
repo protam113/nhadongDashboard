@@ -174,6 +174,7 @@ const Page: React.FC = () => {
 
                         {previewImage && (
                             <Image
+                                alt="Hình ảnh xem trước"
                                 wrapperStyle={{ display: 'none' }}
                                 preview={{
                                     visible: previewOpen,

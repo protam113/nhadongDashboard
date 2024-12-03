@@ -89,7 +89,7 @@ const BlogDetailsDrawer: React.FC<BlogDetailsDrawerProps> = ({ open, onClose, bl
             <Divider />
             <div className="flex items-center mt-4">
                 {blog.user.profile_image && (
-                    <img src={blog.user.profile_image} alt="Profile" className="w-16 h-16 rounded-full object-cover mr-4" />
+                    <Image src={blog.user.profile_image} alt="Profile" className="w-16 h-16 rounded-full object-cover mr-4" />
                 )}
                 <div>
                     <Paragraph className="text-gray-800 mb-1">
