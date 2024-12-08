@@ -5,28 +5,20 @@ import { handleAPI } from "@/apis/axiosClient";
 import { endpoints } from "@/apis/api";
 import { useAuth } from "@/context/authContext";
 import { useEffect, useState } from "react";
-import { EventRegisterListResponse } from "@/types/types";
+import { EventList } from "@/types/types";
 
-const fetchEventRegisterList = async (
-  pageParam: number = 1,
+const fetchEventDetail = async (
   postId: string,
-  token: string
-): Promise<EventRegisterListResponse> => {
-  if (!token) {
-    throw new Error("No token provided");
-  }
+  token: string // Token là tùy chọn
+): Promise<EventList> => {
   try {
-    // Construct the query string
-    const queryString = new URLSearchParams({
-      page: pageParam.toString(),
-    }).toString();
+    if (!token) {
+      throw new Error("No token provided");
+    }
 
     // Gửi request với token nếu có, không thì bỏ qua
     const response = await handleAPI(
-      `${endpoints.eventRegister.replace(":id", postId)}${
-        queryString ? `?${queryString}` : ""
-      }`,
-
+      `${endpoints.event.replace(":id", postId)}`,
       "GET",
       null,
       token // Token chỉ được thêm nếu không null
@@ -39,11 +31,7 @@ const fetchEventRegisterList = async (
 };
 
 // Custom hook for fetching the blog list
-const useEventRegisterList = (
-  postId: string,
-  page: number,
-  refreshKey: number
-) => {
+const useEventDetail = (postId: string) => {
   const { getToken } = useAuth();
   const [token, setToken] = useState<string | null>(null);
 
@@ -57,19 +45,19 @@ const useEventRegisterList = (
     fetchToken();
   }, [getToken]);
 
-  return useQuery<EventRegisterListResponse, Error>({
-    queryKey: ["eventRegisterList", token, postId, page, refreshKey],
+  return useQuery<EventList, Error>({
+    queryKey: ["eventDetail", token, postId],
     queryFn: async () => {
       if (!token) {
         throw new Error("Token is not available");
       }
-      return fetchEventRegisterList(page, postId, token);
-    },
+      return fetchEventDetail(postId, token);
+    }, // Không ép buộc token
     enabled: !!postId,
-    staleTime: 60000,
-    retry: 2,
-    refetchOnWindowFocus: false,
+    staleTime: 60000, // Đặt stale time để không yêu cầu API mỗi lần
+    retry: 2, // Retry 2 lần khi gặp lỗi mạng
+    refetchOnWindowFocus: false, // Tắt tự động gọi lại khi focus window
   });
 };
 
-export { useEventRegisterList };
+export { useEventDetail };

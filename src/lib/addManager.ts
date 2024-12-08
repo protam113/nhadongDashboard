@@ -2,11 +2,7 @@
 
 // queueLogic.ts
 import {useAddManager} from "@/hooks/user/useUsers";
-
-interface BrowseQueueResponse {
-    data: any;  // Thay thế `any` bằng kiểu cụ thể nếu biết rõ kiểu dữ liệu trả về
-    success: boolean;
-}
+import {BrowseQueueResponse} from "@/types/types"
 
 export const AddManager = () => {
     const { mutate: addManagerMutation } = useAddManager();

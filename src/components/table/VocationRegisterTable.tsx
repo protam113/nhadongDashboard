@@ -1,30 +1,28 @@
 "use client"; // Ensures this is a client component
 
 import React, { useState } from "react";
-import { Table, Button, Spin, Image } from "antd";
+import { Table, Button, Spin } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { FaSync } from "react-icons/fa"; // Import refresh icon
-import dayjs from "dayjs";
 import { EyeOutlined } from "@ant-design/icons";
 import Heading from "@/components/design/Heading";
-import { Group } from "@/types/types";
-import { GroupMemberList } from "@/lib/group/groupMemberList";
-import GroupMemberDetail from "@/components/drawer/GroupMemberDetail";
-import CreateGroupMember from "@/components/drawer/CreateGroupMember";
+import { Post } from "@/types/types";
+import { useEventRegisterList } from "@/hooks/event/useEventRegistion";
+import EventRegisterDetail from "../drawer/EventRegisterDetail";
 
-const GroupMember: React.FC<Group> = ({ groupId }) => {
+const VocationRegisterTable: React.FC<Post> = ({ postId }) => {
   const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
-  // Pass model into CategoriesList
-  const { queueData, isLoading, isError } = GroupMemberList(
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [selectedMember, setSelectedMember] = useState(null);
+
+  const { data, isLoading, isError } = useEventRegisterList(
+    postId,
     currentPage,
-    groupId,
     refreshKey
   );
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const [selectedMember, setSelectedMember] = useState(null); // State for selected blog
-  const [isCreateDrawerOpen, setIsCreateDrawerOpen] = useState(false); // State for CreateGroupMember drawer
+  const queueData = data?.results || [];
 
   const handleViewDetails = (member: any) => {
     setSelectedMember(member);
@@ -34,14 +32,6 @@ const GroupMember: React.FC<Group> = ({ groupId }) => {
   const handleDrawerClose = () => {
     setIsDrawerOpen(false);
     setSelectedMember(null);
-  };
-
-  const handleCreateDrawerOpen = () => {
-    setIsCreateDrawerOpen(true);
-  };
-
-  const handleCreateDrawerClose = () => {
-    setIsCreateDrawerOpen(false);
   };
 
   const columns: ColumnsType<any> = [
@@ -64,45 +54,37 @@ const GroupMember: React.FC<Group> = ({ groupId }) => {
       ),
     },
     {
-      title: "Hình Ảnh",
-      dataIndex: "image",
-      key: "image",
-      width: 150,
-      render: (fileUrl: string) => (
-        <Image
-          width={100}
-          src={fileUrl}
-          preview={{
-            destroyOnClose: true,
-          }}
-          alt="Group Image"
-        />
-      ),
+      title: "Họ Và Tên",
+      children: [
+        {
+          title: "Họ và Tên đệm",
+          dataIndex: ["fields_data", "first_name", "value"], // Access nested fields
+          key: "first_name",
+          width: 150,
+          render: (value) => <span>{value}</span>,
+        },
+        {
+          title: "Tên",
+          dataIndex: ["fields_data", "last_name", "value"], // Access nested fields
+          key: "last_name",
+          width: 150,
+          render: (value) => <span>{value}</span>,
+        },
+      ],
     },
     {
-      title: "Tên Thành Viên",
-      dataIndex: "name",
-      key: "name",
+      title: "Số Điện Thoại",
+      dataIndex: ["fields_data", "phone_number", "value"], // Access nested fields
+      key: "phone_number",
       width: 250,
       render: (text) => <span>{text}</span>,
     },
     {
-      title: "Ngày Khấn Tạm",
-      dataIndex: "first_vows_date",
-      key: "first_vows_date",
+      title: "Email",
+      dataIndex: ["fields_data", "email", "value"], // Access nested fields
+      key: "email",
       width: 150,
-      render: (text) => (
-        <span>{text ? dayjs(text).format("DD/MM/YYYY") : ""}</span>
-      ), // Format date to "DD/MM/YYYY"
-    },
-    {
-      title: "Ngày Khấn trọn Đời  ",
-      dataIndex: "final_vows_date",
-      key: "final_vows_date",
-      width: 150,
-      render: (text) => (
-        <span>{text ? dayjs(text).format("DD/MM/YYYY") : ""}</span>
-      ), // Format date to "DD/MM/YYYY"
+      render: (text) => <span>{text}</span>,
     },
     {
       title: "Action",
@@ -113,12 +95,6 @@ const GroupMember: React.FC<Group> = ({ groupId }) => {
         // _: any, record: any
         <>
           <p> delete</p>
-          {/*<Button danger onClick={() => handleDelete(record.id)}>*/}
-          {/*    <MdOutlineDelete className="text-albert-error" />*/}
-          {/*</Button>*/}
-          {/*<Button onClick={() => handleEdit(record)}>*/}
-          {/*    <FaRegEdit />*/}
-          {/*</Button>*/}
         </>
       ),
     },
@@ -140,11 +116,6 @@ const GroupMember: React.FC<Group> = ({ groupId }) => {
         <div className="flex justify-between items-center mb-4">
           <Button onClick={handleRefresh} style={{ marginLeft: "8px" }}>
             <FaSync /> Làm mới
-          </Button>
-
-          {/* Nút Tạo cộng đoàn */}
-          <Button onClick={handleCreateDrawerOpen} className="ml-4">
-            Tạo thành viên
           </Button>
         </div>
 
@@ -176,21 +147,13 @@ const GroupMember: React.FC<Group> = ({ groupId }) => {
         </div>
       </div>
 
-      {/*Xem Thông Tin Chi Tiết Thành Viên Trong Cộng Đoàn*/}
-      <GroupMemberDetail
+      <EventRegisterDetail
         open={isDrawerOpen}
         onClose={handleDrawerClose}
         member={selectedMember}
-      />
-
-      {/*Tạo Thành Viên Trong Cộng Đoàn*/}
-      <CreateGroupMember
-        open={isCreateDrawerOpen}
-        onClose={handleCreateDrawerClose}
-        groupId={groupId}
       />
     </>
   );
 };
 
-export default GroupMember;
+export default VocationRegisterTable;
