@@ -1,8 +1,10 @@
+"use client"; // This line ensures the component is treated as a Client Component
+
 import { useForgotPassword, useGetVerifyCode } from "@/hooks/auth/usePassword";
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Image from "next/image";
 import Logo from "@/assets/image/logo.svg";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation"; // Adjusted to next/navigation for compatibility with Server Components
 
 const Page = () => {
   const [email, setEmail] = useState("");
@@ -11,15 +13,7 @@ const Page = () => {
   const [step, setStep] = useState(1);
   const { mutate: GetVerifyCode } = useGetVerifyCode();
   const { mutate: ForgotPassword } = useForgotPassword();
-  const [isClient, setIsClient] = useState(false); // state to check if component is mounted in the client
-
-  // Check if component is mounted on the client-side
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
-
-  // Avoid using router before client-side
-  const router = isClient ? useRouter() : null;
+  const router = useRouter(); // This should work fine now since "use client" is specified
 
   const handleSendCode = (e: React.FormEvent) => {
     e.preventDefault();
@@ -32,15 +26,11 @@ const Page = () => {
     e.preventDefault();
     try {
       await ForgotPassword({ email, new_password, code });
-      if (router) {
-        router.push("/login");
-      }
+      router.push("/login"); // Navigate after successful password reset
     } catch (error) {
       console.error("Password reset failed", error);
     }
   };
-
-  if (!isClient) return null; // or a loading spinner
 
   return (
     <div className="bg-primary-900">
