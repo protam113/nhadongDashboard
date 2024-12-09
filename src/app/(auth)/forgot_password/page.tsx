@@ -1,7 +1,5 @@
-"use client";
-
 import { useForgotPassword, useGetVerifyCode } from "@/hooks/auth/usePassword";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import Logo from "@/assets/image/logo.svg";
 import { useRouter } from "next/router";
@@ -10,10 +8,18 @@ const Page = () => {
   const [email, setEmail] = useState("");
   const [new_password, setNewPassword] = useState("");
   const [code, setCode] = useState("");
-  const [step, setStep] = useState(1); // step to switch between forms: 1 - email form, 2 - code and new password form
+  const [step, setStep] = useState(1);
   const { mutate: GetVerifyCode } = useGetVerifyCode();
   const { mutate: ForgotPassword } = useForgotPassword();
-  const router = useRouter();
+  const [isClient, setIsClient] = useState(false); // state to check if component is mounted in the client
+
+  // Check if component is mounted on the client-side
+  useEffect(() => {
+    setIsClient(true);
+  }, []);
+
+  // Avoid using router before client-side
+  const router = isClient ? useRouter() : null;
 
   const handleSendCode = (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,11 +32,15 @@ const Page = () => {
     e.preventDefault();
     try {
       await ForgotPassword({ email, new_password, code });
-      router.push("/login");
+      if (router) {
+        router.push("/login");
+      }
     } catch (error) {
       console.error("Password reset failed", error);
     }
   };
+
+  if (!isClient) return null; // or a loading spinner
 
   return (
     <div className="bg-primary-900">
