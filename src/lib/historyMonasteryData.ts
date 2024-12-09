@@ -11,7 +11,6 @@ export const HistoryMonasteryData = (refreshKey: number): {
 } => {
   const { data, isLoading, isError } = useHistoryMonastery(refreshKey);
 
-  // Nếu `data` không tồn tại, trả về `null` thay vì mảng rỗng
   const queueData = data || null;
 
   return { queueData, isLoading, isError };

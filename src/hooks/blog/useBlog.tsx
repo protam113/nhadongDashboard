@@ -6,46 +6,7 @@ import { endpoints } from "@/apis/api";
 import { useAuth } from "@/context/authContext";
 import { useEffect, useState } from "react";
 import { message } from "antd";
-
-interface Category {
-  id: number;
-  name: string;
-  file: string;
-}
-
-interface User {
-  id: number;
-  username: string;
-  first_name: string;
-  last_name: string;
-  email: string;
-  phone_number: string | null;
-  profile_image: string;
-}
-
-interface BLogs {
-  id: number;
-  title: string;
-  description: string;
-  content: string; // Có thể cần điều chỉnh nếu cấu trúc khác
-  link: string;
-  image: string | null; // Chỉnh sửa để phù hợp với giá trị null trong JSON
-  categories: Category[];
-  user: User; // Sử dụng interface User đã khai báo ở trên
-}
-
-// Khai Báo Các Thuộc Tính Không Có trong trường hiển thị
-interface FetchBLogsListResponse {
-  count: number;
-  next: string | null;
-  previous: string | null;
-  results: BLogs[];
-}
-
-// Bộ Lọc
-interface Filters {
-  [key: string]: string | number | string[] | undefined;
-}
+import { FetchBLogsListResponse, Filters, NewPost } from "@/types/types";
 
 const fetchBloglist = async (
   pageParam: number = 1,
@@ -117,21 +78,12 @@ const useBlogList = (
   });
 };
 
-interface NewBlog {
-  title: string;
-  description: string;
-  content: string; // Mảng nội dung chi tiết
-  link: string;
-  category: string[]; // Mảng danh mục
-  image: File[] | string; // Hình ảnh chính cho bài viết
-}
-
-const CreateBlog = async (newBlog: NewBlog, token: string) => {
+const CreateBlog = async (newBlog: NewPost, token: string) => {
   const formData = new FormData();
 
   // Duyệt qua các thuộc tính của `newBlog` và xử lý
   for (const key in newBlog) {
-    const value = newBlog[key as keyof NewBlog];
+    const value = newBlog[key as keyof NewPost];
 
     if (key === "content") {
       // Xử lý content nếu là object hoặc JSON string
@@ -184,7 +136,7 @@ const useCreateBlog = () => {
   }, [getToken]);
 
   return useMutation({
-    mutationFn: async (newBlog: NewBlog) => {
+    mutationFn: async (newBlog: NewPost) => {
       if (!token) {
         throw new Error("Token is not available");
       }
@@ -257,13 +209,13 @@ const useDeleteBlog = () => {
  Sửa Blog
  **/
 
-const EditBlog = async (editBlog: NewBlog, blogId: string, token: string) => {
+const EditBlog = async (editBlog: NewPost, blogId: string, token: string) => {
   const formData = new FormData();
 
   if (!token) throw new Error("No token available");
 
   for (const key in editBlog) {
-    const value = editBlog[key as keyof NewBlog];
+    const value = editBlog[key as keyof NewPost];
 
     if (key === "content") {
       // Xử lý content nếu là object hoặc JSON string
@@ -316,7 +268,7 @@ const useEditBlog = () => {
       editBlog,
       blogId,
     }: {
-      editBlog: NewBlog;
+      editBlog: NewPost;
       blogId: string;
     }) => {
       if (!token) {

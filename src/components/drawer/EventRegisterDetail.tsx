@@ -8,7 +8,6 @@ import {
   FaInfoCircle,
   FaCalendar,
 } from "react-icons/fa";
-import dayjs from "dayjs";
 
 const DescriptionItem = ({
   title,

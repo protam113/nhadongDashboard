@@ -1,11 +1,12 @@
 "use client";
 
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { handleAPI } from "@/apis/axiosClient";
 import { endpoints } from "@/apis/api";
 import { useAuth } from "@/context/authContext";
 import { useEffect, useState } from "react";
-import { EventList } from "@/types/types";
+import { message } from "antd";
+import { EventList, UpdateEvent } from "@/types/types";
 
 const fetchEventDetail = async (
   postId: string,
@@ -60,4 +61,79 @@ const useEventDetail = (postId: string) => {
   });
 };
 
-export { useEventDetail };
+const UpdateEventDetail = async (
+  postId: string,
+  updateEvent: UpdateEvent,
+  token: string
+) => {
+  const formData = new FormData();
+
+  for (const key in updateEvent) {
+    const value = updateEvent[key as keyof UpdateEvent];
+
+    if (key === "description") {
+      // Xử lý content nếu là object hoặc JSON string
+      formData.append(key, JSON.stringify(value));
+    } else if (key === "image" && typeof value === "string") {
+      // Nếu là URL hình ảnh
+      formData.append(key, value);
+    } else if (key === "image" && Array.isArray(value)) {
+      // Nếu là mảng hình ảnh tải lên
+      value.forEach((file) => {
+        formData.append("image", file);
+      });
+    } else if (value) {
+      // Thêm các trường khác
+      formData.append(key, value as string);
+    }
+  }
+
+  if (!token) throw new Error("No token available");
+
+  try {
+    const response = await handleAPI(
+      `${endpoints.event.replace(":id", postId)}`,
+      "PATCH",
+      formData,
+      token
+    );
+    return response.data;
+  } catch (error: any) {
+    // Use 'any' type assertion
+    console.error("Error creating docs:", error.response?.data);
+    throw new Error(error.response?.data?.message || "Failed to create event");
+  }
+};
+
+const useUpdateEvent = (postId: string) => {
+  const queryClient = useQueryClient();
+  const { getToken } = useAuth();
+  const [token, setToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchToken = async () => {
+      const userToken = await getToken();
+      setToken(userToken);
+    };
+
+    fetchToken();
+  }, [getToken]);
+
+  return useMutation({
+    mutationFn: async (updateEvent: UpdateEvent) => {
+      if (!token) {
+        throw new Error("Token is not available");
+      }
+      return UpdateEventDetail(postId, updateEvent, token);
+    },
+    onSuccess: () => {
+      message.success("Cập Nhật Sự Kiện Thành Công");
+      queryClient.invalidateQueries({ queryKey: ["eventList"] });
+    },
+    onError: (error) => {
+      console.log(error.message || "Failed to create event.");
+    },
+  });
+};
+
+export { useEventDetail, useUpdateEvent };

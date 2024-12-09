@@ -14,5 +14,11 @@ export const EventRegisterList = (currentPage: number, refreshKey: number,postId
 
     const queueData = data?.results || [];
 
-    return { queueData, isLoading, isError };
-};
+    return { 
+        queueData,
+        next:data?.next,
+        count: data?.count,
+        isLoading, 
+        isError 
+    };
+    }

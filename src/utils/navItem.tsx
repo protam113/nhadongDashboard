@@ -10,7 +10,6 @@ import { FaNewspaper, FaFileAlt, FaChurch } from "react-icons/fa";
 import { HiUserGroup } from "react-icons/hi2";
 import { SlNotebook, SlCalender } from "react-icons/sl";
 import { BiCategory } from "react-icons/bi";
-import { PiHandsPrayingBold } from "react-icons/pi";
 import { HiOutlineNewspaper } from "react-icons/hi";
 import { RiCommunityLine } from "react-icons/ri";
 
@@ -109,15 +108,15 @@ export const NavItems = () => {
           children: [
             {
               name: "Thể loại",
-              link: "/blog/blog_categories",
+              link: "/hoi_dong/missio/missio_categories",
               key: "36",
               icon: <BiCategory />,
             },
-            {
-              name: "Quản lý sứ vụ",
-              link: "/blog/blog_management",
-              key: "37",
-            },
+            // {
+            //   name: "Quản lý sứ vụ",
+            //   link: "/blog/blog_management",
+            //   key: "37",
+            // },
           ],
         },
         {
@@ -155,7 +154,6 @@ export const NavItems = () => {
     },
     {
       name: "Học Tập",
-      link: "/study",
       key: "12",
       icon: <SlNotebook />,
       children: [
@@ -170,12 +168,12 @@ export const NavItems = () => {
               key: "13",
               icon: <MdManageSearch />,
             },
-            {
-              name: "Thể Loại",
-              link: "/study/document/document_categories",
-              key: "14",
-              icon: <MdManageSearch />,
-            },
+            // {
+            //   name: "Thể Loại",
+            //   link: "/study/document/document_categories",
+            //   key: "14",
+            //   icon: <MdManageSearch />,
+            // },
           ],
         },
         {
@@ -184,12 +182,6 @@ export const NavItems = () => {
           key: "16",
         },
       ],
-    },
-    {
-      name: "Lời Nguyện",
-      link: "/prayer",
-      key: "33",
-      icon: <PiHandsPrayingBold />,
     },
     {
       name: "Danh Mục",

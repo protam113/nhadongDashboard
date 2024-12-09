@@ -42,5 +42,5 @@ export const UserQueue = (currentPage: number,type: string, refreshKey: number) 
     };
 
 
-    return { queueData, isLoading, isError, handleBulkUpdate };
+    return { queueData,next:data?.next, isLoading, isError, handleBulkUpdate };
 };

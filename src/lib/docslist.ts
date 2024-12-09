@@ -15,5 +15,11 @@ export const DocsList = (currentPage: number, model: string, refreshKey: number)
 
     const queueData = data?.results || [];
 
-    return { queueData, isLoading, isError };
-};
+    return { 
+        queueData,
+        next:data?.next,
+        count: data?.count,
+        isLoading, 
+        isError 
+    };
+    }

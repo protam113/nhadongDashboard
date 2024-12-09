@@ -7,16 +7,19 @@ import { FaSync } from "react-icons/fa"; // Import refresh icon
 import { EyeOutlined } from "@ant-design/icons";
 import Heading from "@/components/design/Heading";
 import { Post } from "@/types/types";
-import { useEventRegisterList } from "@/hooks/event/useEventRegistion";
+import {
+  useEventRegisterList,
+  useSubmitEventRegisterList,
+} from "@/hooks/event/useEventRegistion";
 import EventRegisterDetail from "../drawer/EventRegisterDetail";
 
 const VocationRegisterTable: React.FC<Post> = ({ postId }) => {
-  const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
+  const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [refreshKey, setRefreshKey] = useState(0);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
-
+  const { mutate } = useSubmitEventRegisterList(postId);
   const { data, isLoading, isError } = useEventRegisterList(
     postId,
     currentPage,
@@ -87,6 +90,40 @@ const VocationRegisterTable: React.FC<Post> = ({ postId }) => {
       render: (text) => <span>{text}</span>,
     },
     {
+      title: "Trạng Thái",
+      dataIndex: "status", // No need for array, use just 'status' since it's a flat field
+      key: "status",
+      width: 150,
+      render: (status: "approve" | "reject" | "pending") => {
+        let statusClass = "";
+        let textColor = "text-white"; // Default text color
+
+        switch (status) {
+          case "approve":
+            statusClass = "bg-albert-success"; // Green for approved
+            break;
+          case "reject":
+            statusClass = "bg-albert-error"; // Red for rejected
+            textColor = "text-white"; // White text on red
+            break;
+          case "pending":
+            statusClass = "bg-albert-warning"; // Yellow for pending
+            textColor = "text-white"; // Black text on yellow
+            break;
+          default:
+            statusClass = "";
+        }
+
+        return (
+          <span
+            className={`inline-block px-3 py-1 text-14 rounded-full ${statusClass} ${textColor}`}
+          >
+            {status}
+          </span>
+        );
+      },
+    },
+    {
       title: "Action",
       dataIndex: "action",
       key: "action",
@@ -107,18 +144,53 @@ const VocationRegisterTable: React.FC<Post> = ({ postId }) => {
     setRefreshKey((prev) => prev + 1); // Refresh data manually
   };
 
+  const handleSubmit = async () => {
+    // Convert item.id to a number for comparison
+    const selectedData = queueData.filter(
+      (item) => selectedKeys.includes(String(item.id)) // Ensure both are numbers
+    );
+
+    // Ensure that we have selected data
+    if (selectedData.length === 0) {
+      alert("No participants selected.");
+      return;
+    }
+
+    // Submit each selected registration
+    selectedData.forEach((item) => {
+      mutate({
+        registration_id: item.id,
+        status: "approve",
+      });
+    });
+  };
+
   return (
     <>
       <div className="p-4">
-        <Heading name="Danh sách người dùng trong group " />
+        <Heading name="Danh sách người tham gia ơn gọi " />
 
         {/* Model selection */}
         <div className="flex justify-between items-center mb-4">
-          <Button onClick={handleRefresh} style={{ marginLeft: "8px" }}>
-            <FaSync /> Làm mới
-          </Button>
+          <div>
+            <Button onClick={handleRefresh} style={{ marginLeft: "8px" }}>
+              <FaSync /> Làm mới
+            </Button>
+            <Button
+              type="primary"
+              onClick={handleSubmit}
+              style={{ marginBottom: "16px" }}
+            >
+              Approve Selected
+            </Button>
+          </div>
+          {/* <button
+            onClick={handleExportExcel}
+            className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+          >
+            Tải xuống Excel
+          </button> */}
         </div>
-
         <div className="overflow-auto" style={{ maxHeight: "800px" }}>
           <Table
             columns={columns}
@@ -129,7 +201,7 @@ const VocationRegisterTable: React.FC<Post> = ({ postId }) => {
             rowSelection={{
               selectedRowKeys: selectedKeys,
               onChange: (selectedRowKeys) =>
-                setSelectedKeys(selectedRowKeys as number[]),
+                setSelectedKeys(selectedRowKeys as string[]),
             }}
           />
         </div>

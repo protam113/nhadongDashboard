@@ -9,7 +9,6 @@ export const ScheduleList = ({ year, month, refreshKey }: { year: number; month:
     );
   
     const queueData = data?.results || [];
-    console.log("🚀 ~ queueData:", queueData);
   
     return { queueData, isLoading, isError };
   };

@@ -5,7 +5,7 @@
  **/
 
 
-const baseURL = 'http://localhost:8000';
+const baseURL = 'http://103.20.102.30:8000/';
 // const vStorage = 'https://hcm03.auth.vstorage.vngcloud.vn/v3/auth/tokens';
 
 /**
@@ -74,6 +74,12 @@ const endpoints = {
     eventForm: '/event/:id/form/',
     eventRegister: '/event/:id/register/',
 
+    //event
+
+    missions: '/mission/',
+    mission: '/mission/:id/',
+
+
     //schedule
 
     schedules: '/schedule/',
@@ -82,6 +88,11 @@ const endpoints = {
     // eventRegister: '/event/:id/register',
 
     nhaDong: '/website/',
+
+    //password
+    changePassword: '/password/change-password/',
+    codePassword: '/password/reset-password/',
+    verifyCode: '/password/verify-code/',
 };
 
 export { baseURL, endpoints };

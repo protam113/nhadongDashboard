@@ -1,18 +1,20 @@
 "use client"; // Ensures this is a client component
 
 import React, { useState } from "react";
-import { Table, Button, Spin } from "antd";
+import { Table, Button, Spin, Select } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { FaSync } from "react-icons/fa"; // Import refresh icon
 import { EventList } from "@/lib/eventList";
 import Heading from "@/components/design/Heading";
 import PushButton from "@/components/Button/PushButton";
+import { useUpdateEvent } from "@/hooks/event/useEventDetail";
 
 const Page: React.FC = () => {
-  const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [category] = useState<string>("vocation"); // State to hold selected model
   const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
+  const [selectedPostId, setSelectedPostId] = useState<string>(""); // State to hold the selected event ID
+  const { mutate } = useUpdateEvent(selectedPostId);
 
   // Pass model into CategoriesList
   const { queueData, isLoading, isError } = EventList(
@@ -20,6 +22,10 @@ const Page: React.FC = () => {
     category,
     refreshKey
   );
+
+  const handleSelectEvent = (postId: string) => {
+    setSelectedPostId(postId); // Lưu postId khi người dùng chọn sự kiện
+  };
 
   const columns: ColumnsType<any> = [
     {
@@ -35,6 +41,29 @@ const Page: React.FC = () => {
       key: "title",
       width: 400,
       render: (text) => <span>{text}</span>,
+    },
+    {
+      title: "Trạng Thái",
+      dataIndex: "status",
+      key: "status",
+      width: 400,
+      render: (text, record) => (
+        <Select
+          defaultValue={text}
+          onChange={(newStatus) => {
+            // Send the full object with only status updated
+            const updatedEvent = {
+              ...record, // Get all properties of the event
+              status: newStatus, // Update only the status
+            };
+            mutate(updatedEvent); // Send the full event object to the mutate function
+          }}
+          options={[
+            { value: "open", label: "Open" },
+            { value: "close", label: "Close" },
+          ]}
+        />
+      ),
     },
   ];
 
@@ -68,15 +97,8 @@ const Page: React.FC = () => {
             rowKey="id"
             pagination={false}
             scroll={{ y: 500 }}
-            rowSelection={{
-              selectedRowKeys: selectedKeys,
-              onChange: (selectedRowKeys) =>
-                setSelectedKeys(selectedRowKeys as number[]),
-            }}
             onRow={(record) => ({
-              onClick: () => {
-                window.location.href = `/event/vocation_list/${record.id}`;
-              },
+              onClick: () => handleSelectEvent(record.id), // Khi click vào hàng, lưu postId
             })}
           />
         </div>

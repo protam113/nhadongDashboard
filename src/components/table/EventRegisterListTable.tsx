@@ -7,33 +7,58 @@ import { FaSync } from "react-icons/fa"; // Import refresh icon
 // import { EyeOutlined } from "@ant-design/icons";
 import Heading from "@/components/design/Heading";
 import { Post } from "@/types/types";
-import { useEventRegisterList } from "@/hooks/event/useEventRegistion";
-// import EventRegisterDetail from "../drawer/EventRegisterDetail";
+import {
+  useEventRegisterList,
+  useSubmitEventRegisterList,
+} from "@/hooks/event/useEventRegistion";
+import * as XLSX from "xlsx";
 
 const EventRegisterListTable: React.FC<Post> = ({ postId }) => {
-  const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
+  const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [refreshKey, setRefreshKey] = useState(0);
-  //   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  //   const [selectedMember, setSelectedMember] = useState(null);
-
-  // Pass model into CategoriesList
+  const { mutate } = useSubmitEventRegisterList(postId);
   const { data, isLoading, isError } = useEventRegisterList(
     postId,
     currentPage,
     refreshKey
   );
-  const queueData = data?.results || [];
+  const queueData = data?.results || []; // Danh sách người tham gia
+  const handleExportExcel = () => {
+    if (!queueData.length) {
+      alert("Không có dữ liệu để xuất!");
+      return;
+    }
 
-  //   const handleViewDetails = (member: any) => {
-  //     setSelectedMember(member);
-  //     setIsDrawerOpen(true);
-  //   };
+    // Chuẩn bị dữ liệu Excel
+    const excelData = queueData.map((item, index) => ({
+      STT: index + 1,
+      "Họ và Tên đệm": item.fields_data.first_name?.value || "N/A",
+      Tên: item.fields_data.last_name?.value || "N/A",
+      "Số Điện Thoại": item.fields_data.phone_number?.value || "N/A",
+      Email: item.fields_data.email?.value || "N/A",
+    }));
 
-  //   const handleDrawerClose = () => {
-  //     setIsDrawerOpen(false);
-  //     setSelectedMember(null);
-  //   };
+    // Tạo một sheet mới với tiêu đề ở trên
+    const worksheet = XLSX.utils.json_to_sheet(excelData, {
+      header: ["STT", "Họ và Tên đệm", "Tên", "Số Điện Thoại", "Email"],
+    });
+
+    // Thêm tiêu đề "Danh sách đăng ký tham gia sự kiện" ở đầu file Excel
+    const titleRow = [
+      { value: "Danh sách đăng ký tham gia sự kiện", colspan: 5 },
+    ];
+    const titleWorksheet = XLSX.utils.aoa_to_sheet([titleRow]);
+
+    // Tạo workbook và thêm cả tiêu đề và dữ liệu
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, titleWorksheet, "Title");
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Danh sách");
+
+    // Tải xuống file Excel
+    const filename = `DanhSachSuKien_${postId}.xlsx`;
+    XLSX.writeFile(workbook, filename);
+  };
 
   const columns: ColumnsType<any> = [
     {
@@ -43,17 +68,6 @@ const EventRegisterListTable: React.FC<Post> = ({ postId }) => {
       width: 80,
       render: (_, __, index) => <span>{index + 1}</span>, // index + 1
     },
-    // {
-    //   title: "Chi Tiết",
-    //   dataIndex: "full",
-    //   key: "full",
-    //   width: 150,
-    //   render: (_, record) => (
-    //     <Button onClick={() => handleViewDetails(record)}>
-    //       <EyeOutlined /> Xem Chi Tiết
-    //     </Button>
-    //   ),
-    // },
     {
       title: "Họ Và Tên",
       children: [
@@ -88,6 +102,40 @@ const EventRegisterListTable: React.FC<Post> = ({ postId }) => {
       render: (text) => <span>{text}</span>,
     },
     {
+      title: "Trạng Thái",
+      dataIndex: "status", // No need for array, use just 'status' since it's a flat field
+      key: "status",
+      width: 150,
+      render: (status: "approve" | "reject" | "pending") => {
+        let statusClass = "";
+        let textColor = "text-white"; // Default text color
+
+        switch (status) {
+          case "approve":
+            statusClass = "bg-albert-success"; // Green for approved
+            break;
+          case "reject":
+            statusClass = "bg-albert-error"; // Red for rejected
+            textColor = "text-white"; // White text on red
+            break;
+          case "pending":
+            statusClass = "bg-albert-warning"; // Yellow for pending
+            textColor = "text-white"; // Black text on yellow
+            break;
+          default:
+            statusClass = "";
+        }
+
+        return (
+          <span
+            className={`inline-block px-3 py-1 text-14 rounded-full ${statusClass} ${textColor}`}
+          >
+            {status}
+          </span>
+        );
+      },
+    },
+    {
       title: "Action",
       dataIndex: "action",
       key: "action",
@@ -108,16 +156,52 @@ const EventRegisterListTable: React.FC<Post> = ({ postId }) => {
     setRefreshKey((prev) => prev + 1); // Refresh data manually
   };
 
+  const handleSubmit = async () => {
+    // Convert item.id to a number for comparison
+    const selectedData = queueData.filter(
+      (item) => selectedKeys.includes(String(item.id)) // Ensure both are numbers
+    );
+
+    // Ensure that we have selected data
+    if (selectedData.length === 0) {
+      alert("No participants selected.");
+      return;
+    }
+
+    // Submit each selected registration
+    selectedData.forEach((item) => {
+      mutate({
+        registration_id: item.id,
+        status: "approve",
+      });
+    });
+  };
+
   return (
     <>
       <div className="p-4">
-        <Heading name="Danh sách người dùng trong group " />
+        <Heading name="Danh sách người tham gia sự kiện " />
 
         {/* Model selection */}
         <div className="flex justify-between items-center mb-4">
-          <Button onClick={handleRefresh} style={{ marginLeft: "8px" }}>
-            <FaSync /> Làm mới
-          </Button>
+          <div>
+            <Button onClick={handleRefresh} style={{ marginLeft: "8px" }}>
+              <FaSync /> Làm mới
+            </Button>
+            <Button
+              type="primary"
+              onClick={handleSubmit}
+              style={{ marginBottom: "16px" }}
+            >
+              Approve Selected
+            </Button>
+          </div>
+          <button
+            onClick={handleExportExcel}
+            className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
+          >
+            Tải xuống Excel
+          </button>
         </div>
 
         <div className="overflow-auto" style={{ maxHeight: "800px" }}>
@@ -130,7 +214,7 @@ const EventRegisterListTable: React.FC<Post> = ({ postId }) => {
             rowSelection={{
               selectedRowKeys: selectedKeys,
               onChange: (selectedRowKeys) =>
-                setSelectedKeys(selectedRowKeys as number[]),
+                setSelectedKeys(selectedRowKeys as string[]),
             }}
           />
         </div>
@@ -147,12 +231,6 @@ const EventRegisterListTable: React.FC<Post> = ({ postId }) => {
           </Button>
         </div>
       </div>
-
-      {/* <EventRegisterDetail
-        open={isDrawerOpen}
-        onClose={handleDrawerClose}
-        member={selectedMember}
-      /> */}
     </>
   );
 };

@@ -9,7 +9,6 @@ import Heading from "@/components/design/Heading";
 import PushButton from "@/components/Button/PushButton";
 
 const Page: React.FC = () => {
-  const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [category] = useState<string>("event"); // State to hold selected model
   const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
@@ -100,11 +99,6 @@ const Page: React.FC = () => {
             rowKey="id"
             pagination={false}
             scroll={{ y: 500 }}
-            rowSelection={{
-              selectedRowKeys: selectedKeys,
-              onChange: (selectedRowKeys) =>
-                setSelectedKeys(selectedRowKeys as number[]),
-            }}
             onRow={(record) => ({
               onClick: () => {
                 window.location.href = `/event/event_list/${record.id}`;
@@ -124,13 +118,7 @@ const Page: React.FC = () => {
             Next
           </Button>
         </div>
-        {/*<NewsQueueList/>*/}
       </div>
-      {/*<NewsDetailsModal*/}
-      {/*    open={isDrawerOpen}*/}
-      {/*    onClose={handleModalClose}*/}
-      {/*    news={selectedNews}*/}
-      {/*/>*/}
     </>
   );
 };

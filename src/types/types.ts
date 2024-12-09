@@ -79,6 +79,24 @@ export interface NewEvent {
 }
 
 
+export interface UpdateEvent {
+    title: string| null;
+    description: string| null;
+    category: string| null
+    status: string| null;
+    image: File[] | string | null;
+}
+
+
+export interface NewDocs {
+    title: string;
+    description: string;
+    content: string; // Mảng nội dung chi tiết
+    link: string;
+    category: string; // Mảng danh mục
+    image: File[] | string;
+  }
+
 /**
  Event Interface
  **/
@@ -221,12 +239,19 @@ interface FieldsData {
   }
   
 
+
   export interface EventRegisterListResponse {
     count: number;
     next: string | null;
     previous: string | null;
     results: EventRegisterList[];
   }
+
+  export interface SubmitEventRegister {
+    registration_id: string ;
+    status: string
+  }
+
 
 /**
  group post Interface
@@ -240,3 +265,110 @@ interface FieldsData {
   export interface Post {
    postId: string;
   }
+
+
+
+interface Documents {
+    id: string;
+    username: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    phone_number: string | null;
+    profile_image: string;
+}
+
+// Khai Báo Các Thuộc Tính Không Có trong trường hiển thị
+export interface FetchDocsListResponse {
+    count: number;
+    next: string | null;
+    previous: string | null;
+    results: DocsList[];
+}
+
+
+/**
+  post Interface
+ **/
+
+
+interface PostCategory {
+    id: number;
+    name: string;
+    file: string;
+  }
+  
+  interface User {
+    id: number;
+    username: string;
+    first_name: string;
+    last_name: string;
+    email: string;
+    phone_number: string | null;
+    profile_image: string;
+  }
+  
+  interface PostList {
+    id: number;
+    title: string;
+    description: string;
+    content: string; // Có thể cần điều chỉnh nếu cấu trúc khác
+    link: string;
+    image: string | null; // Chỉnh sửa để phù hợp với giá trị null trong JSON
+    categories: PostCategory[];
+    user: User; // Sử dụng interface User đã khai báo ở trên
+  }
+  
+  // Khai Báo Các Thuộc Tính Không Có trong trường hiển thị
+ export interface FetchBLogsListResponse {
+    count: number;
+    next: string | null;
+    previous: string | null;
+    results: PostList[];
+  }
+  
+
+
+  export interface NewPost {
+    title: string;
+    description: string;
+    content: string; // Mảng nội dung chi tiết
+    link: string;
+    category: string[]; // Mảng danh mục
+    image: File[] | string; // Hình ảnh chính cho bài viết
+  }
+
+  
+/**
+  change password Interface
+ **/
+
+
+
+  export interface ChangePassword {
+    old_password: string;
+    new_password: string;
+  }
+  
+  export interface VerifyCode {
+    email:string 
+  }
+
+  export interface ResetPassword {
+    code:string, 
+    new_password: string,
+    email: string,
+  }
+
+
+  /**
+  update profiile Interface
+ **/
+
+  export interface UpdateProfile {
+    profile_image:File | null
+    first_name: string| null;
+    last_name: string| null;
+    phone_number: string| null;
+  }
+
