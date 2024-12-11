@@ -530,3 +530,9 @@ export interface FetchUserListResponse {
   previous: string | null;
   results: UserData[];
 }
+
+export interface UserFilters {
+  role?: string[]; // Use an array for role filters
+  [key: string]: string | number | string[] | undefined;
+}
+

@@ -5,7 +5,8 @@
  **/
 
 
-const baseURL = 'http://localhost:8000';
+// const baseURL = 'http://localhost:8000';
+const baseURL = 'http://103.20.102.30:8000/';
 
 /**
 End Points aPI
