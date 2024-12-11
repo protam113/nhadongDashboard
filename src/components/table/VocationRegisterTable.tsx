@@ -123,18 +123,6 @@ const VocationRegisterTable: React.FC<Post> = ({ postId }) => {
         );
       },
     },
-    {
-      title: "Action",
-      dataIndex: "action",
-      key: "action",
-      width: 100,
-      render: () => (
-        // _: any, record: any
-        <>
-          <p> delete</p>
-        </>
-      ),
-    },
   ];
 
   if (isLoading) return <Spin size="large" />;

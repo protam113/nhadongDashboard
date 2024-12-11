@@ -7,12 +7,13 @@ import { FaSync } from "react-icons/fa"; // Import refresh icon
 import dayjs from "dayjs";
 import { EyeOutlined } from "@ant-design/icons";
 import Heading from "@/components/design/Heading";
-import { Group } from "@/types/types";
+import { GroupMemberData } from "@/types/types";
 import { GroupMemberList } from "@/lib/group/groupMemberList";
 import GroupMemberDetail from "@/components/drawer/GroupMemberDetail";
 import CreateGroupMember from "@/components/drawer/CreateGroupMember";
+import * as XLSX from "xlsx";
 
-const GroupMember: React.FC<Group> = ({ groupId }) => {
+const GroupMember: React.FC<GroupMemberData> = ({ groupId, groupName }) => {
   const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
@@ -22,6 +23,7 @@ const GroupMember: React.FC<Group> = ({ groupId }) => {
     groupId,
     refreshKey
   );
+
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null); // State for selected blog
   const [isCreateDrawerOpen, setIsCreateDrawerOpen] = useState(false); // State for CreateGroupMember drawer
@@ -42,6 +44,37 @@ const GroupMember: React.FC<Group> = ({ groupId }) => {
 
   const handleCreateDrawerClose = () => {
     setIsCreateDrawerOpen(false);
+  };
+
+  const handleExportExcel = () => {
+    if (!queueData || queueData.length === 0) {
+      return alert("Không có dữ liệu để xuất.");
+    }
+
+    // Chuyển đổi dữ liệu thành định dạng Excel
+    const excelData = queueData.map((item, index) => ({
+      ID: index + 1,
+      "Tên Thành Viên": item.name,
+      Email: item.email,
+      "Số Điện Thoại": item.phone_number,
+      "Ngày Sinh": dayjs(item.dob).format("DD/MM/YYYY"),
+      "Ngày Khấn Tạm": item.first_vows_date
+        ? dayjs(item.first_vows_date).format("DD/MM/YYYY")
+        : "",
+      "Ngày Khấn Trọn Đời": item.final_vows_date
+        ? dayjs(item.final_vows_date).format("DD/MM/YYYY")
+        : "",
+      "Ngày Tham Gia": dayjs(item.join_date).format("DD/MM/YYYY"),
+    }));
+
+    // Tạo một workbook và thêm dữ liệu
+    const worksheet = XLSX.utils.json_to_sheet(excelData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "GroupMembers");
+
+    // Xuất file Excel với tên dựa trên groupName
+    const fileName = `congdong_${groupName}.xlsx`;
+    XLSX.writeFile(workbook, fileName);
   };
 
   const columns: ColumnsType<any> = [
@@ -104,24 +137,24 @@ const GroupMember: React.FC<Group> = ({ groupId }) => {
         <span>{text ? dayjs(text).format("DD/MM/YYYY") : ""}</span>
       ), // Format date to "DD/MM/YYYY"
     },
-    {
-      title: "Action",
-      dataIndex: "action",
-      key: "action",
-      width: 100,
-      render: () => (
-        // _: any, record: any
-        <>
-          <p> delete</p>
-          {/*<Button danger onClick={() => handleDelete(record.id)}>*/}
-          {/*    <MdOutlineDelete className="text-albert-error" />*/}
-          {/*</Button>*/}
-          {/*<Button onClick={() => handleEdit(record)}>*/}
-          {/*    <FaRegEdit />*/}
-          {/*</Button>*/}
-        </>
-      ),
-    },
+    // {
+    //   title: "Action",
+    //   dataIndex: "action",
+    //   key: "action",
+    //   width: 100,
+    //   render: () => (
+    //     // _: any, record: any
+    //     <>
+    //       <p> delete</p>
+    //       {/*<Button danger onClick={() => handleDelete(record.id)}>*/}
+    //       {/*    <MdOutlineDelete className="text-albert-error" />*/}
+    //       {/*</Button>*/}
+    //       {/*<Button onClick={() => handleEdit(record)}>*/}
+    //       {/*    <FaRegEdit />*/}
+    //       {/*</Button>*/}
+    //     </>
+    //   ),
+    // },
   ];
 
   if (isLoading) return <Spin size="large" />;
@@ -138,9 +171,14 @@ const GroupMember: React.FC<Group> = ({ groupId }) => {
 
         {/* Model selection */}
         <div className="flex justify-between items-center mb-4">
-          <Button onClick={handleRefresh} style={{ marginLeft: "8px" }}>
-            <FaSync /> Làm mới
-          </Button>
+          <div>
+            <Button onClick={handleRefresh} style={{ marginLeft: "8px" }}>
+              <FaSync /> Làm mới
+            </Button>
+            <Button onClick={handleExportExcel} className="ml-4">
+              Xuất Excel
+            </Button>
+          </div>
 
           {/* Nút Tạo cộng đoàn */}
           <Button onClick={handleCreateDrawerOpen} className="ml-4">

@@ -15,12 +15,16 @@ import { PlusOutlined } from "@ant-design/icons";
 import { RcFile } from "antd/lib/upload";
 import { CategoriesList } from "@/lib/categoriesList";
 import { UploadFile, UploadProps } from "antd/lib/upload/interface";
-import { useCreateNews } from "@/hooks/new/useNews";
-import { Section } from "@/types/types";
 import { useRouter } from "next/navigation";
+import BackButton from "@/components/Button/BackButton";
+import Heading from "@/components/design/Heading"; // Import kiểu dữ liệu
+import ContentSection from "@/components/main/blog/ContentSection";
+import { useCreateNews } from "@/hooks/new/useNews";
 
-const CreateNewsPage: React.FC = () => {
-  const [content, setContent] = useState<Section[]>([]);
+const { TextArea } = Input;
+
+const Page: React.FC = () => {
+  const [content, setContent] = useState<string>("");
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [previewImage, setPreviewImage] = useState<string>("");
   const [previewOpen, setPreviewOpen] = useState<boolean>(false);
@@ -28,7 +32,7 @@ const CreateNewsPage: React.FC = () => {
     title: "",
     description: "",
     image: [] as RcFile[], // Đổi từ `null` thành mảng `File[]`
-    content: [] as Section[],
+    content: "",
     category: [] as string[],
     link: "",
   });
@@ -46,10 +50,6 @@ const CreateNewsPage: React.FC = () => {
 
   const handleCategoryChange = (checkedValues: string[]) => {
     setBlogData({ ...blogData, category: checkedValues });
-  };
-
-  const handleAddSection = () => {
-    setContent([...content, { fields: [] }]);
   };
 
   const handleChange: UploadProps["onChange"] = ({ fileList }) => {
@@ -88,43 +88,26 @@ const CreateNewsPage: React.FC = () => {
       }
 
       if (blogData.image.length === 0) {
-        // Kiểm tra xem đã có ảnh chưa
         message.error("Vui lòng tải lên một hình ảnh!");
         setLoading(false);
         return;
       }
 
-      // Định dạng content thành chuỗi JSON
-      const formattedContent = (blogData.content as Section[]).map(
-        (section) => {
-          const sectionData: Record<string, string> = {};
-          section.fields.forEach((field) => {
-            sectionData[field.type] = field.value;
-          });
-
-          // Convert đối tượng thành chuỗi JSON, sau đó thay dấu " bằng dấu '
-          const jsonString = JSON.stringify(sectionData);
-          return jsonString.replace(/"/g, "'"); // Thay dấu " thành dấu '
-        }
-      );
-
-      // Nếu bạn muốn chỉ có một chuỗi JSON duy nhất cho tất cả phần nội dung
-      const contentString = formattedContent.join(", "); // Nối tất cả các phần lại với nhau
+      // Use the HTML content stored in the state
       const blogDataToSend = {
         ...blogData,
-        content: `{${contentString}}`, // Đặt trong dấu {}
-        image: blogData.image, // Sử dụng mảng File[] của hình ảnh
+        content, // Send the HTML content
+        image: blogData.image,
       };
 
       console.log(blogDataToSend);
-      createBlogMutation(blogDataToSend); // Gọi mutation để tạo blog
-      form.resetFields(); // Reset form sau khi tạo bài viết
-      setContent([]); // Reset các phần nội dung
+      createBlogMutation(blogDataToSend); // Call mutation to create blog
+      form.resetFields();
       setBlogData({
         title: "",
         description: "",
-        image: [], // Reset lại mảng ảnh
-        content: [],
+        image: [],
+        content: "",
         category: [],
         link: "",
       });
@@ -139,7 +122,11 @@ const CreateNewsPage: React.FC = () => {
 
   return (
     <div style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
-      <Card title="Tạo Tin Tức" bordered={false}>
+      <BackButton />
+
+      <Heading name="tạo tin tức mới  " />
+
+      <Card bordered={false}>
         <Form form={form} layout="vertical" onFinish={handleSaveBlog}>
           <Form.Item
             label="Tiêu đề"
@@ -158,7 +145,7 @@ const CreateNewsPage: React.FC = () => {
             name="description"
             rules={[{ required: true, message: "Vui lòng nhập mô tả!" }]}
           >
-            <Input
+            <TextArea
               value={blogData.description}
               onChange={(e) =>
                 setBlogData({ ...blogData, description: e.target.value })
@@ -178,7 +165,7 @@ const CreateNewsPage: React.FC = () => {
 
             {previewImage && (
               <Image
-                alt="Xem Ảnh Trước"
+                alt="Hình ảnh xem trước bài viết"
                 wrapperStyle={{ display: "none" }}
                 preview={{
                   visible: previewOpen,
@@ -187,6 +174,12 @@ const CreateNewsPage: React.FC = () => {
                 src={previewImage}
               />
             )}
+          </Form.Item>
+          <Form.Item label="Nôi Dung Chi Tiết">
+            <ContentSection
+              onChange={setContent}
+              initialContent={blogData.content}
+            />
           </Form.Item>
           <Form.Item label="Link" name="Link">
             <Input
@@ -214,14 +207,6 @@ const CreateNewsPage: React.FC = () => {
             )}
           </Form.Item>
 
-          <Button
-            type="dashed"
-            onClick={handleAddSection}
-            style={{ width: "100%", marginBottom: "20px" }}
-          >
-            + Thêm phần mới
-          </Button>
-
           <Form.Item style={{ textAlign: "center" }}>
             <Button
               type="primary"
@@ -238,4 +223,4 @@ const CreateNewsPage: React.FC = () => {
   );
 };
 
-export default CreateNewsPage;
+export default Page;

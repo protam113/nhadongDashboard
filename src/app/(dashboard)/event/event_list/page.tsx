@@ -1,17 +1,20 @@
 "use client"; // Ensures this is a client component
 
 import React, { useState } from "react";
-import { Table, Button, Spin } from "antd";
+import { Table, Button, Spin, Select } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { FaSync } from "react-icons/fa"; // Import refresh icon
 import { EventList } from "@/lib/eventList";
 import Heading from "@/components/design/Heading";
 import PushButton from "@/components/Button/PushButton";
+import { useUpdateEvent } from "@/hooks/event/useEventDetail";
 
 const Page: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [category] = useState<string>("event"); // State to hold selected model
   const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
+  const [selectedPostId, setSelectedPostId] = useState<string>(""); // State to hold the selected event ID
+  const { mutate } = useUpdateEvent(selectedPostId);
 
   // Pass model into CategoriesList
   const { queueData, isLoading, isError } = EventList(
@@ -19,6 +22,10 @@ const Page: React.FC = () => {
     category,
     refreshKey
   );
+
+  const handleSelectEvent = (postId: string) => {
+    setSelectedPostId(postId); // Lưu postId khi người dùng chọn sự kiện
+  };
 
   const columns: ColumnsType<any> = [
     {
@@ -40,33 +47,25 @@ const Page: React.FC = () => {
       dataIndex: "status",
       key: "status",
       width: 400,
-      render: (text) => <span>{text}</span>,
+      render: (text, record) => (
+        <Select
+          defaultValue={text}
+          onChange={(newStatus) => {
+            // Send the full object with only status updated
+            const updatedEvent = {
+              ...record, // Get all properties of the event
+              status: newStatus, // Update only the status
+            };
+            mutate(updatedEvent); // Send the full event object to the mutate function
+            handleSelectEvent(record.id); // Now handleSelectEvent is called here
+          }}
+          options={[
+            { value: "open", label: "Open" },
+            { value: "close", label: "Close" },
+          ]}
+        />
+      ),
     },
-    // {
-    //     title: "Thể Loại",
-    //     dataIndex: "categories",
-    //     key: "categories",
-    //     width: 150,
-    //     render: (categories) => (
-    //         <span>
-    //                 {categories.map((category: any) => (
-    //                     <div
-    //                         key={category.id}
-    //                         style={{
-    //                             backgroundColor: category.color || '#142857', // Màu nền tùy chọn cho thể loại
-    //                             color: '#fff', // Màu chữ
-    //                             padding: '5px 10px',
-    //                             borderRadius: '4px',
-    //                             marginBottom: '5px',
-    //                             marginRight: '5px',
-    //                         }}
-    //                     >
-    //                         {category.name} {/* Hiển thị tên của thể loại */}
-    //                     </div>
-    //                 ))}
-    //             </span>
-    //     ),
-    // },
   ];
 
   if (isLoading) return <Spin size="large" />;

@@ -55,7 +55,7 @@ const GroupDetailModal: React.FC<GroupDetail> = ({ open, onClose, group }) => {
       <Divider />
       <RoleTableModal groupId={group.id} />{" "}
       {/* Truyền groupId vào RoleTableModal */}
-      <GroupMemberTable groupId={group.id} />
+      <GroupMemberTable groupId={group.id} groupName={group.name} />
       {/* Nút đóng */}
       <div className="flex justify-end mt-4">
         <Button

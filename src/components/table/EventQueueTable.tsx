@@ -6,16 +6,16 @@ import { ReloadOutlined } from "@ant-design/icons"; // Icon từ Ant Design
 import type { ColumnsType } from "antd/es/table";
 import { UserQueue } from "@/lib/userQueue";
 
-const BlogQueueList: React.FC = () => {
+const EventQueueTable = ({ PostModel }: { PostModel: string }) => {
+  console.log("🚀 ~ EventQueueTable ~ model:", PostModel);
   const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [refreshKey, setRefreshKey] = useState(0); // State để làm mới dữ liệu
   const [isRefreshing, setIsRefreshing] = useState(false); // State để kiểm tra trạng thái làm mới
-
-  // Gọi hook `UserQueue` và thêm `refreshKey` làm dependency để làm mới dữ liệu
+  const model = PostModel;
   const { queueData, isLoading, isError, handleBulkUpdate } = UserQueue(
     currentPage,
-    "blog",
+    model,
     refreshKey
   );
 
@@ -174,4 +174,4 @@ const BlogQueueList: React.FC = () => {
   );
 };
 
-export default BlogQueueList;
+export default EventQueueTable;

@@ -29,8 +29,6 @@ export const UserQueue = (currentPage: number,type: string, refreshKey: number) 
             status: status,
         };
 
-
-
         browseQueue(browseManager, {
             onSuccess: (response: BrowseQueueResponse) => {
                 console.log("Response from browseQueue:", response);  // Log phản hồi từ browseQueue
@@ -40,6 +38,8 @@ export const UserQueue = (currentPage: number,type: string, refreshKey: number) 
             }
         });
     };
+
+    
 
 
     return { queueData,next:data?.next, isLoading, isError, handleBulkUpdate };

@@ -5,8 +5,7 @@
  **/
 
 
-const baseURL = 'http://103.20.102.30:8000/';
-// const vStorage = 'https://hcm03.auth.vstorage.vngcloud.vn/v3/auth/tokens';
+const baseURL = 'http://localhost:8000';
 
 /**
 End Points aPI
@@ -83,9 +82,10 @@ const endpoints = {
     //schedule
 
     schedules: '/schedule/',
-    // event: '/event/:id/',
-    // eventForm: '/event/:id/form/',
-    // eventRegister: '/event/:id/register',
+    schedule: '/schedule/:id/feast/',
+
+
+    //nha dong
 
     nhaDong: '/website/',
 

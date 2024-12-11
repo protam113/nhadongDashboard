@@ -119,11 +119,11 @@ export const NavItems = () => {
             // },
           ],
         },
-        {
-          name: "Thuong AI",
-          link: "/hoi_dong/on_goi",
-          key: "10",
-        },
+        // {
+        //   name: "Thuong AI",
+        //   link: "/hoi_dong/on_goi",
+        //   key: "10",
+        // },
       ],
     },
     {

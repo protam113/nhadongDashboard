@@ -6,13 +6,13 @@ import type { ColumnsType } from "antd/es/table";
 import { FaSync } from "react-icons/fa"; // Import refresh icon
 import { MdOutlineDelete } from "react-icons/md";
 import { FaRegEdit } from "react-icons/fa";
-import BlogDetailsModal from "@/app/(dashboard)/blog/BlogDetailsModal";
 import { EyeOutlined } from "@ant-design/icons";
 import Heading from "@/components/design/Heading";
 import { MissionList } from "@/lib/missionList";
 import MissionQueueList from "./MissionQueueList";
 import PushButton from "@/components/Button/PushButton";
 import { useDeleteMission } from "@/hooks/mission/useMission";
+import MissioDetailsDrawer from "./missioDetailModal";
 
 const Page: React.FC = () => {
   const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
@@ -168,7 +168,7 @@ const Page: React.FC = () => {
         <Heading name="Quản lý hàng đợi duyệt sứ vụ" />
         <MissionQueueList />
       </div>
-      <BlogDetailsModal
+      <MissioDetailsDrawer
         open={isDrawerOpen}
         onClose={handleDrawerClose}
         blog={selectedBlog}

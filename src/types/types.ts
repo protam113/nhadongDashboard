@@ -262,6 +262,12 @@ interface FieldsData {
     groupId: string;
   }
 
+  export interface GroupMemberData {
+    groupId: string;
+    groupName:string | null
+  }
+
+
   export interface Post {
    postId: string;
   }
@@ -372,3 +378,155 @@ interface PostCategory {
     phone_number: string| null;
   }
 
+  /**
+  drawer Interface
+ **/
+
+
+  export interface FeastDrawerProps {
+    visible: boolean;
+    onClose: () => void;
+    selectedDate: string | null;
+    selectedFeast: any;
+    scheduleId: string
+  }
+
+
+  /**
+  Schedule Interface
+ **/
+
+  export interface CreateSchedule {
+    feast_name: string;
+    feast_type: string;
+  }
+
+
+  interface GroupList {
+    id: number;
+    name: string;
+    founding_date: string; // Có thể cần điều chỉnh nếu cấu trúc khác
+    link: string;
+    image: string | null; // Chỉnh sửa để phù hợp với giá trị null trong JSON
+    created_date: string;
+    updated_date: string;
+    // user: Documents; // Sử dụng interface User đã khai báo ở trên
+}
+
+// Khai Báo Các Thuộc Tính Không Có trong trường hiển thị
+export interface FetchGroupListResponse {
+    count: number;
+    next: string | null;
+    previous: string | null;
+    results: GroupList[];
+}
+
+export interface NewGroup {
+  name: string;
+  founding_date: Date | null;
+  description: string;
+  image?: File | string[] | null;
+}
+
+
+export interface NewGroupRole {
+  name: string;
+  description: string;
+}
+
+interface GroupMember {
+  id: number;
+  name: string;
+  email: string; // Có thể cần điều chỉnh nếu cấu trúc khác
+  link: string;
+  dob: Date;
+  phone_number:string;
+  image: string | null; // Chỉnh sửa để phù hợp với giá trị null trong JSON
+  role:string;
+  join_date: Date;
+  first_vows_date: Date;
+  final_vows_date: Date;
+  group:string
+  created_date: Date;
+  updated_date: Date;
+  // user: Documents; // Sử dụng interface User đã khai báo ở trên
+}
+
+// Khai Báo Các Thuộc Tính Không Có trong trường hiển thị
+export interface FetchGroupMemberListResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: GroupMember[];
+}
+
+
+export interface NewGroupMember {
+  name: string;
+  email: string;
+  link: string;
+  dob: Date;
+  phone_number:string;
+  image?: File | string[] | null;
+  role:string;
+  join_date: Date;
+  first_vows_date: Date | null;
+  final_vows_date: Date | null;
+  group:string
+}
+
+
+// Khai Báo Các Biến Có trong Queue
+interface Queue {
+  id: number;
+  created_date: string;
+  updated_date: string;
+  data: string;
+  description: string;
+  type: string;
+  action: string;
+  status: string;
+}
+
+// Khai Báo Các Thuộc Tính Không Có trong trường hiển thị
+export interface FetchQueueListResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: Queue[];
+}
+
+
+interface Role {
+  id: number;
+  name: string;
+  description: string;
+}
+
+export interface FetchRoleListResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: Role[];
+}
+
+
+
+interface UserData {
+  id: string;
+  username: string;
+  first_name: string;
+  last_name: string;
+  email: string;
+  phone_number: string | null;
+  profile_image: string;
+  is_active: boolean;
+  blocked: boolean;
+}
+
+export interface FetchUserListResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: UserData[];
+}

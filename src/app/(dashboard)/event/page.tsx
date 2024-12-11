@@ -7,6 +7,7 @@ import { FaSync } from "react-icons/fa"; // Import refresh icon
 
 import { EventList } from "@/lib/eventList";
 import Heading from "@/components/design/Heading";
+import EventQueueTable from "@/components/table/EventQueueTable";
 
 const Page: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -35,31 +36,6 @@ const Page: React.FC = () => {
       width: 400,
       render: (text) => <span>{text}</span>,
     },
-    // {
-    //     title: "Thể Loại",
-    //     dataIndex: "categories",
-    //     key: "categories",
-    //     width: 150,
-    //     render: (categories) => (
-    //         <span>
-    //                 {categories.map((category: any) => (
-    //                     <div
-    //                         key={category.id}
-    //                         style={{
-    //                             backgroundColor: category.color || '#142857', // Màu nền tùy chọn cho thể loại
-    //                             color: '#fff', // Màu chữ
-    //                             padding: '5px 10px',
-    //                             borderRadius: '4px',
-    //                             marginBottom: '5px',
-    //                             marginRight: '5px',
-    //                         }}
-    //                     >
-    //                         {category.name} {/* Hiển thị tên của thể loại */}
-    //                     </div>
-    //                 ))}
-    //             </span>
-    //     ),
-    // },
   ];
 
   if (isLoading) return <Spin size="large" />;
@@ -88,7 +64,6 @@ const Page: React.FC = () => {
             rowKey="id"
             pagination={false}
             scroll={{ y: 500 }}
-            // Bỏ rowSelection để không có checkbox
           />
         </div>
         <div style={{ marginTop: "16px", textAlign: "center" }}>
@@ -103,6 +78,7 @@ const Page: React.FC = () => {
             Next
           </Button>
         </div>
+        <EventQueueTable PostModel="event" />
       </div>
     </>
   );

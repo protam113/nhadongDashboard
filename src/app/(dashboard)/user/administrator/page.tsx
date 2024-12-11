@@ -45,8 +45,8 @@ const ManageUsersPage: React.FC = () => {
       role: selectedRole
         ? [selectedRole]
         : [
-            "9c694bfc-6f29-48a2-b66b-fdc9cd65c362",
-            "f146ab60-321f-4a3b-aab4-997331dce4f5",
+            "980607ec-2a69-4cdd-8781-033ced32a658",
+            "30824651-f0e7-4431-83b3-935d87633e8d",
           ], // Default roles if no selection
     },
     refreshKey

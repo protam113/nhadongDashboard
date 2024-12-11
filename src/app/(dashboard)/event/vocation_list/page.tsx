@@ -57,6 +57,7 @@ const Page: React.FC = () => {
               status: newStatus, // Update only the status
             };
             mutate(updatedEvent); // Send the full event object to the mutate function
+            handleSelectEvent(record.id); // Now handleSelectEvent is called here
           }}
           options={[
             { value: "open", label: "Open" },
@@ -98,7 +99,9 @@ const Page: React.FC = () => {
             pagination={false}
             scroll={{ y: 500 }}
             onRow={(record) => ({
-              onClick: () => handleSelectEvent(record.id), // Khi click vào hàng, lưu postId
+              onClick: () => {
+                window.location.href = `/event/vocation_list/${record.id}`;
+              },
             })}
           />
         </div>
@@ -114,7 +117,6 @@ const Page: React.FC = () => {
             Next
           </Button>
         </div>
-        {/*<NewsQueueList/>*/}
       </div>
     </>
   );

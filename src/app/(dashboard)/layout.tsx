@@ -7,6 +7,7 @@ import { useRouter } from "next/navigation";
 import Loading from "@/components/design/Loading";
 import { UserProvider } from "@/context/userProvider";
 import ScrollToTopButton from "@/components/Button/ScrollButton";
+import { message } from "antd";
 
 export default function DashboardLayout({
   children,
@@ -30,19 +31,13 @@ export default function DashboardLayout({
   }, [loading]);
 
   useEffect(() => {
-    // console.log('Checking loading and authentication...');
-    // console.log('Loading:', loading);
-    // console.log('Authenticated:', isAuthenticated);
-    // console.log('Token:', localStorage.getItem('token'));
-
-    // Chỉ thực hiện chuyển hướng khi trạng thái loading đã hoàn tất và chưa xác thực
     if (tokenChecked) {
       if (isAuthenticated) {
         // Không chuyển hướng nếu đã xác thực
-        console.log("User is authenticated");
+        console.error("User is authenticated");
       } else {
         // Nếu chưa xác thực, chuyển hướng về login
-        console.log("User not authenticated");
+        message.error("Bạn Không Có Quyền Truy Cập Vào Trang !!");
         router.replace("/login");
       }
     }

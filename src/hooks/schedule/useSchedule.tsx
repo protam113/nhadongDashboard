@@ -1,9 +1,9 @@
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { handleAPI } from "@/apis/axiosClient";
 import { endpoints } from "@/apis/api";
 import { useAuth } from "@/context/authContext";
 import { useEffect, useState } from "react";
-import { ScheduleList, Filters } from "@/types/types";
+import { ScheduleList, Filters, CreateSchedule } from "@/types/types";
 
 // Hàm fetch dữ liệu lịch
 const fetchScheduleList = async (
@@ -76,4 +76,70 @@ const useScheduleList = (filters: Filters = {}, refreshKey: number) => {
   });
 };
 
-export { useScheduleList };
+const CreateScheduleItem = async (
+  scheduleId: string,
+  newSchedule: CreateSchedule,
+  token: string
+) => {
+  const formData = new FormData();
+
+  for (const key in newSchedule) {
+    if (Object.prototype.hasOwnProperty.call(newSchedule, key)) {
+      const value = newSchedule[key as keyof CreateSchedule];
+
+      if (typeof value === "string") {
+        // If the value is a string, append to FormData
+        formData.append(key, value);
+      }
+    }
+  }
+
+  if (!token) throw new Error("No token available");
+
+  try {
+    const response = await handleAPI(
+      `${endpoints.schedule.replace(":id", scheduleId)}`,
+      "POST",
+      formData,
+      token
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error("Error creating category:", error.response?.data);
+    throw new Error(
+      error.response?.data?.message || "Failed to create category"
+    );
+  }
+};
+
+const useCreateSchedule = (scheduleId: string) => {
+  const queryClient = useQueryClient();
+  const { getToken } = useAuth();
+  const [token, setToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchToken = async () => {
+      const userToken = await getToken();
+      setToken(userToken);
+    };
+    fetchToken();
+  }, [getToken]);
+
+  return useMutation({
+    mutationFn: async (newSchedule: CreateSchedule) => {
+      if (!token) {
+        throw new Error("Token is not available");
+      }
+      return CreateScheduleItem(scheduleId, newSchedule, token);
+    },
+    onSuccess: () => {
+      console.log("Category created successfully!");
+      queryClient.invalidateQueries({ queryKey: ["categoriesList"] });
+    },
+    onError: (error: any) => {
+      console.error(error.message || "Failed to create category.");
+    },
+  });
+};
+
+export { useScheduleList, useCreateSchedule };

@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { Table, Button, Spin, Select } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { useQueueManagement } from "@/logic/queueLogic";
-import { MinusOutlined, PlusOutlined, ReloadOutlined } from "@ant-design/icons";
+import { ReloadOutlined } from "@ant-design/icons";
 import Heading from "@/components/design/Heading";
 
 const { Option } = Select;
@@ -15,7 +15,6 @@ const Queue: React.FC = () => {
   const [refreshKey, setRefreshKey] = useState(0); // State để làm mới dữ liệu
   const [isRefreshing, setIsRefreshing] = useState(false); // State để kiểm tra trạng thái làm mới
   const [type, setType] = useState<string>(""); // State to hold selected model
-  const [expandedIds, setExpandedIds] = useState<number[]>([]); // State to track expanded items
   const [isExpanded, setIsExpanded] = useState(false);
 
   const { queueData, isLoading, isError, handleBulkUpdate } =
@@ -39,16 +38,16 @@ const Queue: React.FC = () => {
     setSelectedKeys([]); // Xóa các khóa đã chọn sau khi thực hiện
   };
 
-  const handleBulkReject = () => {
-    // Gọi hàm handleBulkUpdate với status 'rejected'
-    handleBulkUpdate(selectedKeys, "rejecte");
-    setSelectedKeys([]); // Sau khi xử lý xong, xóa các key đã chọn
-  };
-
-  const toggleExpand = (id: number) => {
-    setExpandedIds((prev) =>
-      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
-    );
+  const handleBulkReject = async () => {
+    try {
+      // Gọi hàm handleBulkUpdate với status 'approved' và chờ kết quả
+      const response = await handleBulkUpdate(selectedKeys, "reject");
+      console.log("Approve Response:", response); // Log giá trị trả về từ API
+    } catch (error) {
+      console.error("Error during approval:", error); // Log lỗi nếu có
+    }
+    console.log("Approve setSelectedKeys:", selectedKeys);
+    setSelectedKeys([]); // Xóa các khóa đã chọn sau khi thực hiện
   };
 
   const columns: ColumnsType<any> = [
@@ -75,41 +74,10 @@ const Queue: React.FC = () => {
     },
     {
       title: "Nội Dung",
-      dataIndex: "data",
+      dataIndex: ["data", "old_data", "name"],
       key: "data",
       width: 250,
-      render: (text, record) => {
-        const content = [
-          `Username: ${text.data}`,
-          // `Email: ${text.data.name}`,
-          // `Phone Number: ${dataObject.phone_number}`,
-          // `First Name: ${dataObject.first_name}`,
-          // `Last Name: ${dataObject.last_name}`,
-          // `Is Active: ${dataObject.is_active ? 'Yes' : 'No'}`,
-          // `Date Joined: ${dataObject.date_joined}`,
-          // `Profile Image: ${dataObject.profile_image}`,
-        ];
-
-        const isExpanded = expandedIds.includes(record.id);
-
-        return (
-          <div>
-            {content
-              .slice(0, isExpanded ? content.length : 4)
-              .map((item, index) => (
-                <p key={index}>{item}</p>
-              ))}
-            {content.length > 4 && (
-              <Button
-                type="link"
-                onClick={() => toggleExpand(record.id)}
-                className="mt-1"
-                icon={isExpanded ? <MinusOutlined /> : <PlusOutlined />}
-              />
-            )}
-          </div>
-        );
-      },
+      render: (text) => <span>{text}</span>,
     },
     {
       title: "Description",
