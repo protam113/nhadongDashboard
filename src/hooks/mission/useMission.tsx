@@ -160,6 +160,9 @@ const DeleteMission = async (postId: string, token: string) => {
   if (!token) throw new Error("No token available");
 
   try {
+    if (!endpoints.mission) {
+      throw null;
+    }
     const response = await handleAPI(
       `${endpoints.mission.replace(":id", postId)}`,
       "DELETE",

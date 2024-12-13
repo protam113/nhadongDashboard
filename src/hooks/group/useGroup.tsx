@@ -162,6 +162,9 @@ const DeleteGroup = async (groupId: string, token: string) => {
   if (!token) throw new Error("No token available");
 
   try {
+    if (!endpoints.group) {
+      throw null;
+    }
     const response = await handleAPI(
       `${endpoints.group.replace(":id", groupId)}`,
       "DELETE",
@@ -233,6 +236,9 @@ const EditGroup = async (
   }
 
   try {
+    if (!endpoints.group) {
+      throw null;
+    }
     const response = await handleAPI(
       `${endpoints.group.replace(":id", groupId)}`,
       "PATCH",
@@ -296,6 +302,9 @@ const fetchGroupRolelist = async (
   }
 
   try {
+    if (!endpoints.groupRole) {
+      throw null;
+    }
     // Construct the query string
     const queryString = new URLSearchParams({
       page: pageParam.toString(),
@@ -377,6 +386,9 @@ const CreateGroupRole = async (
   if (!token) throw new Error("No token available");
 
   try {
+    if (!endpoints.groupRole) {
+      throw null;
+    }
     const response = await handleAPI(
       `${endpoints.groupRole.replace(":id", groupId)}`,
       "POST",

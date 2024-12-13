@@ -4,96 +4,88 @@
  Base URL
  **/
 
+ const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
 
-// const baseURL = 'http://localhost:8000';
-const baseURL = 'http://103.20.102.30:8000/';
+ const endpoints = {
+ 
+     //auth
+     login: process.env.NEXT_PUBLIC_LOGIN,
+     register: process.env.NEXT_PUBLIC_REGISTER,
+     refresh: process.env.NEXT_PUBLIC_REFRESH,
+     changePassword: process.env.NEXT_PUBLIC_CHANGE_PASSWORD,
+     codePassword: process.env.NEXT_PUBLIC_RESET_PASSWORD,
+     verifyCode: process.env.NEXT_PUBLIC_VERIFY_CODE,
+ 
+     //current user lgin
+     currentUser: process.env.NEXT_PUBLIC_CURRENT_USER,
+     updateProfile: process.env.NEXT_PUBLIC_UPDATE_PROFILE,
 
-/**
-End Points aPI
- **/
-
-
-const endpoints = {
-
-    //auth
-    login: '/auth/login/',
-    users: '/user/',
-    refresh: '/auth/refresh/',
-
-    //web
-    web: '/website/1/',
 
     //user
-    blocked: '/user/block/',
-
-    //current user lgin
-    currentUser: '/user/detail/',
-    updateProfile: '/user/update-profile/',
+    blocked: process.env.NEXT_PUBLIC_BLOCKED,
+    users: process.env.NEXT_PUBLIC_USERS,
 
     //queue
-    queues: '/queue/',
-    queueApprove: '/queue/browse/',
-    activeUser: '/user/active/',
+    queues: process.env.NEXT_PUBLIC_QUEUES,
+    queueApprove: process.env.NEXT_PUBLIC_QUEUE_BROWSE,
+    activeUser: process.env.NEXT_PUBLIC_ACTIVE_USER,
 
     //category(thể loại)
-    categories:  '/category/',
-    category: '/category/:id/',
+    categories: process.env.NEXT_PUBLIC_CATEGORIES,
+    category: process.env.NEXT_PUBLIC_CATEGORY,
 
     //role
-    roles: '/role/',
-    roleAddUserToManager: '/role/decentralize/',
-    blockUser: '/user/block/',
+    roles:  process.env.NEXT_PUBLIC_ROLES,
+    roleAddUserToManager:  process.env.NEXT_PUBLIC_ADD_MANAGER,
+    blockUser:  process.env.NEXT_PUBLIC_BLOCKED,
 
     //group
-    groups: '/group/',
-    group: '/group/:id/',
-    groupMember: '/group/:id/member/',
-    groupRole: '/group/:id/role/',
+    groups: process.env.NEXT_PUBLIC_BASE_URL,
+    group: process.env.NEXT_PUBLIC_BASE_URL,
+    groupMember: process.env.NEXT_PUBLIC_BASE_URL,
+    groupRole: process.env.NEXT_PUBLIC_BASE_URL,
+
 
 
     //Doc
-    documents: '/document/',
-    document: '/document/:id/',
+    documents: process.env.NEXT_PUBLIC_DOCUMENTS,
+    document: process.env.NEXT_PUBLIC_DOCUMENT,
 
     //News
-    news: '/news/',
-    new: '/news/:id/',
+    news:  process.env.NEXT_PUBLIC_NEWS,
+    new:  process.env.NEXT_PUBLIC_NEW,
 
     //blog
-    blogs: '/blog/',
-    blog: '/blog/:id/',
-    likeBlog: '/blog/:id/like/',
-    commentBlog: '/blog/:id/comment/',
-    replyComment: '/comment/:id/replies/',
-    comment: '/comment/:id/',
+    blogs: process.env.NEXT_PUBLIC_BLOGS,
+    blog: process.env.NEXT_PUBLIC_BLOG,
 
     //event
 
-    events: '/event/',
-    event: '/event/:id/',
-    eventForm: '/event/:id/form/',
-    eventRegister: '/event/:id/register/',
+    events: process.env.NEXT_PUBLIC_EVENTS,
+    event: process.env.NEXT_PUBLIC_EVENT,
+    eventForm: process.env.NEXT_PUBLIC_EVENT_FORM,
+    eventRegister: process.env.NEXT_PUBLIC_EVENT_REGISTER,
 
-    //event
+    //mission
 
-    missions: '/mission/',
-    mission: '/mission/:id/',
+    missions: process.env.NEXT_PUBLIC_MISSIONS,
+    mission:process.env.NEXT_PUBLIC_MISSION,
 
 
     //schedule
 
-    schedules: '/schedule/',
-    schedule: '/schedule/:id/feast/',
+    schedules: process.env.NEXT_PUBLIC_SCHEDULES,
+    schedule: process.env.NEXT_PUBLIC_SCHEDULE,
 
 
     //nha dong
 
-    nhaDong: '/website/',
+    nhaDong: process.env.NEXT_PUBLIC_NHA_DONG,
 
-    //password
-    changePassword: '/password/change-password/',
-    codePassword: '/password/reset-password/',
-    verifyCode: '/password/verify-code/',
+    
+    // donation
+    donations:process.env.NEXT_PUBLIC_DONATIONS,
+    donation:process.env.NEXT_PUBLIC_DONATE,
 };
 
 export { baseURL, endpoints };

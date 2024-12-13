@@ -4,48 +4,55 @@ import React, { useState } from "react";
 import { Table, Button, Spin, Modal } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { FaSync } from "react-icons/fa"; // Import refresh icon
-import { MdOutlineDelete } from "react-icons/md";
-import { FaRegEdit } from "react-icons/fa";
 import { EyeOutlined } from "@ant-design/icons";
+
 import Heading from "@/components/design/Heading";
-import { MissionList } from "@/lib/missionList";
-import MissionQueueList from "./MissionQueueList";
+import EventQueueTable from "@/components/table/EventQueueTable";
+import { DonateList } from "@/lib/donateList";
+import { FaArrowLeft, FaArrowRight, MdOutlineDelete } from "@/lib/iconLib";
 import PushButton from "@/components/Button/PushButton";
-import { useDeleteMission } from "@/hooks/mission/useMission";
-import MissioDetailsDrawer from "./missioDetailModal";
-import { FaArrowLeft, FaArrowRight } from "@/lib/iconLib";
+import DonationDetailDrawer from "@/components/drawer/DonationDetailDrawer";
+import { useDeleteDonation } from "@/hooks/donation/useDonation";
 
 const Page: React.FC = () => {
-  const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
+  const [category] = useState<string>(""); // State to hold selected model
   const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
-  const [selectedBlog, setSelectedBlog] = useState(null); // State for selected blog
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const { mutate } = useDeleteMission();
+  const [selectedBlog, setSelectedBlog] = useState(null); // State for selected blog
+  const { mutate } = useDeleteDonation();
 
   // Pass model into CategoriesList
-  const { queueData, next, isLoading, isError } = MissionList(
+  const { queueData, next, isLoading, isError } = DonateList(
     currentPage,
-    "",
+    category,
     refreshKey
   );
 
-  const totalPages = next ? currentPage + 1 : currentPage;
-
-  const handleDelete = (postId: string) => {
+  const handleDelete = (categoryId: string) => {
     // Show confirmation dialog before deletion
     Modal.confirm({
       title: "Xác nhận xóa",
-      content: "Bạn có chắc chắn muốn xóa bài viết này?",
+      content: "Bạn có chắc chắn muốn xóa thể loại này?",
       okText: "Xóa",
       okType: "danger",
       cancelText: "Hủy",
       onOk: () => {
-        mutate(postId);
+        mutate(categoryId);
       },
     });
   };
+
+  const totalPages = next ? currentPage + 1 : currentPage;
+
   const columns: ColumnsType<any> = [
+    {
+      title: "ID",
+      dataIndex: "id",
+      key: "id",
+      width: 60,
+      render: (text, record, index) => <span>{index + 1}</span>,
+    },
     {
       title: "Chi Tiết",
       dataIndex: "full",
@@ -58,13 +65,6 @@ const Page: React.FC = () => {
       ),
     },
     {
-      title: "ID",
-      dataIndex: "id",
-      key: "id",
-      width: 60,
-      render: (_: any, record: any, index: number) => index + 1, // This will display index + 1 as the ID
-    },
-    {
       title: "Tiêu Đề",
       dataIndex: "title",
       key: "title",
@@ -72,24 +72,11 @@ const Page: React.FC = () => {
       render: (text) => <span>{text}</span>,
     },
     {
-      title: "Thể Loại",
-      dataIndex: "category",
-      key: "category",
-      width: 150,
-      render: (category) => (
-        <div
-          style={{
-            backgroundColor: category.color || "#142857", // Background color for category
-            color: "#fff", // Text color
-            padding: "5px 10px",
-            borderRadius: "4px",
-            marginBottom: "5px",
-            marginRight: "5px",
-          }}
-        >
-          {category.name} {/* Display category name */}
-        </div>
-      ),
+      title: "Trạng Thái",
+      dataIndex: "visibility",
+      key: "visibility",
+      width: 400,
+      render: (text) => <span>{text}</span>,
     },
     {
       title: "Action",
@@ -101,9 +88,6 @@ const Page: React.FC = () => {
           <Button danger onClick={() => handleDelete(record.id)}>
             <MdOutlineDelete className="text-albert-error" />
           </Button>
-          <Button>
-            <FaRegEdit />
-          </Button>
         </>
       ),
     },
@@ -112,9 +96,8 @@ const Page: React.FC = () => {
   if (isLoading) return <Spin size="large" />;
   if (isError) return <div>Error loading queue data.</div>;
 
-  const handleViewDetails = (blog: any) => {
-    setSelectedBlog(blog);
-    setIsDrawerOpen(true);
+  const handleRefresh = () => {
+    setRefreshKey((prev) => prev + 1); // Refresh data manually
   };
 
   const handleDrawerClose = () => {
@@ -122,14 +105,15 @@ const Page: React.FC = () => {
     setSelectedBlog(null);
   };
 
-  const handleRefresh = () => {
-    setRefreshKey((prev) => prev + 1); // Refresh data manually
+  const handleViewDetails = (blog: any) => {
+    setSelectedBlog(blog);
+    setIsDrawerOpen(true);
   };
 
   return (
     <>
       <div className="p-4">
-        <Heading name="Quản Lý Sứ Vụ" />
+        <Heading name="Quản lý danh sách tin quyên góp" />
 
         {/* Model selection */}
         <div className="flex justify-between items-center mb-4">
@@ -137,8 +121,8 @@ const Page: React.FC = () => {
             <FaSync /> Làm mới
           </Button>
           <PushButton
-            href="/hoi_dong/missio/create_missio"
-            label={"Tạo Sứ Vụ"}
+            href="/donation/create_donation"
+            label={"Tạo Tin Quyên Góp"}
           />
         </div>
 
@@ -149,11 +133,6 @@ const Page: React.FC = () => {
             rowKey="id"
             pagination={false}
             scroll={{ y: 500 }}
-            rowSelection={{
-              selectedRowKeys: selectedKeys,
-              onChange: (selectedRowKeys) =>
-                setSelectedKeys(selectedRowKeys as number[]),
-            }}
           />
         </div>
         <div className="flex justify-center mt-8 items-center space-x-2">
@@ -187,10 +166,10 @@ const Page: React.FC = () => {
             <FaArrowRight />
           </button>
         </div>
-        <Heading name="Quản lý hàng đợi duyệt sứ vụ" />
-        <MissionQueueList />
+        <EventQueueTable PostModel="donation" />
       </div>
-      <MissioDetailsDrawer
+
+      <DonationDetailDrawer
         open={isDrawerOpen}
         onClose={handleDrawerClose}
         blog={selectedBlog}

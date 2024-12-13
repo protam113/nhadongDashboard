@@ -7,7 +7,6 @@ import type { ColumnsType } from "antd/es/table";
 import { UserQueue } from "@/lib/userQueue";
 
 const EventQueueTable = ({ PostModel }: { PostModel: string }) => {
-  console.log("🚀 ~ EventQueueTable ~ model:", PostModel);
   const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [refreshKey, setRefreshKey] = useState(0); // State để làm mới dữ liệu

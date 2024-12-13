@@ -6,7 +6,12 @@ import { endpoints } from "@/apis/api";
 import { useAuth } from "@/context/authContext";
 import { useEffect, useState } from "react";
 import { message } from "antd";
-import { FetchBLogsListResponse, Filters, NewPost } from "@/types/types";
+import {
+  FetchBLogsListResponse,
+  Filters,
+  NewPost,
+  EditPost,
+} from "@/types/types";
 
 const fetchBloglist = async (
   pageParam: number = 1,
@@ -77,6 +82,9 @@ const useBlogList = (
     staleTime: 60000,
   });
 };
+/**
+ Tạo Blog
+ **/
 
 const CreateBlog = async (newBlog: NewPost, token: string) => {
   const formData = new FormData();
@@ -160,6 +168,9 @@ const DeleteBlog = async (blogId: string, token: string) => {
   if (!token) throw new Error("No token available");
 
   try {
+    if (!endpoints.blog) {
+      throw null;
+    }
     const response = await handleAPI(
       `${endpoints.blog.replace(":id", blogId)}`,
       "DELETE",
@@ -209,44 +220,55 @@ const useDeleteBlog = () => {
  Sửa Blog
  **/
 
-const EditBlog = async (editBlog: NewPost, blogId: string, token: string) => {
+const EditBlog = async (editBlog: EditPost, blogId: string, token: string) => {
   const formData = new FormData();
 
   if (!token) throw new Error("No token available");
 
+  // Duyệt qua các trường trong editBlog
   for (const key in editBlog) {
-    const value = editBlog[key as keyof NewPost];
+    const value = editBlog[key as keyof EditPost];
 
     if (key === "content") {
-      // Xử lý content nếu là object hoặc JSON string
+      // JSON.stringify nếu là nội dung dạng JSON
       formData.append(key, JSON.stringify(value));
-    } else if (key === "category" && Array.isArray(value)) {
-      value.forEach((id) => formData.append("category", id)); // Gửi từng ID
-    } else if (key === "image" && typeof value === "string") {
-      // Nếu là URL hình ảnh
-      formData.append(key, value);
-    } else if (key === "image" && Array.isArray(value)) {
-      // Nếu là mảng hình ảnh tải lên
-      value.forEach((file) => {
-        formData.append("image", file);
-      });
-    } else if (value) {
-      // Thêm các trường khác
+    } else if (key === "categories" && Array.isArray(value)) {
+      // Đảm bảo gửi đúng tên trường "categories"
+      value.forEach((id) => formData.append("categories", id));
+    } else if (key === "image") {
+      // Xử lý image (URL hoặc file)
+      if (typeof value === "string") {
+        formData.append(key, value); // Thêm URL
+      } else if (Array.isArray(value)) {
+        value.forEach((file) => formData.append("image", file)); // Thêm từng file
+      }
+    } else if (value !== undefined && value !== null) {
+      // Gửi các trường khác
       formData.append(key, value as string);
     }
   }
 
+  // Debug dữ liệu FormData
+  for (const [key, value] of formData.entries()) {
+    console.log(`FormData - ${key}:`, value);
+  }
+
   try {
+    if (!endpoints.blog) {
+      throw null;
+    }
+    // Gửi API
     const response = await handleAPI(
       `${endpoints.blog.replace(":id", blogId)}`,
       "PATCH",
-      formData, // Gửi formData trong body request
+      formData,
       token
     );
+    console.log("API Response:", response.data); // In kết quả trả về
     return response.data;
   } catch (error: any) {
-    console.error("Error editing blog:", error.response?.data);
-    throw new Error(error.response?.data?.message || "Failed to edit blog");
+    console.error("API Error:", error.response?.data || error.message);
+    throw error;
   }
 };
 
@@ -268,7 +290,7 @@ const useEditBlog = () => {
       editBlog,
       blogId,
     }: {
-      editBlog: NewPost;
+      editBlog: EditPost;
       blogId: string;
     }) => {
       if (!token) {

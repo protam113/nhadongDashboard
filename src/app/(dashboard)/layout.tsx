@@ -5,7 +5,6 @@ import React, { useEffect, useState } from "react";
 import { useAuthStore } from "@/store/authStore";
 import { useRouter } from "next/navigation";
 import Loading from "@/components/design/Loading";
-import { UserProvider } from "@/context/userProvider";
 import ScrollToTopButton from "@/components/Button/ScrollButton";
 import { message } from "antd";
 
@@ -33,8 +32,8 @@ export default function DashboardLayout({
   useEffect(() => {
     if (tokenChecked) {
       if (isAuthenticated) {
-        // Không chuyển hướng nếu đã xác thực
-        console.error("User is authenticated");
+        // logout();
+        console.warn("User is authenticated");
       } else {
         // Nếu chưa xác thực, chuyển hướng về login
         message.error("Bạn Không Có Quyền Truy Cập Vào Trang !!");
@@ -43,17 +42,14 @@ export default function DashboardLayout({
     }
   }, [isAuthenticated, loading, router, tokenChecked]);
 
-  // Nếu đang loading, hiển thị Loading spinner
   if (loading || !tokenChecked) {
     return <Loading />;
   }
 
   return (
-    <UserProvider>
-      <DefaultLayout>
-        {children}
-        <ScrollToTopButton />
-      </DefaultLayout>
-    </UserProvider>
+    <DefaultLayout>
+      {children}
+      <ScrollToTopButton />
+    </DefaultLayout>
   );
 }

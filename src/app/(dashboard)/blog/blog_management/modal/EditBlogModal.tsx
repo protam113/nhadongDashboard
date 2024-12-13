@@ -49,7 +49,7 @@ const EditBlogModal: React.FC<EditBlogModalProps> = ({
         name: blog.title,
         description: blog.description,
         link: blog.link,
-        categories: categoryIds,
+        category: categoryIds,
       });
 
       // Xử lý hình ảnh cho Upload
@@ -78,20 +78,25 @@ const EditBlogModal: React.FC<EditBlogModalProps> = ({
   };
 
   const handleSubmit = () => {
+    if (!blog) {
+      console.error("Blog is null, cannot edit.");
+      return; // Dừng nếu blog là null
+    }
+
     form
       .validateFields()
       .then((values) => {
         console.log("Form Values:", values); // Debug form values
-        const updatedData = {
+        const editBlog = {
           ...values,
-          categories: selectedCategories,
-          image: fileList.map((file) => file.url || file.originFileObj),
+          category: selectedCategories,
+          image: fileList.map((file) => file.originFileObj || file.url),
         };
 
-        console.log("Updated Data:", updatedData); // Debug data gửi lên API
+        console.log("Updated Data:", editBlog); // Debug data gửi lên API
         editBlogMutation({
-          editBlog: updatedData,
-          blogId: blog?.id || "", // ID bài viết cần sửa
+          editBlog: editBlog,
+          blogId: blog.id, // ID bài viết cần sửa
         });
       })
       .catch((info) => {

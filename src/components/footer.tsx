@@ -7,7 +7,10 @@ const Footer = () => {
           HOOKSTER
         </a>
         &
-        <a href="https://flowbite.com/" className="hover:underline">
+        <a
+          href="https://www.facebook.com/thuong.ledanh.9"
+          className="hover:underline"
+        >
           DanhThuong
         </a>
         . All Rights Reserved.

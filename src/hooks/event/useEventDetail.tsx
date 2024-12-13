@@ -16,7 +16,9 @@ const fetchEventDetail = async (
     if (!token) {
       throw new Error("No token provided");
     }
-
+    if (!endpoints.event) {
+      throw null;
+    }
     // Gửi request với token nếu có, không thì bỏ qua
     const response = await handleAPI(
       `${endpoints.event.replace(":id", postId)}`,
@@ -91,6 +93,9 @@ const UpdateEventDetail = async (
   if (!token) throw new Error("No token available");
 
   try {
+    if (!endpoints.event) {
+      throw null;
+    }
     const response = await handleAPI(
       `${endpoints.event.replace(":id", postId)}`,
       "PATCH",

@@ -169,15 +169,6 @@ export interface HistoryMonasteryResponse {
 
 
 
-interface Documents {
-    id: string;
-    username: string;
-    first_name: string;
-    last_name: string;
-    email: string;
-    phone_number: string | null;
-    profile_image: string;
-}
 
 export interface DocsList {
     id: string;
@@ -187,7 +178,7 @@ export interface DocsList {
     link: string;
     image: string | null; // Chỉnh sửa để phù hợp với giá trị null trong JSON
     categories: Category[];
-    user: Documents; // Sử dụng interface User đã khai báo ở trên
+    user: User; // Sử dụng interface User đã khai báo ở trên
 }
 
 
@@ -273,17 +264,6 @@ interface FieldsData {
   }
 
 
-
-interface Documents {
-    id: string;
-    username: string;
-    first_name: string;
-    last_name: string;
-    email: string;
-    phone_number: string | null;
-    profile_image: string;
-}
-
 // Khai Báo Các Thuộc Tính Không Có trong trường hiển thị
 export interface FetchDocsListResponse {
     count: number;
@@ -291,6 +271,54 @@ export interface FetchDocsListResponse {
     previous: string | null;
     results: DocsList[];
 }
+/*
+  Donation Interface
+*/
+
+export interface NewDonation {
+  title: string;
+  description: string;
+  content: string; // Có thể cần điều chỉnh nếu cấu trúc khác
+  link: string;
+  image: File[] | string; // Chỉnh sửa để phù hợp với giá trị null trong JSON
+  visibility: string;
+}
+
+
+
+export interface DonationDetail {
+  id: string;
+  title: string;
+  description: string;
+  content: string; // Có thể cần điều chỉnh nếu cấu trúc khác
+  link: string;
+  image: string; // Chỉnh sửa để phù hợp với giá trị null trong JSON
+  visibility: string;
+  status:string;
+  created_date: string
+  updated_date: string
+}
+
+interface DonationList {
+  id: string;
+  title: string;
+  description: string;
+  content: string; // Có thể cần điều chỉnh nếu cấu trúc khác
+  link: string;
+  image: string; // Chỉnh sửa để phù hợp với giá trị null trong JSON
+  visibility: string;
+  status:string;
+  created_date: string
+  updated_date: string
+}
+
+export interface FetchDonationListResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: DonationList[];
+}
+
 
 
 /**
@@ -342,6 +370,15 @@ interface PostCategory {
     link: string;
     category: string[]; // Mảng danh mục
     image: File[] | string; // Hình ảnh chính cho bài viết
+  }
+
+  export interface EditPost {
+    title: string | null;
+    description: string | null;
+    content: string | null; // Mảng nội dung chi tiết
+    link: string | null;
+    category: string[] | null; // Mảng danh mục
+    image: File[] | string | null; // Hình ảnh chính cho bài viết
   }
 
   
@@ -449,7 +486,6 @@ interface GroupMember {
   group:string
   created_date: Date;
   updated_date: Date;
-  // user: Documents; // Sử dụng interface User đã khai báo ở trên
 }
 
 // Khai Báo Các Thuộc Tính Không Có trong trường hiển thị

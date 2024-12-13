@@ -6,13 +6,13 @@ import { endpoints } from "@/apis/api";
 import { useAuth } from "@/context/authContext";
 import { useEffect, useState } from "react";
 import { message } from "antd";
-import { FetchBLogsListResponse, Filters, NewPost } from "@/types/types";
+import { FetchDonationListResponse, Filters, NewDonation } from "@/types/types";
 
-const fetchNewslist = async (
+const fetchDonationList = async (
   pageParam: number = 1,
   token: string,
   filters: Filters
-): Promise<FetchBLogsListResponse> => {
+): Promise<FetchDonationListResponse> => {
   if (!token) {
     throw new Error("No token provided");
   }
@@ -33,20 +33,20 @@ const fetchNewslist = async (
 
     // Make the API request using handleAPI
     const response = await handleAPI(
-      `${endpoints.news}${queryString ? `?${queryString}` : ""}`,
+      `${endpoints.donations}${queryString ? `?${queryString}` : ""}`,
       "GET",
       null,
       token
     );
     return response;
   } catch (error) {
-    console.error("Error fetching news list:", error);
+    console.error("Error fetching blogs list:", error);
     throw error; // Rethrow error for further handling
   }
 };
 
 // Custom hook for fetching the queue list
-const useNewsList = (
+const useDonationList = (
   page: number,
   filters: Filters = {},
   refreshKey: number
@@ -65,13 +65,13 @@ const useNewsList = (
     fetchToken();
   }, [getToken]);
 
-  return useQuery<FetchBLogsListResponse, Error>({
-    queryKey: ["newsList", token, page, filters, refreshKey], // Thêm refreshKey vào queryKey
+  return useQuery<FetchDonationListResponse, Error>({
+    queryKey: ["donateList", token, page, filters, refreshKey], // Thêm refreshKey vào queryKey
     queryFn: async () => {
       if (!token) {
         throw new Error("Token is not available");
       }
-      return fetchNewslist(page, token, filters);
+      return fetchDonationList(page, token, filters);
     },
     enabled: isReady && !!token,
     staleTime: 60000,
@@ -79,20 +79,19 @@ const useNewsList = (
 };
 
 /**
- Tạo Tin Tức
+ Tạo Tin Quyên Góp
  **/
 
-const CreateNews = async (newNews: NewPost, token: string) => {
+const CreateDonation = async (newPost: NewDonation, token: string) => {
   const formData = new FormData();
 
-  for (const key in newNews) {
-    const value = newNews[key as keyof NewPost];
+  // Duyệt qua các thuộc tính của `newBlog` và xử lý
+  for (const key in newPost) {
+    const value = newPost[key as keyof NewDonation];
 
     if (key === "content") {
       // Xử lý content nếu là object hoặc JSON string
       formData.append(key, JSON.stringify(value));
-    } else if (key === "category" && Array.isArray(value)) {
-      value.forEach((id) => formData.append("category", id)); // Gửi từng ID
     } else if (key === "image" && typeof value === "string") {
       // Nếu là URL hình ảnh
       formData.append(key, value);
@@ -110,21 +109,21 @@ const CreateNews = async (newNews: NewPost, token: string) => {
   if (!token) throw new Error("No token available");
 
   try {
+    // Gửi FormData tới backend
     const response = await handleAPI(
-      `${endpoints.news}`,
+      `${endpoints.donations}`,
       "POST",
       formData,
       token
     );
     return response.data;
   } catch (error: any) {
-    // Use 'any' type assertion
-    console.error("Error creating news:", error.response?.data);
-    throw new Error(error.response?.data?.message || "Failed to create news");
+    console.error("Error creating blog:", error.response?.data);
+    throw new Error(error.response?.data?.message || "Failed to create blog");
   }
 };
 
-const useCreateNews = () => {
+const useCreateDonation = () => {
   const queryClient = useQueryClient();
   const { getToken } = useAuth();
   const [token, setToken] = useState<string | null>(null);
@@ -139,47 +138,49 @@ const useCreateNews = () => {
   }, [getToken]);
 
   return useMutation({
-    mutationFn: async (newNews: NewPost) => {
+    mutationFn: async (newPost: NewDonation) => {
       if (!token) {
         throw new Error("Token is not available");
       }
-      return CreateNews(newNews, token);
+      return CreateDonation(newPost, token);
     },
     onSuccess: () => {
-      message.success("Tin Tức đã được thêm thành công");
-      queryClient.invalidateQueries({ queryKey: ["newsList"] });
+      message.success("Bài Viết đã được thêm thành công");
+      queryClient.invalidateQueries({ queryKey: ["donateList"] });
     },
     onError: (error) => {
-      console.log(error.message || "Failed to create news.");
+      console.log(error.message || "Failed to create blog.");
     },
   });
 };
 
 /**
- Xóa Tin Tức
+ Xóa Tin Quyên Góp
  **/
 
-const DeleteNews = async (newsId: string, token: string) => {
+const DeleteDonation = async (blogId: string, token: string) => {
   if (!token) throw new Error("No token available");
 
   try {
-    if (!endpoints.new) {
+    if (!endpoints.donation) {
       throw null;
     }
     const response = await handleAPI(
-      `${endpoints.new.replace(":id", newsId)}`,
+      `${endpoints.donation.replace(":id", blogId)}`,
       "DELETE",
       null,
       token
     );
     return response.data;
   } catch (error: any) {
-    console.error("Error deleting news:", error.response?.data);
-    throw new Error(error.response?.data?.message || "Failed to delete news");
+    console.error("Error deleting category:", error.response?.data);
+    throw new Error(
+      error.response?.data?.message || "Failed to delete category"
+    );
   }
 };
 
-const useDeleteNews = () => {
+const useDeleteDonation = () => {
   const queryClient = useQueryClient();
   const { getToken } = useAuth();
   const [token, setToken] = useState<string | null>(null);
@@ -193,20 +194,20 @@ const useDeleteNews = () => {
   }, [getToken]);
 
   return useMutation({
-    mutationFn: async (newsId: string) => {
+    mutationFn: async (blogId: string) => {
       if (!token) {
         throw new Error("Token is not available");
       }
-      return DeleteNews(newsId, token);
+      return DeleteDonation(blogId, token);
     },
     onSuccess: () => {
-      message.success("Xóa tin tức Thành Công!");
-      queryClient.invalidateQueries({ queryKey: ["newsList"] });
+      message.success("Xóa Tin Quyên Góp Thành Công!");
+      queryClient.invalidateQueries({ queryKey: ["donateList"] });
     },
     onError: (error: any) => {
-      console.error(error.message || "Failed to delete news.");
+      console.error(error.message || "Failed to delete category.");
     },
   });
 };
 
-export { useNewsList, useCreateNews, useDeleteNews };
+export { useDonationList, useCreateDonation, useDeleteDonation };

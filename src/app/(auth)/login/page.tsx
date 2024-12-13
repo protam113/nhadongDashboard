@@ -68,17 +68,6 @@ export default function LoginPage() {
               </div>
 
               <div className="flex flex-wrap items-center justify-between gap-4">
-                {/*<div className="flex items-center">*/}
-                {/*    <input*/}
-                {/*        id="remember-me"*/}
-                {/*        name="remember-me"*/}
-                {/*        type="checkbox"*/}
-                {/*        className="h-4 w-4 shrink-0 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"*/}
-                {/*    />*/}
-                {/*    <label htmlFor="remember-me" className="ml-3 block text-sm text-gray-800">*/}
-                {/*        Remember me*/}
-                {/*    </label>*/}
-                {/*</div>*/}
                 <div className="text-sm">
                   <a
                     href="/forgot_password"
@@ -105,13 +94,6 @@ export default function LoginPage() {
               className="w-full h-auto max-h-[200px] object-contain"
               alt="Logo"
             />
-            <p className="text-white mt-4 px-4 md:px-8">
-              Marcellin Champagnat, a Marist Priest, dreamed of a worldwide
-              community devoted to making Jesus Christ known and loved among
-              children and young people, especially the least favored. Today, an
-              international community of brothers and laypeople continues its
-              dream.
-            </p>
           </div>
         </div>
       </div>

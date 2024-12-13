@@ -129,10 +129,10 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({
       <div style={{ display: "flex", alignItems: "center", margin: "18px 0" }}>
         <Image
           src={Logo}
-          className="w-auto h-auto max-h-[50px] object-contain"
+          className="w-auto h-auto max-h-[50px] object-contain hidden md:block"
           alt="Logo"
         />
-        <p className="text-primary-logo text-18 font-bold ml-2">
+        <p className="text-primary-logo text-18 font-bold ml-2 hidden md:block">
           Champagnat Dashboard
         </p>
       </div>

@@ -35,7 +35,9 @@ const fetchUserList = async (
         params.append(key, value.toString());
       }
     });
-
+    if (!endpoints.users) {
+      throw null;
+    }
     // Make the API request
     const response = await handleAPI(
       `${endpoints.users}?${params.toString()}`,

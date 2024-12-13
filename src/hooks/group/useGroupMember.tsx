@@ -22,7 +22,9 @@ const fetchGroupMember = async (
     const queryString = new URLSearchParams({
       page: pageParam.toString(),
     }).toString();
-
+    if (!endpoints.groupMember) {
+      throw null;
+    }
     // Make the API request using handleAPI
     const response = await handleAPI(
       `${endpoints.groupMember.replace(":id", groupId)}${
@@ -89,6 +91,9 @@ const CreateGroupMember = async (
   if (!token) throw new Error("No token available");
 
   try {
+    if (!endpoints.groupMember) {
+      throw null;
+    }
     const response = await handleAPI(
       `${endpoints.groupMember.replace(":id", groupId)}`,
       "POST",

@@ -21,7 +21,9 @@ const fetchEventRegisterList = async (
     const queryString = new URLSearchParams({
       page: pageParam.toString(),
     }).toString();
-
+    if (!endpoints.eventRegister) {
+      throw null;
+    }
     // Gửi request với token nếu có, không thì bỏ qua
     const response = await handleAPI(
       `${endpoints.eventRegister.replace(":id", postId)}${
@@ -32,7 +34,6 @@ const fetchEventRegisterList = async (
       null,
       token // Token chỉ được thêm nếu không null
     );
-    console.log("🚀 ~ response:", response);
     return response;
   } catch (error) {
     console.error("Lỗi khi tải chi tiết bài viết:", error);
@@ -97,6 +98,9 @@ const SubmitEventRegisterList = async (
   if (!token) throw new Error("No token available");
 
   try {
+    if (!endpoints.eventRegister) {
+      throw null;
+    }
     const response = await handleAPI(
       `${endpoints.eventRegister.replace(":id", postId)}`,
       "PATCH",

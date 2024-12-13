@@ -13,6 +13,8 @@ import {AiOutlineEye, AiOutlineLike} from "react-icons/ai";
 import { PiHandsPrayingBold } from "react-icons/pi";
 import { GiIronCross } from "react-icons/gi";
 import { IoDocumentText } from "react-icons/io5";
+import { BiDonateHeart } from "react-icons/bi";
+import { MdOutlineDelete } from "react-icons/md";
 
 // Export trực tiếp các icon mà không cần khai báo interface
 export {
@@ -34,4 +36,6 @@ export {
     IoDocumentText,
     FaArrowLeft, FaArrowRight,
     FaSync,
+    BiDonateHeart,
+    MdOutlineDelete,
 };

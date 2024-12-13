@@ -8,8 +8,8 @@ import { CategoriesList } from "@/lib/categoriesList";
 import { useDeleteCategory } from "@/hooks/cateogry/useCategories";
 import { MdOutlineDelete } from "react-icons/md";
 import { FaRegEdit } from "react-icons/fa";
-import CreateDocsCategoryModal from "@/app/(dashboard)/study/document/modal/CreateDocsCategoryModal";
 import EditBlogCategory from "@/app/(dashboard)/blog/blog_categories/EditBlogCategory";
+import CreateDocsCategoryModal from "./modal/CreateDocsCategoryModal";
 
 const { Title } = Typography;
 
@@ -20,6 +20,7 @@ const DocumentCategoriesTable: React.FC = () => {
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false); // For creating category
   const [isEditModalVisible, setIsEditModalVisible] = useState(false); // For editing category
   const [editingCategory, setEditingCategory] = useState(null);
+  const [isCreateLoading, setIsCreateLoading] = useState<boolean>(false);
 
   const { mutate: deleteCategory } = useDeleteCategory();
 
@@ -124,6 +125,10 @@ const DocumentCategoriesTable: React.FC = () => {
     setEditingCategory(null); // Reset editing category
   };
 
+  const handleLoadingChange = (isLoading: boolean) => {
+    setIsCreateLoading(isLoading);
+  };
+
   return (
     <>
       <div className="p-4">
@@ -133,7 +138,11 @@ const DocumentCategoriesTable: React.FC = () => {
           <Button onClick={handleRefresh}>
             <FaSync /> Làm mới
           </Button>
-          <Button type="primary" onClick={handleCreateCategory}>
+          <Button
+            type="primary"
+            onClick={handleCreateCategory}
+            loading={isCreateLoading}
+          >
             Tạo Thể Loại
           </Button>
         </div>
@@ -174,7 +183,8 @@ const DocumentCategoriesTable: React.FC = () => {
         footer={null}
         width={600}
       >
-        <CreateDocsCategoryModal /> {/* Render CreateBlogCategory form */}
+        <CreateDocsCategoryModal onLoadingChange={handleLoadingChange} />{" "}
+        {/* Render CreateBlogCategory form */}
       </Modal>
 
       {/* Modal sửa thể loại */}

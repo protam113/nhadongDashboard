@@ -1,27 +1,30 @@
 import { create } from "zustand";
 import { persist, PersistOptions } from "zustand/middleware";
 import { baseURL, endpoints } from "@/apis/api";
+import { encrypt, decrypt } from "@/utils/crypto"; // Import hàm mã hóa/giải mã
 
-// Define the state shape with correct types
+// Định nghĩa kiểu dữ liệu của state
 type AuthState = {
   isAuthenticated: boolean;
   token: string | null;
   loading: boolean;
+  userInfo?: any | null; // Thêm trường userInfo để lưu thông tin người dùng
   login: (username: string, password: string) => Promise<void>;
   logout: () => void;
   getToken: () => string | null;
   checkAuth: () => void;
   refreshLogin: () => Promise<void>;
+  scheduleTokenCheck: () => void;
 };
 
-// Persist options for AuthState
+// Tùy chọn cho middleware `persist`
 type AuthPersist = PersistOptions<AuthState>;
 
 export const useAuthStore = create<AuthState>()(
   persist<AuthState>(
-    (set) => ({
+    (set, get) => ({
       isAuthenticated: false,
-      token: null, // Thêm token vào trạng thái ban đầu
+      token: null,
       loading: false,
       login: async (username: string, password: string): Promise<void> => {
         const formData = new FormData();
@@ -41,43 +44,104 @@ export const useAuthStore = create<AuthState>()(
           const data = await response.json();
 
           if (typeof window !== "undefined") {
-            localStorage.setItem("token", data.access);
-            document.cookie = `refresh=${data.refresh}; path=/; max-age=604800`;
+            localStorage.setItem("token", encrypt(data.access));
+            document.cookie = `refresh=${encrypt(
+              data.refresh
+            )}; path=/; max-age=86400`;
+            localStorage.setItem("expires", encrypt(data.expires.toString()));
           }
 
-          set({ isAuthenticated: true, token: data.access, loading: false }); // Thêm token khi đăng nhập thành công
+          // Lấy thông tin người dùng sau khi đăng nhập thành công
+          const userResponse = await fetch(
+            `${baseURL}${endpoints.currentUser}`,
+            {
+              method: "GET",
+              headers: {
+                Authorization: `Bearer ${data.access}`,
+              },
+            }
+          );
+
+          if (!userResponse.ok) {
+            throw new Error("Failed to fetch user info");
+          }
+
+          const userData = await userResponse.json();
+
+          // Lưu thông tin người dùng vào store
+          set({
+            isAuthenticated: true,
+            token: data.access,
+            loading: false,
+            userInfo: userData, // Lưu thông tin người dùng vào state
+          });
         } catch (error) {
           console.error("Login error:", error);
-          set({ isAuthenticated: false, token: null, loading: false }); // Đảm bảo token được xóa khi lỗi
+          set({ isAuthenticated: false, token: null, loading: false });
           throw error;
         }
       },
+
       logout: () => {
         if (typeof window !== "undefined") {
           localStorage.removeItem("token");
-          localStorage.removeItem("user_info");
+          localStorage.removeItem("expires");
           document.cookie = "refresh=; path=/; max-age=0";
+          document.cookie = "user_info=; path=/; max-age=0";
         }
 
-        set({ isAuthenticated: false, token: null }); // Đặt lại token về null khi đăng xuất
+        set({ isAuthenticated: false, token: null, userInfo: null }); // Xóa thông tin người dùng khi đăng xuất
         window.location.reload();
       },
       getToken: () => {
-        return typeof window !== "undefined"
-          ? localStorage.getItem("token")
-          : null;
+        const token =
+          typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
+        return token ? decrypt(token) : null;
       },
-      checkAuth: () => {
+      checkAuth: async () => {
         const token = localStorage.getItem("token");
         if (token) {
-          set({ isAuthenticated: true, token, loading: false }); // Cập nhật cả trạng thái isAuthenticated và loading
+          set({ isAuthenticated: true, token: decrypt(token), loading: false });
+
+          try {
+            // Lấy thông tin người dùng nếu token hợp lệ
+            const userResponse = await fetch(
+              `${baseURL}${endpoints.currentUser}`,
+              {
+                method: "GET",
+                headers: {
+                  Authorization: `Bearer ${decrypt(token)}`,
+                },
+              }
+            );
+
+            if (userResponse.ok) {
+              const userData = await userResponse.json();
+
+              // Kiểm tra nếu role.name là 'user' thì đăng xuất và chuyển hướng về trang login
+              if (userData.role && userData.role.name === "user") {
+                get().logout(); // Thực hiện đăng xuất
+                window.location.href = "/login"; // Chuyển hướng về trang đăng nhập
+                return;
+              }
+              set({ userInfo: userData });
+            }
+          } catch (error) {
+            console.error("Failed to fetch user info:", error);
+          }
         } else {
-          set({ isAuthenticated: false, token: null, loading: false });
+          set({
+            isAuthenticated: false,
+            token: null,
+            loading: false,
+            userInfo: null,
+          });
         }
       },
+
       refreshLogin: async (): Promise<void> => {
         try {
-          // Lấy refresh token từ cookie
           const refreshToken = document.cookie
             .split("; ")
             .find((row) => row.startsWith("refresh="))
@@ -87,11 +151,16 @@ export const useAuthStore = create<AuthState>()(
             throw new Error("No refresh token found");
           }
 
-          // Chuẩn bị FormData
-          const formData = new FormData();
-          formData.append("refresh", refreshToken);
+          // Giải mã refresh token
+          const decryptedRefreshToken = decrypt(refreshToken);
 
-          // Gửi yêu cầu làm mới token
+          if (typeof decryptedRefreshToken !== "string") {
+            throw new Error("Decrypted refresh token is not a string");
+          }
+
+          const formData = new FormData();
+          formData.append("refresh", decryptedRefreshToken); // Đảm bảo giá trị là chuỗi
+
           const response = await fetch(`${baseURL}${endpoints.refresh}`, {
             method: "POST",
             body: formData,
@@ -101,21 +170,43 @@ export const useAuthStore = create<AuthState>()(
             throw new Error("Failed to refresh token");
           }
 
-          // Lấy dữ liệu phản hồi
           const data = await response.json();
 
           if (typeof window !== "undefined") {
-            // Lưu access token mới vào localStorage
-            localStorage.setItem("token", data.access);
+            localStorage.setItem("token", encrypt(data.access));
           }
 
-          // Cập nhật trạng thái trong store
           set({ token: data.access, isAuthenticated: true });
+          get().scheduleTokenCheck();
         } catch (error) {
           console.error("Refresh login error:", error);
-          // Đặt lại trạng thái nếu làm mới thất bại
           set({ isAuthenticated: false, token: null });
-          throw error;
+          get().logout();
+        }
+      },
+
+      scheduleTokenCheck: () => {
+        const encryptedExpires = localStorage.getItem("expires");
+        const expires = encryptedExpires
+          ? Number(decrypt(encryptedExpires))
+          : 0;
+        const currentTime = Math.floor(Date.now() / 1000);
+        const remainingTime = expires - currentTime;
+
+        if (remainingTime > 0) {
+          const refreshTime = remainingTime * 0.75 * 1000;
+
+          setTimeout(async () => {
+            try {
+              await get().refreshLogin();
+            } catch {
+              get().logout();
+            }
+          }, refreshTime);
+
+          setTimeout(() => {
+            get().logout();
+          }, remainingTime * 1000);
         }
       },
     }),

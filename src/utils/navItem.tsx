@@ -12,6 +12,7 @@ import { SlNotebook, SlCalender } from "react-icons/sl";
 import { BiCategory } from "react-icons/bi";
 import { HiOutlineNewspaper } from "react-icons/hi";
 import { RiCommunityLine } from "react-icons/ri";
+import { BiDonateHeart } from "@/lib/iconLib";
 
 /**
 35,18
@@ -112,18 +113,8 @@ export const NavItems = () => {
               key: "36",
               icon: <BiCategory />,
             },
-            // {
-            //   name: "Quản lý sứ vụ",
-            //   link: "/blog/blog_management",
-            //   key: "37",
-            // },
           ],
         },
-        // {
-        //   name: "Thuong AI",
-        //   link: "/hoi_dong/on_goi",
-        //   key: "10",
-        // },
       ],
     },
     {
@@ -151,6 +142,12 @@ export const NavItems = () => {
       link: "/catholic_calendar",
       key: "26",
       icon: <SlCalender />,
+    },
+    {
+      name: "Quyên Góp",
+      link: "/donation",
+      key: "1010",
+      icon: <BiDonateHeart />,
     },
     {
       name: "Học Tập",

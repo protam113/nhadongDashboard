@@ -131,13 +131,6 @@ const Page = () => {
               className="w-full h-auto max-h-[200px] object-contain"
               alt="Logo"
             />
-            <p className="text-white mt-4 px-4 md:px-8">
-              Marcellin Champagnat, a Marist Priest, dreamed of a worldwide
-              community devoted to making Jesus Christ known and loved among
-              children and young people, especially the least favored. Today, an
-              international community of brothers and laypeople continues its
-              dream.
-            </p>
           </div>
         </div>
       </div>

@@ -97,6 +97,9 @@ const CreateScheduleItem = async (
   if (!token) throw new Error("No token available");
 
   try {
+    if (!endpoints.schedule) {
+      throw null;
+    }
     const response = await handleAPI(
       `${endpoints.schedule.replace(":id", scheduleId)}`,
       "POST",
