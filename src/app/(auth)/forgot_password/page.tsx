@@ -42,7 +42,7 @@ const Page = () => {
               <form onSubmit={handleSendCode} className="space-y-4">
                 <div className="mb-8">
                   <h3 className="text-gray-800 text-3xl font-extrabold">
-                    Forgot your password&amp;#63;
+                    Forgot your password !;
                   </h3>
                   <p className="text-gray-500 text-sm mt-4 leading-relaxed">
                     Enter your email and we&apos;ll send you a verification code

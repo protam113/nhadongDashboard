@@ -161,7 +161,7 @@ const News: React.FC = () => {
       <NewsDetailsModal
         open={isDrawerOpen}
         onClose={handleModalClose}
-        news={selectedNews}
+        blog={selectedNews}
       />
     </>
   );

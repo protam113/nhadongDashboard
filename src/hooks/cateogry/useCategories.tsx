@@ -6,27 +6,11 @@ import { endpoints } from "@/apis/api";
 import { useAuth } from "@/context/authContext";
 import { useEffect, useState } from "react";
 import { message } from "antd";
+import {Filters ,FetchCategoriesListResponse,CreateCategoryItem,EditCategoryItem} from '@/types/types'
 
-// Khai Báo Các Biến Có trong Category
-interface Category {
-  id: number;
-  name: string;
-  model: string;
-  file: string;
-}
-
-// Khai Báo Các Thuộc Tính Không Có trong trường hiển thị
-interface FetchCategoriesListResponse {
-  count: number;
-  next: string | null;
-  previous: string | null;
-  results: Category[];
-}
-
-// Bộ Lọc
-interface Filters {
-  [key: string]: string | number | string[] | undefined;
-}
+/**
+ Lấy Danh Sách Thể Loại
+ **/
 
 const fetchCategorieslist = async (
   pageParam: number = 1,
@@ -98,11 +82,9 @@ const useCateogiesList = (
   });
 };
 
-interface CreateCategoryItem {
-  name: string;
-  model: string;
-  image: File | string | null; // Use File type for file, or string if necessary
-}
+/**
+ Tạo Thể Loại
+ **/
 
 const CreateCategory = async (
   newCategory: CreateCategoryItem,
@@ -175,6 +157,10 @@ const useCreateCategory = () => {
   });
 };
 
+/**
+ Xóa Thể Loại
+ **/
+
 const DeleteCategory = async (categoryId: string, token: string) => {
   if (!token) throw new Error("No token available");
 
@@ -227,10 +213,9 @@ const useDeleteCategory = () => {
   });
 };
 
-interface EditCategoryItem {
-  name: string;
-  image: File | string | null;
-}
+/**
+ Sửa Thể Loại
+ **/
 
 const EditCategory = async (
   editCategory: EditCategoryItem,

@@ -46,7 +46,7 @@ const EditBlogModal: React.FC<EditBlogModalProps> = ({
 
       // Gán dữ liệu ban đầu vào form
       form.setFieldsValue({
-        name: blog.title,
+        title: blog.title,
         description: blog.description,
         link: blog.link,
         category: categoryIds,
@@ -123,7 +123,7 @@ const EditBlogModal: React.FC<EditBlogModalProps> = ({
         <Row gutter={16}>
           <Col span={12}>
             <Form.Item
-              name="name"
+              name="title"
               label="Tiêu Đề"
               rules={[{ required: true, message: "Hãy nhập tiêu đề" }]}
             >

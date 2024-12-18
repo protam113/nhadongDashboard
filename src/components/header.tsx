@@ -14,6 +14,7 @@ import Image from "next/image";
 import Logo from "@/assets/image/logoHeader.png";
 import { useUser } from "@/context/userProvider";
 import ProfileDrawer from "@/components/drawer/ProfileDrawer";
+import { IoMdChatbubbles } from 'react-icons/io'; // Icon cho "chatAI"
 
 const { Header } = Layout;
 
@@ -106,38 +107,49 @@ const HeaderComponent: React.FC<HeaderComponentProps> = ({
     token: { colorBgContainer },
   } = theme.useToken();
   return (
-    <Header
-      style={{
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        padding: "0 16px",
-        background: colorBgContainer,
-      }}
-    >
-      <Button
-        type="text"
-        icon={collapsed ? <MenuUnfoldOutlined /> : <MenuFoldOutlined />}
-        onClick={toggleCollapse}
-        style={{
-          fontSize: "16px",
-          width: 64,
-          height: 64,
-          lineHeight: "64px",
-        }}
-      />
-      <div style={{ display: "flex", alignItems: "center", margin: "18px 0" }}>
-        <Image
-          src={Logo}
-          className="w-auto h-auto max-h-[50px] object-contain hidden md:block"
-          alt="Logo"
-        />
-        <p className="text-primary-logo text-18 font-bold ml-2 hidden md:block">
-          Champagnat Dashboard
-        </p>
-      </div>
-      <DropdownMenu />
-    </Header>
+      <Header
+          style={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              padding: "0 16px",
+              background: colorBgContainer,
+          }}
+      >
+          <Button
+              type="text"
+              icon={collapsed ? <MenuUnfoldOutlined/> : <MenuFoldOutlined/>}
+              onClick={toggleCollapse}
+              style={{
+                  fontSize: "16px",
+                  width: 64,
+                  height: 64,
+                  lineHeight: "64px",
+              }}
+          />
+          <div style={{display: "flex", alignItems: "center", margin: "18px 0"}}>
+              <Image
+                  src={Logo}
+                  className="w-auto h-auto max-h-[50px] object-contain hidden md:block"
+                  alt="Logo"
+              />
+              <p className="text-primary-logo text-18 font-bold ml-2 hidden md:block">
+                  Champagnat Dashboard
+              </p>
+
+          </div>
+          <div style={{display: "flex", alignItems: "center", gap: "16px"}}>
+              <a
+                  href="/chatAI"
+                  className="text-blue-500 text-lg font-bold flex items-center gap-2 no-underline"
+              >
+                  <IoMdChatbubbles size={20}/> {/* Sử dụng icon chat cho "AI" */}
+                  <span>AI</span>
+              </a>
+
+              <DropdownMenu/>
+          </div>
+      </Header>
   );
 };
 

@@ -93,10 +93,7 @@ const CreateBlog = async (newBlog: NewPost, token: string) => {
   for (const key in newBlog) {
     const value = newBlog[key as keyof NewPost];
 
-    if (key === "content") {
-      // Xử lý content nếu là object hoặc JSON string
-      formData.append(key, JSON.stringify(value));
-    } else if (key === "category" && Array.isArray(value)) {
+   if (key === "category" && Array.isArray(value)) {
       value.forEach((id) => formData.append("category", id)); // Gửi từng ID
     } else if (key === "image" && typeof value === "string") {
       // Nếu là URL hình ảnh
@@ -229,28 +226,25 @@ const EditBlog = async (editBlog: EditPost, blogId: string, token: string) => {
   for (const key in editBlog) {
     const value = editBlog[key as keyof EditPost];
 
-    if (key === "content") {
-      // JSON.stringify nếu là nội dung dạng JSON
-      formData.append(key, JSON.stringify(value));
-    } else if (key === "categories" && Array.isArray(value)) {
-      // Đảm bảo gửi đúng tên trường "categories"
-      value.forEach((id) => formData.append("categories", id));
+    if (key === "category" && Array.isArray(value)) {
+      value.forEach((id) => formData.append("category", id));
     } else if (key === "image") {
-      // Xử lý image (URL hoặc file)
+      // Xử lý trường image
       if (typeof value === "string") {
-        formData.append(key, value); // Thêm URL
+        // Nếu là URL, thêm vào formData
+        formData.append("image", value); // Thêm URL vào FormData
       } else if (Array.isArray(value)) {
-        value.forEach((file) => formData.append("image", file)); // Thêm từng file
+        value.forEach((file) => {
+          // Kiểm tra nếu file là đối tượng kiểu File
+          if (file instanceof File) {
+            formData.append("image", file); // Thêm từng file vào FormData
+          }
+        });
       }
-    } else if (value !== undefined && value !== null) {
-      // Gửi các trường khác
+    } else if (value !== null && value !== undefined) {
+      // Thêm các trường khác vào formData
       formData.append(key, value as string);
     }
-  }
-
-  // Debug dữ liệu FormData
-  for (const [key, value] of formData.entries()) {
-    console.log(`FormData - ${key}:`, value);
   }
 
   try {
@@ -259,12 +253,11 @@ const EditBlog = async (editBlog: EditPost, blogId: string, token: string) => {
     }
     // Gửi API
     const response = await handleAPI(
-      `${endpoints.blog.replace(":id", blogId)}`,
-      "PATCH",
-      formData,
-      token
+        `${endpoints.blog.replace(":id", blogId)}`,
+        "PATCH",
+        formData,
+        token
     );
-    console.log("API Response:", response.data); // In kết quả trả về
     return response.data;
   } catch (error: any) {
     console.error("API Error:", error.response?.data || error.message);

@@ -8,6 +8,10 @@ import { useEffect, useState } from "react";
 import { message } from "antd";
 import { ChangePassword, VerifyCode, ResetPassword } from "@/types/types";
 
+/**
+ Đổi Mật Khẩu Sau Khi Đăng Nhập
+ **/
+
 const ChangePasswordAuth = async (
   changePassword: ChangePassword,
   token: string
@@ -71,6 +75,10 @@ const useChangePassword = () => {
     },
   });
 };
+/**
+Nhận Verify code
+ **/
+
 
 const GetVerifyCode = async (verifyCode: VerifyCode, token?: string) => {
   const formData = new FormData();
@@ -127,6 +135,11 @@ const useGetVerifyCode = () => {
     },
   });
 };
+
+/**
+ Đổi Mật Khẩu Khi Chưa Đăng Nhập
+ **/
+
 
 const ForgotPasswordAuth = async (
   updatePassword: ResetPassword,

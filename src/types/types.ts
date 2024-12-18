@@ -16,8 +16,39 @@ export interface AuthContextType {
 /**
  PushButtonProps Interface
  **/
+
+interface CategoryList {
+    id: number;
+    name: string;
+    model: string;
+    file: string;
+}
+
+// Khai Báo Các Thuộc Tính Không Có trong trường hiển thị
+export interface FetchCategoriesListResponse {
+    count: number;
+    next: string | null;
+    previous: string | null;
+    results: CategoryList[];
+}
+
+export interface EditCategoryItem {
+    name: string;
+    image: File | string | null;
+}
+
+
+export interface CreateCategoryItem {
+    name: string;
+    model: string;
+    image: File | string | null; // Use File type for file, or string if necessary
+}
+
+/**
+ PushButtonProps Interface
+ **/
 export interface PushButtonProps {
-    href: string; // Đường dẫn để chuyển hướng
+    href: string;
     label: string
 }
 
@@ -56,12 +87,6 @@ export interface Blog {
     updated_date: string;
     categories: Category[];
 }
-
-export interface EditCategoryItem {
-    name: string;
-    image: RcFile | null; // Chỉnh sửa kiểu file thành RcFile | null
-}
-
 
 
 
@@ -319,7 +344,20 @@ export interface FetchDonationListResponse {
   results: DonationList[];
 }
 
+/**
+ chatAI Interface
+ **/
 
+type ChatItem = {
+    content: string;
+    response: string;
+};
+
+export type FetchChatListResponse = ChatItem[];
+
+export interface NewChat {
+    content: string;
+}
 
 /**
   post Interface

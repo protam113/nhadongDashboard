@@ -86,6 +86,11 @@
     // donation
     donations:process.env.NEXT_PUBLIC_DONATIONS,
     donation:process.env.NEXT_PUBLIC_DONATE,
+
+     // chatAI
+
+     chatHistory:process.env.NEXT_PUBLIC_CHAT_HISTORY,
+     chat:process.env.NEXT_PUBLIC_CHAT,
 };
 
 export { baseURL, endpoints };

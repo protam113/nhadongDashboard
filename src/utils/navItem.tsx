@@ -165,12 +165,6 @@ export const NavItems = () => {
               key: "13",
               icon: <MdManageSearch />,
             },
-            // {
-            //   name: "Thể Loại",
-            //   link: "/study/document/document_categories",
-            //   key: "14",
-            //   icon: <MdManageSearch />,
-            // },
           ],
         },
         {
