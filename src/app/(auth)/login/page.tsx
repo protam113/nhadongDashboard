@@ -31,12 +31,10 @@ export default function LoginPage() {
           <div className="border border-gray-300 bg-white rounded-lg p-6 max-w-md max-md:mx-auto">
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="mb-8">
-                <h3 className="text-gray-800 text-3xl font-extrabold">
-                  Sign in
-                </h3>
+                <h3 className="text-gray-800 text-3xl font-bold">Đăng nhập</h3>
                 <p className="text-gray-500 text-sm mt-4 leading-relaxed">
-                  Sign in to your account and explore a world of possibilities.
-                  Your journey begins here.
+                  Đăng nhập vào tài khoản của bạn để sử dụng các tính năng
+                  dashboard
                 </p>
               </div>
 
@@ -73,7 +71,7 @@ export default function LoginPage() {
                     href="/forgot_password"
                     className="text-blue-600 hover:underline font-semibold"
                   >
-                    Forgot your password?
+                    Quên mật khẩu?
                   </a>
                 </div>
               </div>
@@ -83,7 +81,7 @@ export default function LoginPage() {
                   type="submit"
                   className="w-full shadow-xl py-3 px-4 text-sm tracking-wide rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none"
                 >
-                  Log in
+                  Đăng nhập
                 </button>
               </div>
             </form>

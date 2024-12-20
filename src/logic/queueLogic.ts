@@ -1,9 +1,5 @@
 import { useQueueList, useBrowseQueue } from '@/hooks/queue/useQueue';
 
-interface BrowseQueueResponse {
-    data: any;  // Thay thế `any` bằng kiểu cụ thể nếu biết rõ kiểu dữ liệu trả về
-    success: boolean;
-}
 
 export const useQueueManagement = (currentPage: number, type: string, refreshKey: number) => {
     const { data, isLoading, isError } = useQueueList(currentPage, {
@@ -26,18 +22,8 @@ export const useQueueManagement = (currentPage: number, type: string, refreshKey
             status: status,
         };
 
-        console.log("browseManager:", browseManager);
 
-        console.log("handleBulkUpdate - browseManager:", browseManager);
-
-        browseQueue(browseManager, {
-            onSuccess: (response: BrowseQueueResponse) => {
-                console.log("Response from browseQueue:", response);  // Log phản hồi từ browseQueue
-            },
-            onError: (error: any) => {
-                console.error("Error in browseQueue:", error);  // Log lỗi nếu có
-            }
-        });
+        browseQueue(browseManager);
     };
 
     const handleStatusChange = (value: string, id: number) => {
@@ -48,5 +34,5 @@ export const useQueueManagement = (currentPage: number, type: string, refreshKey
         browseQueue(browseManager);
     };
 
-    return { queueData, isLoading, isError, handleBulkUpdate, handleStatusChange };
+    return { queueData,next:data?.next, isLoading, isError, handleBulkUpdate, handleStatusChange };
 };

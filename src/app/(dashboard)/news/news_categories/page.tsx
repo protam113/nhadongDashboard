@@ -14,7 +14,6 @@ import { FaArrowLeft, FaArrowRight } from "@/lib/iconLib";
 import CreateNewsCategoryModal from "./CreateNewsCategoryModal";
 
 const Page: React.FC = () => {
-  const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [refreshKey, setRefreshKey] = useState(0);
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false); // For creating category
@@ -156,11 +155,6 @@ const Page: React.FC = () => {
             rowKey="id"
             pagination={false}
             scroll={{ y: 500 }}
-            rowSelection={{
-              selectedRowKeys: selectedKeys,
-              onChange: (selectedRowKeys) =>
-                setSelectedKeys(selectedRowKeys as number[]),
-            }}
           />
         </div>
         <div className="flex justify-center mt-8 items-center space-x-2">

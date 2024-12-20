@@ -4,22 +4,21 @@
  Base URL
  **/
 
- const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
+const baseURL = process.env.NEXT_PUBLIC_BASE_URL;
 
- const endpoints = {
- 
+const endpoints = {
+
      //auth
-     login: process.env.NEXT_PUBLIC_LOGIN,
-     register: process.env.NEXT_PUBLIC_REGISTER,
-     refresh: process.env.NEXT_PUBLIC_REFRESH,
-     changePassword: process.env.NEXT_PUBLIC_CHANGE_PASSWORD,
-     codePassword: process.env.NEXT_PUBLIC_RESET_PASSWORD,
-     verifyCode: process.env.NEXT_PUBLIC_VERIFY_CODE,
- 
-     //current user lgin
-     currentUser: process.env.NEXT_PUBLIC_CURRENT_USER,
-     updateProfile: process.env.NEXT_PUBLIC_UPDATE_PROFILE,
+    login: process.env.NEXT_PUBLIC_LOGIN,
+    register: process.env.NEXT_PUBLIC_REGISTER,
+    refresh: process.env.NEXT_PUBLIC_REFRESH,
+    changePassword: process.env.NEXT_PUBLIC_CHANGE_PASSWORD,
+    codePassword: process.env.NEXT_PUBLIC_RESET_PASSWORD,
+    verifyCode: process.env.NEXT_PUBLIC_VERIFY_CODE,
 
+     //current user lgin
+    currentUser: process.env.NEXT_PUBLIC_CURRENT_USER,
+    updateProfile: process.env.NEXT_PUBLIC_UPDATE_PROFILE,
 
     //user
     blocked: process.env.NEXT_PUBLIC_BLOCKED,

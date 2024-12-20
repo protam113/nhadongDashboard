@@ -15,7 +15,6 @@ import PushButton from "@/components/Button/PushButton";
 import { FaArrowLeft, FaArrowRight, FaSync } from "@/lib/iconLib";
 
 const BlogManagement: React.FC = () => {
-  const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [category] = useState<string>(""); // State to hold selected model
   const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
@@ -161,11 +160,6 @@ const BlogManagement: React.FC = () => {
             rowKey="id"
             pagination={false}
             scroll={{ y: 500 }}
-            rowSelection={{
-              selectedRowKeys: selectedKeys,
-              onChange: (selectedRowKeys) =>
-                setSelectedKeys(selectedRowKeys as number[]),
-            }}
           />
         </div>
         <div className="flex justify-center mt-8 items-center space-x-2">

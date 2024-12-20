@@ -9,10 +9,16 @@ import { EyeOutlined } from "@ant-design/icons";
 import Heading from "@/components/design/Heading";
 import EventQueueTable from "@/components/table/EventQueueTable";
 import { DonateList } from "@/lib/donateList";
-import { FaArrowLeft, FaArrowRight, MdOutlineDelete } from "@/lib/iconLib";
+import {
+  FaArrowLeft,
+  FaArrowRight,
+  MdOutlineDelete,
+  FaRegEdit,
+} from "@/lib/iconLib";
 import PushButton from "@/components/Button/PushButton";
 import DonationDetailDrawer from "@/components/drawer/DonationDetailDrawer";
 import { useDeleteDonation } from "@/hooks/donation/useDonation";
+import EditDonationModal from "./drawer/EditDonation";
 
 const Page: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -21,6 +27,7 @@ const Page: React.FC = () => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedBlog, setSelectedBlog] = useState(null); // State for selected blog
   const { mutate } = useDeleteDonation();
+  const [isDrawerVisible, setIsDrawerVisible] = useState(false);
 
   // Pass model into CategoriesList
   const { queueData, next, isLoading, isError } = DonateList(
@@ -28,6 +35,11 @@ const Page: React.FC = () => {
     category,
     refreshKey
   );
+
+  const handleEdit = (blog: any) => {
+    setSelectedBlog(blog); // Set blog to be edited
+    setIsDrawerVisible(true); // Open the drawer
+  };
 
   const handleDelete = (categoryId: string) => {
     // Show confirmation dialog before deletion
@@ -88,6 +100,9 @@ const Page: React.FC = () => {
           <Button danger onClick={() => handleDelete(record.id)}>
             <MdOutlineDelete className="text-albert-error" />
           </Button>
+          <Button type="primary" onClick={() => handleEdit(record)}>
+            <FaRegEdit />
+          </Button>
         </>
       ),
     },
@@ -103,6 +118,7 @@ const Page: React.FC = () => {
   const handleDrawerClose = () => {
     setIsDrawerOpen(false);
     setSelectedBlog(null);
+    setIsDrawerVisible(false); // Close the drawer
   };
 
   const handleViewDetails = (blog: any) => {
@@ -173,6 +189,11 @@ const Page: React.FC = () => {
         open={isDrawerOpen}
         onClose={handleDrawerClose}
         blog={selectedBlog}
+      />
+      <EditDonationModal
+        open={isDrawerVisible}
+        onClose={handleDrawerClose}
+        blog={selectedBlog} // Pass selected blog to EditBlogModal
       />
     </>
   );

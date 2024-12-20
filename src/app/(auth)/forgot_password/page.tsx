@@ -1,36 +1,42 @@
-"use client"; // This line ensures the component is treated as a Client Component
+"use client"; // Ensures this is a client component
 
 import { useForgotPassword, useGetVerifyCode } from "@/hooks/auth/usePassword";
 import React, { useState } from "react";
 import Image from "next/image";
 import Logo from "@/assets/image/logo.svg";
-import { useRouter } from "next/navigation"; // Adjusted to next/navigation for compatibility with Server Components
+import { useRouter } from "next/navigation";
 
 const Page = () => {
   const [email, setEmail] = useState("");
   const [new_password, setNewPassword] = useState("");
+  const [confirm_password, setConfirmPassword] = useState(""); // Thêm state cho mật khẩu xác nhận
   const [code, setCode] = useState("");
   const [step, setStep] = useState(1);
   const { mutate: GetVerifyCode } = useGetVerifyCode();
   const { mutate: ForgotPassword } = useForgotPassword();
-  const router = useRouter(); // This should work fine now since "use client" is specified
+  const router = useRouter();
 
   const handleSendCode = (e: React.FormEvent) => {
     e.preventDefault();
-    // Call API to send verification code
     GetVerifyCode({ email });
-    setStep(2); // Go to the next step
+    setStep(2);
   };
 
   const handleResetPassword = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (new_password !== confirm_password) {
+      alert("Mật khẩu mới và mật khẩu xác nhận không khớp.");
+      return; // Dừng lại nếu mật khẩu không khớp
+    }
     try {
       await ForgotPassword({ email, new_password, code });
-      router.push("/login"); // Navigate after successful password reset
+      router.push("/login");
     } catch (error) {
       console.error("Password reset failed", error);
     }
   };
+
+  const isPasswordMatch = new_password === confirm_password;
 
   return (
     <div className="bg-primary-900">
@@ -41,18 +47,18 @@ const Page = () => {
               // Form 1: Enter email to send verification code
               <form onSubmit={handleSendCode} className="space-y-4">
                 <div className="mb-8">
-                  <h3 className="text-gray-800 text-3xl font-extrabold">
-                    Forgot your password !;
+                  <h3 className="text-gray-800 text-3xl font-bold">
+                    Bạn Quên Mật Khẩu ?
                   </h3>
                   <p className="text-gray-500 text-sm mt-4 leading-relaxed">
-                    Enter your email and we&apos;ll send you a verification code
-                    to reset your password.
+                    Nhập email của bạn và chúng tôi sẽ gửi cho bạn mã xác minh
+                    để đặt lại mật khẩu!
                   </p>
                 </div>
 
                 <div>
                   <label className="text-gray-800 text-sm mb-2 block">
-                    Email Address
+                    Email
                   </label>
                   <input
                     type="email"
@@ -69,7 +75,7 @@ const Page = () => {
                     type="submit"
                     className="w-full shadow-xl py-3 px-4 text-sm tracking-wide rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none"
                   >
-                    Send Verification Code
+                    Gửi mã xác minh
                   </button>
                 </div>
               </form>
@@ -77,18 +83,18 @@ const Page = () => {
               // Form 2: Enter code and new password to reset
               <form onSubmit={handleResetPassword} className="space-y-4">
                 <div className="mb-8">
-                  <h3 className="text-gray-800 text-3xl font-extrabold">
-                    Reset your password
+                  <h3 className="text-gray-800 text-3xl font-bold">
+                    Đặt lại mật khẩu của bạn
                   </h3>
                   <p className="text-gray-500 text-sm mt-4 leading-relaxed">
-                    Enter the verification code we sent to your email and your
-                    new password.
+                    Nhập mã xác minh mà chúng tôi đã gửi đến email của bạn và
+                    mật khẩu mới của bạn.
                   </p>
                 </div>
 
                 <div>
                   <label className="text-gray-800 text-sm mb-2 block">
-                    Verification Code
+                    Mã xác minh
                   </label>
                   <input
                     type="text"
@@ -102,7 +108,7 @@ const Page = () => {
 
                 <div>
                   <label className="text-gray-800 text-sm mb-2 block">
-                    New Password
+                    Mật Khẩu Mới
                   </label>
                   <input
                     type="password"
@@ -114,12 +120,31 @@ const Page = () => {
                   />
                 </div>
 
+                <div>
+                  <label className="text-gray-800 text-sm mb-2 block">
+                    Xác nhận Mật Khẩu Mới
+                  </label>
+                  <input
+                    type="password"
+                    required
+                    className={`w-full text-sm text-black border px-4 py-3 rounded-lg outline-blue-600 ${
+                      !isPasswordMatch ? "border-red-500" : "border-gray-300"
+                    }`}
+                    placeholder="Confirm new password"
+                    value={confirm_password}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                  />
+                </div>
+
                 <div className="!mt-8">
                   <button
                     type="submit"
-                    className="w-full shadow-xl py-3 px-4 text-sm tracking-wide rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none"
+                    className={`w-full shadow-xl py-3 px-4 text-sm tracking-wide rounded-lg text-white bg-blue-600 hover:bg-blue-700 focus:outline-none ${
+                      !isPasswordMatch ? "opacity-50 cursor-not-allowed" : ""
+                    }`}
+                    disabled={!isPasswordMatch} // Disable button if passwords don't match
                   >
-                    Reset Password
+                    Cập nhật
                   </button>
                 </div>
               </form>

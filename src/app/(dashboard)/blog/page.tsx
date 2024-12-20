@@ -3,18 +3,20 @@
 import React, { useState } from "react";
 import { Table, Button, Spin, Modal } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { FaSync } from "react-icons/fa"; // Import refresh icon
 import { useDeleteCategory } from "@/hooks/cateogry/useCategories";
-import { FaRegEdit } from "react-icons/fa";
 import { BlogList } from "@/lib/blogList";
 import BlogDetailsModal from "@/app/(dashboard)/blog/BlogDetailsModal";
 import { EyeOutlined } from "@ant-design/icons";
 import BlogQueueList from "@/app/(dashboard)/blog/BlogQueueTable";
 import Heading from "@/components/design/Heading";
-import { FaArrowLeft, FaArrowRight, MdOutlineDelete } from "@/lib/iconLib";
+import {
+  FaArrowLeft,
+  FaArrowRight,
+  MdOutlineDelete,
+  FaSync,
+} from "@/lib/iconLib";
 
 const Blogs: React.FC = () => {
-  const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
   const { mutate: deleteCategory } = useDeleteCategory();
@@ -105,9 +107,6 @@ const Blogs: React.FC = () => {
           <Button danger onClick={() => handleDelete(record.id)}>
             <MdOutlineDelete className="text-albert-error" />
           </Button>
-          <Button>
-            <FaRegEdit />
-          </Button>
         </>
       ),
     },
@@ -149,11 +148,6 @@ const Blogs: React.FC = () => {
             rowKey="id"
             pagination={false}
             scroll={{ y: 500 }}
-            rowSelection={{
-              selectedRowKeys: selectedKeys,
-              onChange: (selectedRowKeys) =>
-                setSelectedKeys(selectedRowKeys as number[]),
-            }}
           />
         </div>
         <div className="flex justify-center mt-8 items-center space-x-2">

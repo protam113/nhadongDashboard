@@ -6,7 +6,12 @@ import { endpoints } from "@/apis/api";
 import { useAuth } from "@/context/authContext";
 import { useEffect, useState } from "react";
 import { message } from "antd";
-import { FetchDonationListResponse, Filters, NewDonation } from "@/types/types";
+import {
+  FetchDonationListResponse,
+  Filters,
+  NewDonation,
+  EditDonation,
+} from "@/types/types";
 
 const fetchDonationList = async (
   pageParam: number = 1,
@@ -89,10 +94,7 @@ const CreateDonation = async (newPost: NewDonation, token: string) => {
   for (const key in newPost) {
     const value = newPost[key as keyof NewDonation];
 
-    if (key === "content") {
-      // Xử lý content nếu là object hoặc JSON string
-      formData.append(key, JSON.stringify(value));
-    } else if (key === "image" && typeof value === "string") {
+    if (key === "image" && typeof value === "string") {
       // Nếu là URL hình ảnh
       formData.append(key, value);
     } else if (key === "image" && Array.isArray(value)) {
@@ -210,4 +212,99 @@ const useDeleteDonation = () => {
   });
 };
 
-export { useDonationList, useCreateDonation, useDeleteDonation };
+/**
+ Sửa Tin Donation
+ **/
+
+const EditDonationD = async (
+  editDonation: EditDonation,
+  blogId: string,
+  token: string
+) => {
+  const formData = new FormData();
+
+  if (!token) throw new Error("No token available");
+
+  // Duyệt qua các trường trong editBlog
+  for (const key in editDonation) {
+    const value = editDonation[key as keyof EditDonation];
+
+    if (key === "image") {
+      // Xử lý trường image
+      if (typeof value === "string") {
+        // Nếu là URL, thêm vào formData
+        formData.append("image", value); // Thêm URL vào FormData
+      } else if (Array.isArray(value)) {
+        value.forEach((file) => {
+          // Kiểm tra nếu file là đối tượng kiểu File
+          if (file instanceof File) {
+            formData.append("image", file); // Thêm từng file vào FormData
+          }
+        });
+      }
+    } else if (value !== null && value !== undefined) {
+      // Thêm các trường khác vào formData
+      formData.append(key, value as string);
+    }
+  }
+
+  try {
+    if (!endpoints.donation) {
+      throw null;
+    }
+    // Gửi API
+    const response = await handleAPI(
+      `${endpoints.donation.replace(":id", blogId)}`,
+      "PATCH",
+      formData,
+      token
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error("API Error:", error.response?.data || error.message);
+    throw error;
+  }
+};
+
+const useEditDonation = () => {
+  const queryClient = useQueryClient();
+  const { getToken } = useAuth();
+  const [token, setToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchToken = async () => {
+      const userToken = await getToken();
+      setToken(userToken);
+    };
+    fetchToken();
+  }, [getToken]);
+
+  return useMutation({
+    mutationFn: async ({
+      editDonation,
+      blogId,
+    }: {
+      editDonation: EditDonation;
+      blogId: string;
+    }) => {
+      if (!token) {
+        throw new Error("Token is not available");
+      }
+      return EditDonationD(editDonation, blogId, token);
+    },
+    onSuccess: () => {
+      message.success("Sửa Bài Viết Thành Công!");
+      queryClient.invalidateQueries({ queryKey: ["donateList"] });
+    },
+    onError: (error: any) => {
+      message.error(error.message || "Failed to edit blog.");
+    },
+  });
+};
+
+export {
+  useDonationList,
+  useCreateDonation,
+  useDeleteDonation,
+  useEditDonation,
+};

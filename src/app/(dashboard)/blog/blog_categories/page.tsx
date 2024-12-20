@@ -10,12 +10,10 @@ import { MdOutlineDelete } from "react-icons/md";
 import { FaRegEdit } from "react-icons/fa";
 import CreateBlogCategory from "./CreateBlogCategory";
 import EditBlogCategory from "@/app/(dashboard)/blog/blog_categories/EditBlogCategory";
-import BlogCategoryModal from "@/app/(dashboard)/blog/blog_categories/BlogCategoryModal";
 import Heading from "@/components/design/Heading";
 import { FaArrowLeft, FaArrowRight } from "@/lib/iconLib";
 
 const BlogCategories: React.FC = () => {
-  const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [refreshKey, setRefreshKey] = useState(0);
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false); // For creating category
@@ -157,11 +155,6 @@ const BlogCategories: React.FC = () => {
             rowKey="id"
             pagination={false}
             scroll={{ y: 500 }}
-            rowSelection={{
-              selectedRowKeys: selectedKeys,
-              onChange: (selectedRowKeys) =>
-                setSelectedKeys(selectedRowKeys as number[]),
-            }}
           />
         </div>
         <div className="flex justify-center mt-8 items-center space-x-2">
@@ -195,7 +188,6 @@ const BlogCategories: React.FC = () => {
             <FaArrowRight />
           </button>
         </div>
-        <BlogCategoryModal />
       </div>
 
       {/* Modal tạo thể loại */}

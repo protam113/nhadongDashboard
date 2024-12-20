@@ -200,7 +200,7 @@ const useDeleteEvent = () => {
     },
     onSuccess: () => {
       message.success("Xóa Sự Kiện Thành Công!");
-      queryClient.invalidateQueries({ queryKey: ["docsList"] });
+      queryClient.invalidateQueries({ queryKey: ["eventList"] });
     },
     onError: (error: any) => {
       console.error(error.message || "Failed to delete category.");

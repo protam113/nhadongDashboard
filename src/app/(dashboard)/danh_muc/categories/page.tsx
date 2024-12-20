@@ -12,6 +12,7 @@ import { FaRegEdit } from "react-icons/fa";
 import CategoriesQueueTable from "@/app/(dashboard)/danh_muc/categories/CategoriesQueueTable";
 import EditBlogCategory from "@/app/(dashboard)/blog/blog_categories/EditBlogCategory";
 import Heading from "@/components/design/Heading";
+import { FaArrowLeft, FaArrowRight } from "@/lib/iconLib";
 
 const { Option } = Select;
 
@@ -24,11 +25,14 @@ const Categories: React.FC = () => {
   const [isEditModalVisible, setIsEditModalVisible] = useState(false); // For editing category
   const [editingCategory, setEditingCategory] = useState(null);
   // Pass model into CategoriesList
-  const { queueData, isLoading, isError } = CategoriesList(
+  const { queueData, next, isLoading, isError } = CategoriesList(
     currentPage,
     model,
     refreshKey
   );
+
+  const totalPages = next ? currentPage + 1 : currentPage;
+
   const { mutate: deleteCategory } = useDeleteCategory();
 
   const handleDelete = (categoryId: string) => {
@@ -176,17 +180,36 @@ const Categories: React.FC = () => {
             }}
           />
         </div>
-        <div style={{ marginTop: "16px", textAlign: "center" }}>
-          <Button
-            disabled={currentPage === 1}
+        <div className="flex justify-center mt-8 items-center space-x-2">
+          <button
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className={`flex items-center justify-center w-6 h-6 text-10 bg-gray-200 rounded-full hover:bg-gray-300 ${
+              currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
-            Previous
-          </Button>
-          <span style={{ margin: "0 8px" }}>Page {currentPage}</span>
-          <Button onClick={() => setCurrentPage((prev) => prev + 1)}>
-            Next
-          </Button>
+            <FaArrowLeft />
+          </button>
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentPage(i + 1)}
+              className={`w-6 h-6 text-10 rounded-full hover:bg-gray-300 ${
+                currentPage === i + 1 ? "bg-blue-500 text-white" : "bg-gray-200"
+              }`}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button
+            onClick={() => setCurrentPage((prev) => prev + 1)}
+            disabled={!next}
+            className={`flex items-center justify-center w-6 h-6 text-10 bg-gray-200 rounded-full hover:bg-gray-300 ${
+              !next ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+          >
+            <FaArrowRight />
+          </button>
         </div>
         <CategoriesQueueTable />
       </div>

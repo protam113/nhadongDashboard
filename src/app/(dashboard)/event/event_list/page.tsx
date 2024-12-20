@@ -3,11 +3,11 @@
 import React, { useState } from "react";
 import { Table, Button, Spin, Select } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { FaSync } from "react-icons/fa"; // Import refresh icon
 import { EventList } from "@/lib/eventList";
 import Heading from "@/components/design/Heading";
 import PushButton from "@/components/Button/PushButton";
 import { useUpdateEvent } from "@/hooks/event/useEventDetail";
+import { FaArrowLeft, FaArrowRight, FaSync } from "@/lib/iconLib";
 
 const Page: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -17,11 +17,12 @@ const Page: React.FC = () => {
   const { mutate } = useUpdateEvent(selectedPostId);
 
   // Pass model into CategoriesList
-  const { queueData, isLoading, isError } = EventList(
+  const { queueData, next, isLoading, isError } = EventList(
     currentPage,
     category,
     refreshKey
   );
+  const totalPages = next ? currentPage + 1 : currentPage;
 
   const handleSelectEvent = (postId: string) => {
     setSelectedPostId(postId); // Lưu postId khi người dùng chọn sự kiện
@@ -105,17 +106,36 @@ const Page: React.FC = () => {
             })}
           />
         </div>
-        <div style={{ marginTop: "16px", textAlign: "center" }}>
-          <Button
-            disabled={currentPage === 1}
+        <div className="flex justify-center mt-8 items-center space-x-2">
+          <button
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className={`flex items-center justify-center w-6 h-6 text-10 bg-gray-200 rounded-full hover:bg-gray-300 ${
+              currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
-            Previous
-          </Button>
-          <span style={{ margin: "0 8px" }}>Page {currentPage}</span>
-          <Button onClick={() => setCurrentPage((prev) => prev + 1)}>
-            Next
-          </Button>
+            <FaArrowLeft />
+          </button>
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentPage(i + 1)}
+              className={`w-6 h-6 text-10 rounded-full hover:bg-gray-300 ${
+                currentPage === i + 1 ? "bg-blue-500 text-white" : "bg-gray-200"
+              }`}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button
+            onClick={() => setCurrentPage((prev) => prev + 1)}
+            disabled={!next}
+            className={`flex items-center justify-center w-6 h-6 text-10 bg-gray-200 rounded-full hover:bg-gray-300 ${
+              !next ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+          >
+            <FaArrowRight />
+          </button>
         </div>
       </div>
     </>
