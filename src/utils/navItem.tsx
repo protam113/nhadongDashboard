@@ -93,7 +93,6 @@ export const NavItems = () => {
     },
     {
       name: "Hội Dòng",
-      link: "/hoi_dong",
       key: "6",
       icon: <FaChurch />,
       children: [
@@ -169,7 +168,7 @@ export const NavItems = () => {
         },
         {
           name: "Thuong AI",
-          link: "/hoi_dong/on_goi",
+          link: "/study/chatAI",
           key: "16",
         },
       ],

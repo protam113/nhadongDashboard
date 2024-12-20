@@ -32,7 +32,6 @@ export default function DashboardLayout({
   useEffect(() => {
     if (tokenChecked) {
       if (isAuthenticated) {
-        // logout();
         console.warn("User is authenticated");
       } else {
         // Nếu chưa xác thực, chuyển hướng về login

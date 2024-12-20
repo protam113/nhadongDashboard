@@ -1,10 +1,9 @@
 "use client"; // Ensures this is a client component
 
 import React, { useState } from "react";
-import { Table, Button, Typography, Spin, Modal, Select } from "antd";
+import { Table, Button, Spin, Modal, Select } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { FaSync } from "react-icons/fa"; // Import refresh icon
-import { useDeleteCategory } from "@/hooks/cateogry/useCategories";
 import { MdOutlineDelete } from "react-icons/md";
 import { FaRegEdit } from "react-icons/fa";
 import { EyeOutlined } from "@ant-design/icons";
@@ -13,15 +12,17 @@ import DocsDetailsModal from "@/app/(dashboard)/study/document/DocumentDetailMod
 import Link from "next/link";
 import { CategoriesList } from "@/lib/categoriesList";
 import BackButton from "@/components/Button/BackButton";
+import { FaArrowLeft, FaArrowRight } from "@/lib/iconLib";
+import { useDeleteDoc } from "@/hooks/document/useDocs";
+import Heading from "@/components/design/Heading";
 
-const { Title } = Typography;
 const { Option } = Select;
 
 const Page: React.FC = () => {
   const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
-  const { mutate: deleteCategory } = useDeleteCategory();
+  const { mutate } = useDeleteDoc();
   const [selectedDoc, setSelectedDoc] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [model, setModel] = useState<string>(""); // State to hold selected model
@@ -29,6 +30,7 @@ const Page: React.FC = () => {
   // Pass model into CategoriesList
   const {
     queueData: document,
+    next,
     isLoading: isDocumentLoad,
     isError: isDocumentError,
   } = DocsList(currentPage, model, refreshKey);
@@ -38,16 +40,18 @@ const Page: React.FC = () => {
     isError: isCategoryError,
   } = CategoriesList(currentPage, "document", refreshKey);
 
-  const handleDelete = (categoryId: string) => {
+  const totalPages = next ? currentPage + 1 : currentPage;
+
+  const handleDelete = (blogId: string) => {
     // Show confirmation dialog before deletion
     Modal.confirm({
       title: "Xác nhận xóa",
-      content: "Bạn có chắc chắn muốn xóa thể loại này?",
+      content: "Bạn có chắc chắn muốn xóa tài liệuliệu này?",
       okText: "Xóa",
       okType: "danger",
       cancelText: "Hủy",
       onOk: () => {
-        deleteCategory(categoryId);
+        mutate(blogId);
       },
     });
   };
@@ -144,7 +148,7 @@ const Page: React.FC = () => {
     <>
       <div className="p-4">
         <BackButton />
-        <Title level={2}>Quản Lý Tài Liệu</Title>
+        <Heading name="Quản Lý Thể Loại Tài Liệu (Document)" />
 
         {/* Model selection */}
         <div className="flex justify-between items-center mb-4">
@@ -205,17 +209,36 @@ const Page: React.FC = () => {
             }}
           />
         </div>
-        <div style={{ marginTop: "16px", textAlign: "center" }}>
-          <Button
-            disabled={currentPage === 1}
+        <div className="flex justify-center mt-8 items-center space-x-2">
+          <button
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className={`flex items-center justify-center w-6 h-6 text-10 bg-gray-200 rounded-full hover:bg-gray-300 ${
+              currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
-            Previous
-          </Button>
-          <span style={{ margin: "0 8px" }}>Page {currentPage}</span>
-          <Button onClick={() => setCurrentPage((prev) => prev + 1)}>
-            Next
-          </Button>
+            <FaArrowLeft />
+          </button>
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentPage(i + 1)}
+              className={`w-6 h-6 text-10 rounded-full hover:bg-gray-300 ${
+                currentPage === i + 1 ? "bg-blue-500 text-white" : "bg-gray-200"
+              }`}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button
+            onClick={() => setCurrentPage((prev) => prev + 1)}
+            disabled={!next}
+            className={`flex items-center justify-center w-6 h-6 text-10 bg-gray-200 rounded-full hover:bg-gray-300 ${
+              !next ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+          >
+            <FaArrowRight />
+          </button>
         </div>
       </div>
       <DocsDetailsModal

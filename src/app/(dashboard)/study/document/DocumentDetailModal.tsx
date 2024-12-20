@@ -19,29 +19,6 @@ const DocsDetailsModal: React.FC<NewsDetailsModalProps> = ({
   if (!doc) return null;
 
   // Helper function to clean and parse the content field
-  const parseContent = (content: string) => {
-    // Loại bỏ các dấu ngoặc kép ngoài cùng nếu có
-    let cleanedString = content
-      .replace(/^"|"$/g, "")
-      .replace(/\\"/g, '"') // Chuyển \\" thành "
-      .replace(/'/g, '"'); // Thay dấu nháy đơn bằng dấu nháy kép
-
-    // Kiểm tra nếu chuỗi bắt đầu và kết thúc bằng {{ và }} thì loại bỏ chúng
-    if (cleanedString.startsWith("{{") && cleanedString.endsWith("}}")) {
-      cleanedString = cleanedString.slice(2, -2); // Loại bỏ {{ và }}
-    }
-
-    // Chắc chắn chuỗi đã trở thành JSON hợp lệ
-    try {
-      const jsonObject = JSON.parse(`{${cleanedString}}`); // Đảm bảo thêm dấu ngoặc nhọn bao quanh chuỗi
-      return jsonObject;
-    } catch (error) {
-      console.error("Error parsing content:", error);
-      return null;
-    }
-  };
-
-  const contentData = parseContent(doc.content);
 
   // Parse the content data
   return (
@@ -66,18 +43,15 @@ const DocsDetailsModal: React.FC<NewsDetailsModalProps> = ({
 
       {/* Content of the blog post */}
       <div className="mb-4">
-        <strong className="text-xl text-gray-900">Nội dung:</strong>
-        <div className="space-y-4 mt-2">
-          {/* Display the extracted content */}
-          {contentData && contentData.title && (
-            <p className="text-gray-600">{contentData.title}</p> // Only display title content
-          )}
-          {contentData && contentData.description && (
-            <p className="text-gray-600">{contentData.description}</p> // Only display description content
-          )}
-          {contentData && contentData.content && (
-            <p className="text-gray-600">{contentData.content}</p> // Only display content
-          )}
+        <div className="flex flex-col md:flex-row gap-12 justify-between">
+          <div className="lg:text-lg flex flex-col gap-6 text-justify">
+            <div
+              className="content"
+              dangerouslySetInnerHTML={{
+                __html: doc.content.replace(/\"/g, ""), // Xóa tất cả dấu "
+              }}
+            />
+          </div>
         </div>
       </div>
 
@@ -109,17 +83,15 @@ const DocsDetailsModal: React.FC<NewsDetailsModalProps> = ({
         <strong>Thể loại:</strong>
       </Paragraph>
       <div className="flex flex-wrap gap-2 mb-4">
-        {doc.categories && doc.categories.length > 0 ? (
-          doc.categories.map((category: any) => (
-            <span
-              key={category.id}
-              className="bg-indigo-500 text-white py-1 px-3 rounded-full text-sm"
-            >
-              {category.name}
-            </span>
-          ))
+        {doc.category ? (
+          <span
+            key={doc.category.id}
+            className="bg-indigo-500 text-white py-1 px-3 rounded-full text-sm"
+          >
+            {doc.category.name}
+          </span>
         ) : (
-          <span>No categories available</span>
+          <span>No category available</span>
         )}
       </div>
 

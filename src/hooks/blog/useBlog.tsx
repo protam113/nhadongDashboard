@@ -93,7 +93,7 @@ const CreateBlog = async (newBlog: NewPost, token: string) => {
   for (const key in newBlog) {
     const value = newBlog[key as keyof NewPost];
 
-   if (key === "category" && Array.isArray(value)) {
+    if (key === "category" && Array.isArray(value)) {
       value.forEach((id) => formData.append("category", id)); // Gửi từng ID
     } else if (key === "image" && typeof value === "string") {
       // Nếu là URL hình ảnh
@@ -253,10 +253,10 @@ const EditBlog = async (editBlog: EditPost, blogId: string, token: string) => {
     }
     // Gửi API
     const response = await handleAPI(
-        `${endpoints.blog.replace(":id", blogId)}`,
-        "PATCH",
-        formData,
-        token
+      `${endpoints.blog.replace(":id", blogId)}`,
+      "PATCH",
+      formData,
+      token
     );
     return response.data;
   } catch (error: any) {

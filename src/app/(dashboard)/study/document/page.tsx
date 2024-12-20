@@ -3,10 +3,6 @@
 import React, { useState } from "react";
 import { Table, Button, Spin, Modal } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { FaSync } from "react-icons/fa"; // Import refresh icon
-import { useDeleteCategory } from "@/hooks/cateogry/useCategories";
-import { MdOutlineDelete } from "react-icons/md";
-import { FaRegEdit } from "react-icons/fa";
 import { EyeOutlined } from "@ant-design/icons";
 import DocumentCategoriesTable from "@/app/(dashboard)/study/document/DocumentCategoriesTable";
 import DocumentQueueList from "@/app/(dashboard)/study/document/DocumentQueueTable";
@@ -15,33 +11,50 @@ import DocsDetailsModal from "@/app/(dashboard)/study/document/DocumentDetailMod
 import Link from "next/link";
 import BackButton from "@/components/Button/BackButton";
 import Heading from "@/components/design/Heading";
+import { useDeleteDoc } from "@/hooks/document/useDocs";
+import {
+  FaArrowLeft,
+  FaArrowRight,
+  MdOutlineDelete,
+  FaSync,
+  FaRegEdit,
+} from "@/lib/iconLib";
+import EditDocumentModal from "./modal/EditDocumentDrawer";
 
 const Documents: React.FC = () => {
   const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [model] = useState<string>("");
   const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
-  const { mutate: deleteCategory } = useDeleteCategory();
+  const { mutate } = useDeleteDoc();
   const [selectedDoc, setSelectedDoc] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isDrawerVisible, setIsDrawerVisible] = useState(false);
 
   // Pass model into CategoriesList
-  const { queueData, isLoading, isError } = DocsList(
+  const { queueData, next, isLoading, isError } = DocsList(
     currentPage,
     model,
     refreshKey
   );
 
-  const handleDelete = (categoryId: string) => {
+  const totalPages = next ? currentPage + 1 : currentPage;
+
+  const handleEdit = (blog: any) => {
+    setSelectedDoc(blog); // Set blog to be edited
+    setIsDrawerVisible(true); // Open the drawer
+  };
+
+  const handleDelete = (blogId: string) => {
     // Show confirmation dialog before deletion
     Modal.confirm({
       title: "Xác nhận xóa",
-      content: "Bạn có chắc chắn muốn xóa thể loại này?",
+      content: "Bạn có chắc chắn muốn xóa tài liệu này?",
       okText: "Xóa",
       okType: "danger",
       cancelText: "Hủy",
       onOk: () => {
-        deleteCategory(categoryId);
+        mutate(blogId);
       },
     });
   };
@@ -102,7 +115,7 @@ const Documents: React.FC = () => {
           <Button danger onClick={() => handleDelete(record.id)}>
             <MdOutlineDelete className="text-albert-error" />
           </Button>
-          <Button>
+          <Button type="primary" onClick={() => handleEdit(record)}>
             <FaRegEdit />
           </Button>
         </>
@@ -122,6 +135,11 @@ const Documents: React.FC = () => {
   const handleModalClose = () => {
     setIsModalVisible(false);
     setSelectedDoc(null);
+  };
+
+  const handleDrawerClose = () => {
+    setSelectedDoc(null);
+    setIsDrawerVisible(false); // Close the drawer
   };
 
   const handleRefresh = () => {
@@ -168,17 +186,36 @@ const Documents: React.FC = () => {
             }}
           />
         </div>
-        <div style={{ marginTop: "16px", textAlign: "center" }}>
-          <Button
-            disabled={currentPage === 1}
+        <div className="flex justify-center mt-8 items-center space-x-2">
+          <button
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className={`flex items-center justify-center w-6 h-6 text-10 bg-gray-200 rounded-full hover:bg-gray-300 ${
+              currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
-            Previous
-          </Button>
-          <span style={{ margin: "0 8px" }}>Page {currentPage}</span>
-          <Button onClick={() => setCurrentPage((prev) => prev + 1)}>
-            Next
-          </Button>
+            <FaArrowLeft />
+          </button>
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentPage(i + 1)}
+              className={`w-6 h-6 text-10 rounded-full hover:bg-gray-300 ${
+                currentPage === i + 1 ? "bg-blue-500 text-white" : "bg-gray-200"
+              }`}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button
+            onClick={() => setCurrentPage((prev) => prev + 1)}
+            disabled={!next}
+            className={`flex items-center justify-center w-6 h-6 text-10 bg-gray-200 rounded-full hover:bg-gray-300 ${
+              !next ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+          >
+            <FaArrowRight />
+          </button>
         </div>
         <DocumentCategoriesTable />
         <DocumentQueueList />
@@ -187,6 +224,11 @@ const Documents: React.FC = () => {
         visible={isModalVisible}
         onClose={handleModalClose}
         doc={selectedDoc}
+      />
+      <EditDocumentModal
+        open={isDrawerVisible}
+        onClose={handleDrawerClose}
+        document={selectedDoc} // Pass selected blog to EditBlogModal
       />
     </>
   );

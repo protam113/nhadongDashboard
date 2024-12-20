@@ -72,17 +72,15 @@ const MissioDetailsDrawer: React.FC<BlogDetailsDrawerProps> = ({
         <strong>Thể loại:</strong>
       </Paragraph>
       <div className="flex flex-wrap gap-2 mb-4">
-        {blog.categories && blog.categories.length > 0 ? (
-          blog.categories.map((category: any) => (
-            <span
-              key={category.id}
-              className="bg-indigo-500 text-white py-1 px-3 rounded-full text-sm"
-            >
-              {category.name}
-            </span>
-          ))
+        {blog.category ? (
+          <span
+            key={blog.category.id}
+            className="bg-indigo-500 text-white py-1 px-3 rounded-full text-sm"
+          >
+            {blog.category.name}
+          </span>
         ) : (
-          <span>No categories available</span>
+          <span>No category available</span>
         )}
       </div>
 
@@ -103,11 +101,6 @@ const MissioDetailsDrawer: React.FC<BlogDetailsDrawerProps> = ({
           <Paragraph className="text-gray-600 mb-1">
             <strong>Email:</strong> {blog.user.email}
           </Paragraph>
-          {blog.user.phone_number && (
-            <Paragraph className="text-gray-600 mb-1">
-              <strong>Số điện thoại:</strong> {blog.user.phone_number}
-            </Paragraph>
-          )}
         </div>
       </div>
       <div className="flex justify-end mt-4">

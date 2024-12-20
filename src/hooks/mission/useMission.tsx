@@ -6,7 +6,12 @@ import { endpoints } from "@/apis/api";
 import { useAuth } from "@/context/authContext";
 import { useEffect, useState } from "react";
 import { message } from "antd";
-import { FetchDocsListResponse, Filters, NewDocs } from "@/types/types";
+import {
+  FetchDocsListResponse,
+  Filters,
+  NewDocs,
+  EditDocs,
+} from "@/types/types";
 
 const fetchMissionlist = async (
   pageParam: number = 1,
@@ -208,85 +213,99 @@ const useDeleteMission = () => {
   });
 };
 
-// /**
-//  Sửa Blog
-//  **/
+/**
+ Sửa Mission
+ **/
 
-// const EditBlog = async (editBlog: NewBlog, blogId: string, token: string) => {
-//   const formData = new FormData();
+const EditMission = async (
+  editDoc: EditDocs,
+  blogId: string,
+  token: string
+) => {
+  const formData = new FormData();
 
-//   if (!token) throw new Error("No token available");
+  if (!token) throw new Error("No token available");
 
-//   for (const key in editBlog) {
-//     const value = editBlog[key as keyof NewBlog];
+  // Duyệt qua các trường trong editBlog
+  for (const key in editDoc) {
+    const value = editDoc[key as keyof EditDocs];
 
-//     if (key === "content") {
-//       // Xử lý content nếu là object hoặc JSON string
-//       formData.append(key, JSON.stringify(value));
-//     } else if (key === "category" && Array.isArray(value)) {
-//       value.forEach((id) => formData.append("category", id)); // Gửi từng ID
-//     } else if (key === "image" && typeof value === "string") {
-//       // Nếu là URL hình ảnh
-//       formData.append(key, value);
-//     } else if (key === "image" && Array.isArray(value)) {
-//       // Nếu là mảng hình ảnh tải lên
-//       value.forEach((file) => {
-//         formData.append("image", file);
-//       });
-//     } else if (value) {
-//       // Thêm các trường khác
-//       formData.append(key, value as string);
-//     }
-//   }
+    if (key === "category") {
+      // Nếu là mảng, lấy giá trị đầu tiên; nếu không, giữ nguyên giá trị
+      if (typeof value === "string") {
+        formData.append("category", value); // Nếu đã là string thì truyền trực tiếp
+      }
+    } else if (key === "image") {
+      // Xử lý trường image
+      if (typeof value === "string") {
+        // Nếu là URL, thêm vào formData
+        formData.append("image", value); // Thêm URL vào FormData
+      } else if (Array.isArray(value)) {
+        value.forEach((file) => {
+          // Kiểm tra nếu file là đối tượng kiểu File
+          if (file instanceof File) {
+            formData.append("image", file); // Thêm từng file vào FormData
+          }
+        });
+      }
+    } else if (value !== null && value !== undefined) {
+      // Thêm các trường khác vào formData
+      formData.append(key, value as string);
+    }
+  }
 
-//   try {
-//     const response = await handleAPI(
-//       `${endpoints.blog.replace(":id", blogId)}`,
-//       "PATCH",
-//       formData, // Gửi formData trong body request
-//       token
-//     );
-//     return response.data;
-//   } catch (error: any) {
-//     console.error("Error editing blog:", error.response?.data);
-//     throw new Error(error.response?.data?.message || "Failed to edit blog");
-//   }
-// };
+  try {
+    if (!endpoints.mission) {
+      throw null;
+    }
+    // Gửi API
+    const response = await handleAPI(
+      `${endpoints.mission.replace(":id", blogId)}`,
+      "PATCH",
+      formData,
+      token
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error("API Error:", error.response?.data || error.message);
+    throw error;
+  }
+};
 
-// const useEditBlog = () => {
-//   const queryClient = useQueryClient();
-//   const { getToken } = useAuth();
-//   const [token, setToken] = useState<string | null>(null);
+const useEditMission = () => {
+  const queryClient = useQueryClient();
+  const { getToken } = useAuth();
+  const [token, setToken] = useState<string | null>(null);
 
-//   useEffect(() => {
-//     const fetchToken = async () => {
-//       const userToken = await getToken();
-//       setToken(userToken);
-//     };
-//     fetchToken();
-//   }, [getToken]);
+  useEffect(() => {
+    const fetchToken = async () => {
+      const userToken = await getToken();
+      setToken(userToken);
+    };
+    fetchToken();
+  }, [getToken]);
 
-//   return useMutation({
-//     mutationFn: async ({
-//       editBlog,
-//       blogId,
-//     }: {
-//       editBlog: NewBlog;
-//       blogId: string;
-//     }) => {
-//       if (!token) {
-//         throw new Error("Token is not available");
-//       }
-//       return EditBlog(editBlog, blogId, token);
-//     },
-//     onSuccess: () => {
-//       message.success("Sửa Bài Viết Thành Công!");
-//       queryClient.invalidateQueries({ queryKey: ["blogList"] });
-//     },
-//     onError: (error: any) => {
-//       message.error(error.message || "Failed to edit blog.");
-//     },
-//   });
-// };
+  return useMutation({
+    mutationFn: async ({
+      editDoc,
+      blogId,
+    }: {
+      editDoc: EditDocs;
+      blogId: string;
+    }) => {
+      if (!token) {
+        throw new Error("Token is not available");
+      }
+      return EditMission(editDoc, blogId, token);
+    },
+    onSuccess: () => {
+      message.success("Sửa Sứ Vụ Thành Công!");
+      queryClient.invalidateQueries({ queryKey: ["missionList"] });
+    },
+    onError: (error: any) => {
+      message.error(error.message || "Failed to edit blog.");
+    },
+  });
+};
 
-export { useMissionList, useCreateMission, useDeleteMission };
+export { useMissionList, useCreateMission, useDeleteMission, useEditMission };

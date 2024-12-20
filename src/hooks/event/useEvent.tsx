@@ -77,6 +77,10 @@ const useEventList = (
   });
 };
 
+/** 
+ Tạo Tin Sự Kiện
+**/
+
 const CreateEvent = async (newDoc: NewEvent, token: string) => {
   const formData = new FormData();
 
@@ -148,4 +152,60 @@ const useCreateEvent = () => {
   });
 };
 
-export { useEventList, useCreateEvent };
+/** 
+ Xóa Tin Sự Kiện
+**/
+
+const DeleteEvent = async (blogId: string, token: string) => {
+  if (!token) throw new Error("No token available");
+
+  try {
+    if (!endpoints.event) {
+      throw null;
+    }
+    const response = await handleAPI(
+      `${endpoints.event.replace(":id", blogId)}`,
+      "DELETE",
+      null,
+      token
+    );
+    return response.data;
+  } catch (error: any) {
+    console.error("Error deleting category:", error.response?.data);
+    throw new Error(
+      error.response?.data?.message || "Failed to delete category"
+    );
+  }
+};
+
+const useDeleteEvent = () => {
+  const queryClient = useQueryClient();
+  const { getToken } = useAuth();
+  const [token, setToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchToken = async () => {
+      const userToken = await getToken();
+      setToken(userToken);
+    };
+    fetchToken();
+  }, [getToken]);
+
+  return useMutation({
+    mutationFn: async (blogId: string) => {
+      if (!token) {
+        throw new Error("Token is not available");
+      }
+      return DeleteEvent(blogId, token);
+    },
+    onSuccess: () => {
+      message.success("Xóa Sự Kiện Thành Công!");
+      queryClient.invalidateQueries({ queryKey: ["docsList"] });
+    },
+    onError: (error: any) => {
+      console.error(error.message || "Failed to delete category.");
+    },
+  });
+};
+
+export { useEventList, useCreateEvent, useDeleteEvent };

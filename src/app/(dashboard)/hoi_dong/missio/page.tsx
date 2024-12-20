@@ -14,6 +14,7 @@ import PushButton from "@/components/Button/PushButton";
 import { useDeleteMission } from "@/hooks/mission/useMission";
 import MissioDetailsDrawer from "./missioDetailModal";
 import { FaArrowLeft, FaArrowRight } from "@/lib/iconLib";
+import EditMissionModal from "./drawer/EditMission";
 
 const Page: React.FC = () => {
   const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
@@ -22,6 +23,8 @@ const Page: React.FC = () => {
   const [selectedBlog, setSelectedBlog] = useState(null); // State for selected blog
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const { mutate } = useDeleteMission();
+  const [selectedDoc, setSelectedDoc] = useState(null);
+  const [isDrawerVisible, setIsDrawerVisible] = useState(false);
 
   // Pass model into CategoriesList
   const { queueData, next, isLoading, isError } = MissionList(
@@ -32,6 +35,10 @@ const Page: React.FC = () => {
 
   const totalPages = next ? currentPage + 1 : currentPage;
 
+  const handleEdit = (blog: any) => {
+    setSelectedDoc(blog); // Set blog to be edited
+    setIsDrawerVisible(true); // Open the drawer
+  };
   const handleDelete = (postId: string) => {
     // Show confirmation dialog before deletion
     Modal.confirm({
@@ -101,7 +108,7 @@ const Page: React.FC = () => {
           <Button danger onClick={() => handleDelete(record.id)}>
             <MdOutlineDelete className="text-albert-error" />
           </Button>
-          <Button>
+          <Button type="primary" onClick={() => handleEdit(record)}>
             <FaRegEdit />
           </Button>
         </>
@@ -120,6 +127,7 @@ const Page: React.FC = () => {
   const handleDrawerClose = () => {
     setIsDrawerOpen(false);
     setSelectedBlog(null);
+    setIsDrawerVisible(false); // Close the drawer
   };
 
   const handleRefresh = () => {
@@ -194,6 +202,11 @@ const Page: React.FC = () => {
         open={isDrawerOpen}
         onClose={handleDrawerClose}
         blog={selectedBlog}
+      />
+      <EditMissionModal
+        open={isDrawerVisible}
+        onClose={handleDrawerClose}
+        document={selectedDoc} // Pass selected blog to EditBlogModal
       />
     </>
   );

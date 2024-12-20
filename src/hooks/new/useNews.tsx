@@ -6,7 +6,12 @@ import { endpoints } from "@/apis/api";
 import { useAuth } from "@/context/authContext";
 import { useEffect, useState } from "react";
 import { message } from "antd";
-import {EditPost, FetchBLogsListResponse, Filters, NewPost} from "@/types/types";
+import {
+  EditPost,
+  FetchBLogsListResponse,
+  Filters,
+  NewPost,
+} from "@/types/types";
 
 const fetchNewslist = async (
   pageParam: number = 1,
@@ -88,10 +93,7 @@ const CreateNews = async (newNews: NewPost, token: string) => {
   for (const key in newNews) {
     const value = newNews[key as keyof NewPost];
 
-    if (key === "content") {
-      // Xử lý content nếu là object hoặc JSON string
-      formData.append(key, JSON.stringify(value));
-    } else if (key === "category" && Array.isArray(value)) {
+    if (key === "category" && Array.isArray(value)) {
       value.forEach((id) => formData.append("category", id)); // Gửi từng ID
     } else if (key === "image" && typeof value === "string") {
       // Nếu là URL hình ảnh
@@ -249,10 +251,10 @@ const EditNews = async (editNews: EditPost, blogId: string, token: string) => {
     }
     // Gửi API
     const response = await handleAPI(
-        `${endpoints.new.replace(":id", blogId)}`,
-        "PATCH",
-        formData,
-        token
+      `${endpoints.new.replace(":id", blogId)}`,
+      "PATCH",
+      formData,
+      token
     );
     return response.data;
   } catch (error: any) {
@@ -276,9 +278,9 @@ const useEditNews = () => {
 
   return useMutation({
     mutationFn: async ({
-                         editNews,
-                         blogId,
-                       }: {
+      editNews,
+      blogId,
+    }: {
       editNews: EditPost;
       blogId: string;
     }) => {
@@ -296,4 +298,5 @@ const useEditNews = () => {
     },
   });
 };
-export { useNewsList, useCreateNews, useDeleteNews ,useEditNews};
+
+export { useNewsList, useCreateNews, useDeleteNews, useEditNews };

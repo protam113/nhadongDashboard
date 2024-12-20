@@ -1,5 +1,4 @@
 // types.ts
-import {RcFile} from "antd/es/upload";
 
 /**
  authContext Interface
@@ -88,6 +87,18 @@ export interface Blog {
     categories: Category[];
 }
 
+export interface Document {
+  id: string;
+  title: string;
+  description: string;
+  content: string;
+  link: string;
+  image: string;
+  created_date: string;
+  updated_date: string;
+  category: Category;
+}
+
 
 
 /**
@@ -121,6 +132,18 @@ export interface NewDocs {
     category: string; // Mảng danh mục
     image: File[] | string;
   }
+
+  
+  export interface EditDocs {
+    title: string | null;
+    description: string | null;
+    content: string | null; // Mảng nội dung chi tiết
+    link: string | null;
+    category: string | null; // Mảng danh mục
+    image: File[] | string | null; // Hình ảnh chính cho bài viết
+    category_remove:string | null;
+  }
+
 
 /**
  Event Interface
@@ -202,7 +225,7 @@ export interface DocsList {
     content: string; // Có thể cần điều chỉnh nếu cấu trúc khác
     link: string;
     image: string | null; // Chỉnh sửa để phù hợp với giá trị null trong JSON
-    categories: Category[];
+    category: Category;
     user: User; // Sử dụng interface User đã khai báo ở trên
 }
 
@@ -417,7 +440,10 @@ interface PostCategory {
     link: string | null;
     category: string[] | null; // Mảng danh mục
     image: File[] | string | null; // Hình ảnh chính cho bài viết
+    category_remove:string[] | null;
   }
+
+
 
   
 /**

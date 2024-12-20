@@ -18,6 +18,7 @@ import { Blog } from "@/types/types";
 import { CategoriesList } from "@/lib/categoriesList";
 import { UploadFile } from "antd/lib/upload/interface";
 import { useEditBlog } from "@/hooks/blog/useBlog";
+import EditContentSection from "@/components/main/blog/EditContentSection";
 
 interface EditBlogModalProps {
   open: boolean;
@@ -33,6 +34,7 @@ const EditBlogModal: React.FC<EditBlogModalProps> = ({
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [initialCategories, setInitialCategories] = useState<string[]>([]);
   const [previewImage] = useState<string>("");
   const [previewOpen, setPreviewOpen] = useState<boolean>(false);
   const { queueData, isLoading, isError } = CategoriesList(1, "blog", 0);
@@ -40,19 +42,19 @@ const EditBlogModal: React.FC<EditBlogModalProps> = ({
 
   useEffect(() => {
     if (blog) {
-      // Lấy danh sách ID thể loại đã chọn
       const categoryIds =
         blog.categories?.map((category) => category.id.toString()) || [];
+      setInitialCategories(categoryIds); // Lưu thể loại ban đầu
+      setSelectedCategories(categoryIds);
 
-      // Gán dữ liệu ban đầu vào form
       form.setFieldsValue({
         title: blog.title,
         description: blog.description,
+        content: blog.content,
         link: blog.link,
         category: categoryIds,
       });
 
-      // Xử lý hình ảnh cho Upload
       if (blog.image) {
         setFileList([
           {
@@ -63,9 +65,6 @@ const EditBlogModal: React.FC<EditBlogModalProps> = ({
           },
         ]);
       }
-
-      // Gán thể loại đã chọn
-      setSelectedCategories(categoryIds);
     }
   }, [blog, form]);
 
@@ -80,23 +79,26 @@ const EditBlogModal: React.FC<EditBlogModalProps> = ({
   const handleSubmit = () => {
     if (!blog) {
       console.error("Blog is null, cannot edit.");
-      return; // Dừng nếu blog là null
+      return;
     }
 
     form
       .validateFields()
       .then((values) => {
-        console.log("Form Values:", values); // Debug form values
+        const category_remove = initialCategories.filter(
+          (category) => !selectedCategories.includes(category)
+        );
+
         const editBlog = {
           ...values,
           category: selectedCategories,
+          category_remove,
           image: fileList.map((file) => file.originFileObj || file.url),
         };
 
-        console.log("Updated Data:", editBlog); // Debug data gửi lên API
         editBlogMutation({
           editBlog: editBlog,
-          blogId: blog.id, // ID bài viết cần sửa
+          blogId: blog.id,
         });
       })
       .catch((info) => {
@@ -139,6 +141,19 @@ const EditBlogModal: React.FC<EditBlogModalProps> = ({
               <Input.TextArea rows={4} placeholder="Nhập mô tả" />
             </Form.Item>
           </Col>
+          <Col span={24}>
+            <Form.Item
+              name="content"
+              label="Nội dung chi tiết"
+              rules={[{ required: true, message: "Hãy nhập nội dung" }]}
+            >
+              <EditContentSection
+                onChange={(content) => form.setFieldValue("content", content)}
+                initialContent={blog?.content || ""}
+              />
+            </Form.Item>
+          </Col>
+
           <Col span={12}>
             <Form.Item
               name="link"

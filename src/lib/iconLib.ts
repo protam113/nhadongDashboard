@@ -15,6 +15,7 @@ import { GiIronCross } from "react-icons/gi";
 import { IoDocumentText } from "react-icons/io5";
 import { BiDonateHeart } from "react-icons/bi";
 import { MdOutlineDelete } from "react-icons/md";
+import { FaRegEdit } from "react-icons/fa";
 
 // Export trực tiếp các icon mà không cần khai báo interface
 export {
@@ -37,5 +38,5 @@ export {
     FaArrowLeft, FaArrowRight,
     FaSync,
     BiDonateHeart,
-    MdOutlineDelete,
+    MdOutlineDelete,FaRegEdit,
 };
