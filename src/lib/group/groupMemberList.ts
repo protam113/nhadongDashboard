@@ -17,5 +17,10 @@ export const GroupMemberList = (currentPage: number,groupId:string, refreshKey: 
 
     const queueData = data?.results || [];
 
-    return { queueData, isLoading, isError };
+    return { queueData,
+        next:data?.next,
+        isLoading,
+         isError };
 };
+
+

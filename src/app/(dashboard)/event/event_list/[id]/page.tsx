@@ -6,6 +6,7 @@ import { LoadingOutlined } from "@ant-design/icons";
 import Image from "next/image";
 import { useEventDetail } from "@/hooks/event/useEventDetail";
 import EventRegisterListTable from "@/components/table/EventRegisterListTable";
+import BackButton from "@/components/Button/BackButton";
 
 const Page = () => {
   const { id: blogIdParam } = useParams();
@@ -15,9 +16,9 @@ const Page = () => {
 
   if (isLoading) {
     return (
-      <>
+      <div className="flex items-center justify-center min-h-screen">
         <Spin indicator={<LoadingOutlined style={{ fontSize: 48 }} spin />} />
-      </>
+      </div>
     );
   }
 
@@ -38,8 +39,13 @@ const Page = () => {
   return (
     <div className="flex flex-col gap-8">
       {/* detail */}
+
       <div className="flex gap-8">
         <div className="lg:w-3/5 flex flex-col gap-8">
+          <div>
+            <BackButton />
+          </div>
+
           <h1 className="text-xl md:text-3xl xl:text-4xl 2xl:text-5xl font-semibold">
             {blog.title}
           </h1>

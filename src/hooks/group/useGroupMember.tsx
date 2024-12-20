@@ -79,15 +79,19 @@ const CreateGroupMember = async (
     const value = newGroupMember[key as keyof NewGroupMember];
 
     // Kiểm tra nếu value không phải là null hoặc undefined
-    if (value !== null && value !== undefined) {
-      if (Array.isArray(value)) {
-        value.forEach((v) => formData.append(key, v)); // Nếu là mảng, thêm từng phần tử vào FormData
-      } else {
-        formData.append(key, value as string | Blob); // Nếu là string hoặc File, append trực tiếp
-      }
+    if (key === "image" && typeof value === "string") {
+      // Nếu là URL hình ảnh
+      formData.append(key, value);
+    } else if (key === "image" && Array.isArray(value)) {
+      // Nếu là mảng hình ảnh tải lên
+      value.forEach((file) => {
+        formData.append("image", file);
+      });
+    } else if (value) {
+      // Thêm các trường khác
+      formData.append(key, value as string);
     }
   }
-
   if (!token) throw new Error("No token available");
 
   try {
@@ -132,7 +136,7 @@ const useCreateGroupMember = (groupId: string) => {
       return CreateGroupMember(newGroupMember, groupId, token);
     },
     onSuccess: () => {
-      message.success("Role đã được thêm thành công");
+      message.success("Member đã được thêm thành công");
       queryClient.invalidateQueries({ queryKey: ["groupMemberList"] });
     },
     onError: (error) => {

@@ -1,5 +1,5 @@
 import React from "react";
-import { Drawer, Row, Col, Divider, Avatar } from "antd";
+import { Drawer, Row, Col, Divider, Avatar, Button } from "antd";
 import {
   FaUser,
   FaEnvelope,
@@ -8,6 +8,8 @@ import {
   FaInfoCircle,
   FaCalendar,
 } from "react-icons/fa";
+import { saveAs } from "file-saver";
+import { Document, Packer, Paragraph } from "docx";
 
 const DescriptionItem = ({
   title,
@@ -27,8 +29,89 @@ const DescriptionItem = ({
   </div>
 );
 
-// const formatDate = (date: string) =>
-//   date ? dayjs(date).format("DD/MM/YYYY") : "Không có thông tin!";
+// Hàm tạo file Word
+const generateWordDocument = (member: any) => {
+  const fieldsData = member?.fields_data || {};
+
+  const getFieldValue = (key: string) =>
+    fieldsData[key]?.value || "Không có thông tin!";
+
+  const doc = new Document({
+    sections: [
+      {
+        children: [
+          new Paragraph({
+            text: "Thông Tin Cá Nhân",
+            heading: "Heading1",
+            spacing: { after: 200 },
+          }),
+          new Paragraph(
+            `Họ và Tên: ${getFieldValue("first_name")} ${getFieldValue(
+              "last_name"
+            )}`
+          ),
+          new Paragraph(`Email: ${getFieldValue("email")}`),
+          new Paragraph(`Số Điện Thoại: ${getFieldValue("phone_number")}`),
+          new Paragraph(`Ngày Sinh: ${getFieldValue("dob")}`),
+          new Paragraph(
+            `Mã Ơn Gọi Tu Sĩ: ${getFieldValue("religious_vocation_id")}`
+          ),
+          new Paragraph(`Địa Chỉ: ${getFieldValue("location")}`),
+
+          new Paragraph({
+            text: "Thông Tin Gia Đình",
+            heading: "Heading1",
+            spacing: { before: 400, after: 200 },
+          }),
+          new Paragraph(`Họ Cha: ${getFieldValue("dad_first_name")}`),
+          new Paragraph(`Tên Cha: ${getFieldValue("dad_last_name")}`),
+          new Paragraph(`Họ Mẹ: ${getFieldValue("mom_first_name")}`),
+          new Paragraph(`Tên Mẹ: ${getFieldValue("mom_last_name")}`),
+          new Paragraph(
+            `Tên Anh/Em: ${getFieldValue("brothers_and_sisters_name")}`
+          ),
+          new Paragraph(
+            `Năm Sinh Anh/Em: ${getFieldValue("brothers_and_sisters_year")}`
+          ),
+
+          new Paragraph({
+            text: "Thông Tin Khác",
+            heading: "Heading1",
+            spacing: { before: 400, after: 200 },
+          }),
+          new Paragraph(`Người Rửa Tội: ${getFieldValue("pardoner")}`),
+          new Paragraph(`Ngày Rửa Tội: ${getFieldValue("baptism_day")}`),
+          new Paragraph(`Nơi Rửa Tội: ${getFieldValue("baptismal_at")}`),
+          new Paragraph(
+            `Người Đỡ Đầu Rửa Tội: ${getFieldValue("baptismal_sponsor")}`
+          ),
+          new Paragraph(`Cha Rửa Tội: ${getFieldValue("baptism_day_form")}`),
+          new Paragraph(`Giáo Xứ: ${getFieldValue("parish_hometown")}`),
+          new Paragraph(`Cha Thêm Sức: ${getFieldValue("confirmation_form")}`),
+          new Paragraph(`Nơi Thêm Sức: ${getFieldValue("confirmation_at")}`),
+          new Paragraph(
+            `Người Đỡ Đầu Thêm Sức: ${getFieldValue("confirmation_sponsor")}`
+          ),
+          new Paragraph(
+            `Thánh lễ Thêm Sức: ${getFieldValue("confirmation_mass")}`
+          ),
+          new Paragraph(
+            `Ngày Lần đầu nhận Mình Thánh Chúa: ${getFieldValue(
+              "first_communion_day"
+            )}`
+          ),
+          new Paragraph(
+            `Quá Trình Học Giáo Lý: ${getFieldValue("learning_process")}`
+          ),
+        ],
+      },
+    ],
+  });
+
+  Packer.toBlob(doc).then((blob) => {
+    saveAs(blob, "Thông_Tin_Cá_Nhân.docx");
+  });
+};
 
 const EventRegisterDetail: React.FC<{
   open: boolean;
@@ -58,6 +141,13 @@ const EventRegisterDetail: React.FC<{
           alt="Avatar"
         />
       </Row>
+      <Button
+        type="primary"
+        onClick={() => generateWordDocument(member)}
+        className="mb-4"
+      >
+        Tải Xuống Thông Tin
+      </Button>
       <p className="text-gray-700 text-lg font-semibold mb-4">
         <FaInfoCircle className="mr-2 inline text-gray-700" /> Thông Tin Cá Nhân
       </p>

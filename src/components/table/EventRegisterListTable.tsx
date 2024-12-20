@@ -3,27 +3,26 @@
 import React, { useState } from "react";
 import { Table, Button, Spin } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { FaSync } from "react-icons/fa"; // Import refresh icon
-// import { EyeOutlined } from "@ant-design/icons";
 import Heading from "@/components/design/Heading";
 import { Post } from "@/types/types";
-import {
-  useEventRegisterList,
-  useSubmitEventRegisterList,
-} from "@/hooks/event/useEventRegistion";
+import { useSubmitEventRegisterList } from "@/hooks/event/useEventRegistion";
 import * as XLSX from "xlsx";
+import RegisterList from "@/lib/registerList";
+import { FaArrowLeft, FaArrowRight, FaSync } from "@/lib/iconLib";
 
 const EventRegisterListTable: React.FC<Post> = ({ postId }) => {
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [refreshKey, setRefreshKey] = useState(0);
   const { mutate } = useSubmitEventRegisterList(postId);
-  const { data, isLoading, isError } = useEventRegisterList(
-    postId,
+  const { queueData, next, isLoading, isError } = RegisterList(
     currentPage,
+    postId,
     refreshKey
   );
-  const queueData = data?.results || []; // Danh sách người tham gia
+
+  const totalPages = next ? currentPage + 1 : currentPage;
+
   const handleExportExcel = () => {
     if (!queueData.length) {
       alert("Không có dữ liệu để xuất!");
@@ -31,31 +30,25 @@ const EventRegisterListTable: React.FC<Post> = ({ postId }) => {
     }
 
     // Chuẩn bị dữ liệu Excel
-    const excelData = queueData.map((item, index) => ({
-      STT: index + 1,
-      "Họ và Tên đệm": item.fields_data.first_name?.value || "N/A",
-      Tên: item.fields_data.last_name?.value || "N/A",
-      "Số Điện Thoại": item.fields_data.phone_number?.value || "N/A",
-      Email: item.fields_data.email?.value || "N/A",
-    }));
+    const excelData = queueData.map((item, index) => [
+      index + 1,
+      item.fields_data.first_name?.value || "N/A",
+      item.fields_data.last_name?.value || "N/A",
+      item.fields_data.phone_number?.value || "N/A",
+      item.fields_data.email?.value || "N/A",
+    ]);
 
-    // Tạo một sheet mới với tiêu đề ở trên
-    const worksheet = XLSX.utils.json_to_sheet(excelData, {
-      header: ["STT", "Họ và Tên đệm", "Tên", "Số Điện Thoại", "Email"],
-    });
+    // Thêm tiêu đề
+    const header = ["STT", "Họ và Tên đệm", "Tên", "Số Điện Thoại", "Email"];
+    const title = [["Danh sách đăng ký tham gia sự kiện"]];
+    const finalData = [...title, [], header, ...excelData]; // Ghép dữ liệu
 
-    // Thêm tiêu đề "Danh sách đăng ký tham gia sự kiện" ở đầu file Excel
-    const titleRow = [
-      { value: "Danh sách đăng ký tham gia sự kiện", colspan: 5 },
-    ];
-    const titleWorksheet = XLSX.utils.aoa_to_sheet([titleRow]);
+    // Tạo sheet từ dữ liệu
+    const worksheet = XLSX.utils.aoa_to_sheet(finalData);
 
-    // Tạo workbook và thêm cả tiêu đề và dữ liệu
+    // Tạo workbook và tải file
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, titleWorksheet, "Title");
     XLSX.utils.book_append_sheet(workbook, worksheet, "Danh sách");
-
-    // Tải xuống file Excel
     const filename = `DanhSachSuKien_${postId}.xlsx`;
     XLSX.writeFile(workbook, filename);
   };
@@ -206,17 +199,36 @@ const EventRegisterListTable: React.FC<Post> = ({ postId }) => {
             }}
           />
         </div>
-        <div style={{ marginTop: "16px", textAlign: "center" }}>
-          <Button
-            disabled={currentPage === 1}
+        <div className="flex justify-center mt-8 items-center space-x-2">
+          <button
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className={`flex items-center justify-center w-6 h-6 text-10 bg-gray-200 rounded-full hover:bg-gray-300 ${
+              currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
-            Previous
-          </Button>
-          <span style={{ margin: "0 8px" }}>Page {currentPage}</span>
-          <Button onClick={() => setCurrentPage((prev) => prev + 1)}>
-            Next
-          </Button>
+            <FaArrowLeft />
+          </button>
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentPage(i + 1)}
+              className={`w-6 h-6 text-10 rounded-full hover:bg-gray-300 ${
+                currentPage === i + 1 ? "bg-blue-500 text-white" : "bg-gray-200"
+              }`}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button
+            onClick={() => setCurrentPage((prev) => prev + 1)}
+            disabled={!next}
+            className={`flex items-center justify-center w-6 h-6 text-10 bg-gray-200 rounded-full hover:bg-gray-300 ${
+              !next ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+          >
+            <FaArrowRight />
+          </button>
         </div>
       </div>
     </>

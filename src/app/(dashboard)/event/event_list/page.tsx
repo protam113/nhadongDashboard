@@ -8,6 +8,8 @@ import Heading from "@/components/design/Heading";
 import PushButton from "@/components/Button/PushButton";
 import { useUpdateEvent } from "@/hooks/event/useEventDetail";
 import { FaArrowLeft, FaArrowRight, FaSync } from "@/lib/iconLib";
+import { EyeOutlined } from "@ant-design/icons";
+import { useRouter } from "next/navigation"; // Import useRouter
 
 const Page: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -15,6 +17,7 @@ const Page: React.FC = () => {
   const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
   const [selectedPostId, setSelectedPostId] = useState<string>(""); // State to hold the selected event ID
   const { mutate } = useUpdateEvent(selectedPostId);
+  const router = useRouter(); // Khởi tạo useRouter
 
   // Pass model into CategoriesList
   const { queueData, next, isLoading, isError } = EventList(
@@ -23,6 +26,10 @@ const Page: React.FC = () => {
     refreshKey
   );
   const totalPages = next ? currentPage + 1 : currentPage;
+
+  const handleViewDetails = (record: any) => {
+    router.push(`/event/event_list/${record.id}`); // Chuyển hướng đến URL với ID
+  };
 
   const handleSelectEvent = (postId: string) => {
     setSelectedPostId(postId); // Lưu postId khi người dùng chọn sự kiện
@@ -35,6 +42,17 @@ const Page: React.FC = () => {
       key: "id",
       width: 60,
       render: (text, record, index) => <span>{index + 1}</span>,
+    },
+    {
+      title: "Chi Tiết",
+      dataIndex: "full",
+      key: "full",
+      width: 150,
+      render: (_, record) => (
+        <Button onClick={() => handleViewDetails(record)}>
+          <EyeOutlined /> Xem Chi Tiết
+        </Button>
+      ),
     },
     {
       title: "Tiêu Đề",
@@ -69,7 +87,13 @@ const Page: React.FC = () => {
     },
   ];
 
-  if (isLoading) return <Spin size="large" />;
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Spin size="large" />
+      </div>
+    );
+  }
   if (isError) return <div>Error loading queue data.</div>;
 
   const handleRefresh = () => {
@@ -99,11 +123,6 @@ const Page: React.FC = () => {
             rowKey="id"
             pagination={false}
             scroll={{ y: 500 }}
-            onRow={(record) => ({
-              onClick: () => {
-                window.location.href = `/event/event_list/${record.id}`;
-              },
-            })}
           />
         </div>
         <div className="flex justify-center mt-8 items-center space-x-2">

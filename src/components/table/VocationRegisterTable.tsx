@@ -3,15 +3,13 @@
 import React, { useState } from "react";
 import { Table, Button, Spin } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { FaSync } from "react-icons/fa"; // Import refresh icon
 import { EyeOutlined } from "@ant-design/icons";
 import Heading from "@/components/design/Heading";
 import { Post } from "@/types/types";
-import {
-  useEventRegisterList,
-  useSubmitEventRegisterList,
-} from "@/hooks/event/useEventRegistion";
+import { useSubmitEventRegisterList } from "@/hooks/event/useEventRegistion";
 import EventRegisterDetail from "../drawer/EventRegisterDetail";
+import { FaArrowLeft, FaArrowRight, FaSync } from "@/lib/iconLib";
+import RegisterList from "@/lib/registerList"; // Không cần dấu {}
 
 const VocationRegisterTable: React.FC<Post> = ({ postId }) => {
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
@@ -20,12 +18,13 @@ const VocationRegisterTable: React.FC<Post> = ({ postId }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
   const { mutate } = useSubmitEventRegisterList(postId);
-  const { data, isLoading, isError } = useEventRegisterList(
-    postId,
+
+  const { queueData, next, isLoading, isError } = RegisterList(
     currentPage,
+    postId,
     refreshKey
   );
-  const queueData = data?.results || [];
+  const totalPages = next ? currentPage + 1 : currentPage;
 
   const handleViewDetails = (member: any) => {
     setSelectedMember(member);
@@ -172,12 +171,6 @@ const VocationRegisterTable: React.FC<Post> = ({ postId }) => {
               Approve Selected
             </Button>
           </div>
-          {/* <button
-            onClick={handleExportExcel}
-            className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"
-          >
-            Tải xuống Excel
-          </button> */}
         </div>
         <div className="overflow-auto" style={{ maxHeight: "800px" }}>
           <Table
@@ -193,17 +186,36 @@ const VocationRegisterTable: React.FC<Post> = ({ postId }) => {
             }}
           />
         </div>
-        <div style={{ marginTop: "16px", textAlign: "center" }}>
-          <Button
-            disabled={currentPage === 1}
+        <div className="flex justify-center mt-8 items-center space-x-2">
+          <button
             onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className={`flex items-center justify-center w-6 h-6 text-10 bg-gray-200 rounded-full hover:bg-gray-300 ${
+              currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
-            Previous
-          </Button>
-          <span style={{ margin: "0 8px" }}>Page {currentPage}</span>
-          <Button onClick={() => setCurrentPage((prev) => prev + 1)}>
-            Next
-          </Button>
+            <FaArrowLeft />
+          </button>
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentPage(i + 1)}
+              className={`w-6 h-6 text-10 rounded-full hover:bg-gray-300 ${
+                currentPage === i + 1 ? "bg-blue-500 text-white" : "bg-gray-200"
+              }`}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button
+            onClick={() => setCurrentPage((prev) => prev + 1)}
+            disabled={!next}
+            className={`flex items-center justify-center w-6 h-6 text-10 bg-gray-200 rounded-full hover:bg-gray-300 ${
+              !next ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+          >
+            <FaArrowRight />
+          </button>
         </div>
       </div>
 

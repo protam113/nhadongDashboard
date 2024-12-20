@@ -38,7 +38,14 @@ const Page: React.FC = () => {
     },
   ];
 
-  if (isLoading) return <Spin size="large" />;
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <Spin size="large" />
+      </div>
+    );
+  }
+
   if (isError) return <div>Error loading queue data.</div>;
 
   const handleRefresh = () => {

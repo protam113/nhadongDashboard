@@ -101,7 +101,6 @@ const CreateBlogPage: React.FC = () => {
         image: blogData.image,
       };
 
-      console.log(blogDataToSend);
       createBlogMutation(blogDataToSend); // Call mutation to create blog
       form.resetFields();
       setBlogData({

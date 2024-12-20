@@ -101,6 +101,7 @@ export interface Document {
 
 
 
+
 /**
  New Event Interface
  **/
@@ -323,6 +324,15 @@ export interface FetchDocsListResponse {
   Donation Interface
 */
 
+export interface EditDonation {
+  title: string| null;
+  description: string| null;
+  content: string| null; // Có thể cần điều chỉnh nếu cấu trúc khác
+  link: string| null;
+  image: File[] | string| null; // Chỉnh sửa để phù hợp với giá trị null trong JSON
+  visibility: string| null;
+}
+
 export interface NewDonation {
   title: string;
   description: string;
@@ -331,7 +341,15 @@ export interface NewDonation {
   image: File[] | string; // Chỉnh sửa để phù hợp với giá trị null trong JSON
   visibility: string;
 }
-
+export interface Donation {
+  id: string;
+  title: string;
+  description: string;
+  content: string;
+  link: string;
+  visibility: string;
+  image: string;
+}
 
 
 export interface DonationDetail {
@@ -567,7 +585,7 @@ export interface NewGroupMember {
   link: string;
   dob: Date;
   phone_number:string;
-  image?: File | string[] | null;
+  image: File[] | string;
   role:string;
   join_date: Date;
   first_vows_date: Date | null;

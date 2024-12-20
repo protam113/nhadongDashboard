@@ -39,12 +39,10 @@ const endpoints = {
     blockUser:  process.env.NEXT_PUBLIC_BLOCKED,
 
     //group
-    groups: process.env.NEXT_PUBLIC_BASE_URL,
-    group: process.env.NEXT_PUBLIC_BASE_URL,
-    groupMember: process.env.NEXT_PUBLIC_BASE_URL,
-    groupRole: process.env.NEXT_PUBLIC_BASE_URL,
-
-
+    groups: process.env.NEXT_PUBLIC_GROUPS,
+    group: process.env.NEXT_PUBLIC_GROUP,
+    groupMember: process.env.NEXT_PUBLIC_GROUP_MEMBER,
+    groupRole: process.env.NEXT_PUBLIC_GROUP_ROLE,
 
     //Doc
     documents: process.env.NEXT_PUBLIC_DOCUMENTS,

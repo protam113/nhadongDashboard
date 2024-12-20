@@ -46,9 +46,8 @@ const CreateGroupMember: React.FC<{
     </div>
   );
 
-  const handleChange = ({ fileList: newFileList }: any) => {
-    setFileList(newFileList); // Cập nhật danh sách file
-  };
+  const handleChange = ({ fileList }: { fileList: any }) =>
+    setFileList(fileList);
 
   const handlePreview = async (file: any) => {
     if (!file.url && !file.preview) {
@@ -75,12 +74,15 @@ const CreateGroupMember: React.FC<{
         ? dayjs(values.final_vows_date).format("YYYY-MM-DD")
         : null,
       group: groupId,
-      image: fileList[0]?.thumbUrl || null,
+      image: fileList[0]?.originFileObj ?? null,
     };
 
     // Đảm bảo rằng role là một ID hợp lệ
     if (values.role && typeof values.role === "string") {
       formattedValues.role = values.role; // role là UUID
+    }
+    if (!fileList.length) {
+      delete formattedValues.image; // Xóa trường nếu không có ảnh
     }
 
     mutate(formattedValues);

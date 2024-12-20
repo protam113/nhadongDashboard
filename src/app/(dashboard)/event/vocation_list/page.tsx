@@ -8,13 +8,15 @@ import Heading from "@/components/design/Heading";
 import PushButton from "@/components/Button/PushButton";
 import { useUpdateEvent } from "@/hooks/event/useEventDetail";
 import { FaArrowLeft, FaArrowRight, FaSync } from "@/lib/iconLib";
-
+import { EyeOutlined } from "@ant-design/icons";
+import { useRouter } from "next/navigation";
 const Page: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [category] = useState<string>("vocation"); // State to hold selected model
-  const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
-  const [selectedPostId, setSelectedPostId] = useState<string>(""); // State to hold the selected event ID
+  const [category] = useState<string>("vocation");
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [selectedPostId, setSelectedPostId] = useState<string>("");
   const { mutate } = useUpdateEvent(selectedPostId);
+  const router = useRouter();
 
   // Pass model into CategoriesList
   const { queueData, next, isLoading, isError } = EventList(
@@ -26,7 +28,10 @@ const Page: React.FC = () => {
   const totalPages = next ? currentPage + 1 : currentPage;
 
   const handleSelectEvent = (postId: string) => {
-    setSelectedPostId(postId); // Lưu postId khi người dùng chọn sự kiện
+    setSelectedPostId(postId);
+  };
+  const handleViewDetails = (record: any) => {
+    router.push(`/event/event_list/${record.id}`);
   };
 
   const columns: ColumnsType<any> = [
@@ -36,6 +41,17 @@ const Page: React.FC = () => {
       key: "id",
       width: 60,
       render: (text, record, index) => <span>{index + 1}</span>,
+    },
+    {
+      title: "Chi Tiết",
+      dataIndex: "full",
+      key: "full",
+      width: 150,
+      render: (_, record) => (
+        <Button onClick={() => handleViewDetails(record)}>
+          <EyeOutlined /> Xem Chi Tiết
+        </Button>
+      ),
     },
     {
       title: "Tiêu Đề",
@@ -53,13 +69,12 @@ const Page: React.FC = () => {
         <Select
           defaultValue={text}
           onChange={(newStatus) => {
-            // Send the full object with only status updated
             const updatedEvent = {
-              ...record, // Get all properties of the event
-              status: newStatus, // Update only the status
+              ...record,
+              status: newStatus,
             };
-            mutate(updatedEvent); // Send the full event object to the mutate function
-            handleSelectEvent(record.id); // Now handleSelectEvent is called here
+            mutate(updatedEvent);
+            handleSelectEvent(record.id);
           }}
           options={[
             { value: "open", label: "Open" },
@@ -100,11 +115,6 @@ const Page: React.FC = () => {
             rowKey="id"
             pagination={false}
             scroll={{ y: 500 }}
-            onRow={(record) => ({
-              onClick: () => {
-                window.location.href = `/event/vocation_list/${record.id}`;
-              },
-            })}
           />
         </div>
         <div className="flex justify-center mt-8 items-center space-x-2">

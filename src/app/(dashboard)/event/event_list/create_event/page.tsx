@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Input, Select, Upload, Button, Image, message, Form } from "antd";
+import { Input, Select, Upload, Button, Image, Form } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { RcFile } from "antd/lib/upload";
@@ -29,7 +29,6 @@ const Page = () => {
       category: "event",
       description: description,
     });
-    message.success("Tạo sự kiện thành công!");
     router.back();
   };
 
