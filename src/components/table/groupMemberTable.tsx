@@ -11,7 +11,12 @@ import { GroupMemberList } from "@/lib/group/groupMemberList";
 import GroupMemberDetail from "@/components/drawer/GroupMemberDetail";
 import CreateGroupMember from "@/components/drawer/CreateGroupMember";
 import * as XLSX from "xlsx";
-import { FaArrowLeft, FaArrowRight, FaSync } from "@/lib/iconLib";
+import {
+  FaArrowLeft,
+  FaArrowRight,
+  FaSync,
+  MdOutlineDelete,
+} from "@/lib/iconLib";
 
 const GroupMember: React.FC<GroupMemberData> = ({ groupId, groupName }) => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -139,24 +144,23 @@ const GroupMember: React.FC<GroupMemberData> = ({ groupId, groupName }) => {
         <span>{text ? dayjs(text).format("DD/MM/YYYY") : ""}</span>
       ), // Format date to "DD/MM/YYYY"
     },
-    // {
-    //   title: "Action",
-    //   dataIndex: "action",
-    //   key: "action",
-    //   width: 100,
-    //   render: () => (
-    //     // _: any, record: any
-    //     <>
-    //       <p> delete</p>
-    //       {/*<Button danger onClick={() => handleDelete(record.id)}>*/}
-    //       {/*    <MdOutlineDelete className="text-albert-error" />*/}
-    //       {/*</Button>*/}
-    //       {/*<Button onClick={() => handleEdit(record)}>*/}
-    //       {/*    <FaRegEdit />*/}
-    //       {/*</Button>*/}
-    //     </>
-    //   ),
-    // },
+    {
+      title: "Action",
+      dataIndex: "action",
+      key: "action",
+      width: 100,
+      render: () => (
+        // _: any, record: any
+        <>
+          <Button danger>
+            <MdOutlineDelete className="text-albert-error" />
+          </Button>
+          {/*<Button onClick={() => handleEdit(record)}>*/}
+          {/*    <FaRegEdit />*/}
+          {/*</Button>*/}
+        </>
+      ),
+    },
   ];
 
   if (isLoading) return <Spin size="large" />;

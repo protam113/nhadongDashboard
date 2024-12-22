@@ -9,8 +9,7 @@ import ChatFont from "@/components/main/chatAI/chatFont";
 import ReactMarkdown from "react-markdown"; // Import thư viện
 
 const Page = () => {
-  const [chatView, setChatView] = useState(false); // Xác định chế độ hiển thị
-  const [refreshKey, setRefreshKey] = useState<number>(0);
+  const [refreshKey] = useState<number>(0);
   const { data, isLoading, isError } = useChatList(refreshKey);
   const { mutate } = useChat();
   const [userInput, setUserInput] = useState(""); // Nội dung nhập từ người dùng
@@ -46,7 +45,6 @@ const Page = () => {
 
       // Gửi tin nhắn tới API
       mutate({ content: userInput });
-      setChatView(true);
     }
   };
 

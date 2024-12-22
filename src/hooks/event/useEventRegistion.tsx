@@ -5,38 +5,56 @@ import { handleAPI } from "@/apis/axiosClient";
 import { endpoints } from "@/apis/api";
 import { useAuth } from "@/context/authContext";
 import { useEffect, useState } from "react";
-import { EventRegisterListResponse, SubmitEventRegister } from "@/types/types";
+import {
+  EventRegisterListResponse,
+  SubmitEventRegister,
+  Filters,
+} from "@/types/types";
 import { message } from "antd";
 
 const fetchEventRegisterList = async (
   pageParam: number = 1,
   postId: string,
-  token: string
+  token: string,
+  filters: Filters
 ): Promise<EventRegisterListResponse> => {
   if (!token) {
     throw new Error("No token provided");
   }
   try {
-    // Construct the query string
+    // Lọc filters hợp lệ
+    const validFilters = Object.fromEntries(
+      Object.entries(filters).filter(
+        ([, value]) => value !== undefined && value !== ""
+      )
+    );
+
+    // Tạo query string từ filters
     const queryString = new URLSearchParams({
       page: pageParam.toString(),
+      ...validFilters, // Thêm filters hợp lệ vào query string
     }).toString();
+
     if (!endpoints.eventRegister) {
       throw null;
     }
-    // Gửi request với token nếu có, không thì bỏ qua
-    const response = await handleAPI(
-      `${endpoints.eventRegister.replace(":id", postId)}${
-        queryString ? `?${queryString}` : ""
-      }`,
+    // Xây dựng URL endpoint chính xác
+    const apiUrl = endpoints.eventRegister.replace(":id", postId);
 
+    if (!apiUrl) {
+      throw new Error("API endpoint không khả dụng");
+    }
+
+    // Gửi request đến API
+    const response = await handleAPI(
+      `${apiUrl}${queryString ? `?${queryString}` : ""}`,
       "GET",
       null,
-      token // Token chỉ được thêm nếu không null
+      token
     );
     return response;
   } catch (error) {
-    console.error("Lỗi khi tải chi tiết bài viết:", error);
+    console.error("Lỗi khi tải danh sách đăng ký sự kiện:", error);
     throw error;
   }
 };
@@ -45,6 +63,7 @@ const fetchEventRegisterList = async (
 const useEventRegisterList = (
   postId: string,
   page: number,
+  filters: Filters = {},
   refreshKey: number
 ) => {
   const { getToken } = useAuth();
@@ -61,12 +80,12 @@ const useEventRegisterList = (
   }, [getToken]);
 
   return useQuery<EventRegisterListResponse, Error>({
-    queryKey: ["eventRegisterList", token, postId, page, refreshKey],
+    queryKey: ["eventRegisterList", token, postId, page, filters, refreshKey],
     queryFn: async () => {
       if (!token) {
         throw new Error("Token is not available");
       }
-      return fetchEventRegisterList(page, postId, token);
+      return fetchEventRegisterList(page, postId, token, filters);
     },
     enabled: !!postId,
     staleTime: 60000,

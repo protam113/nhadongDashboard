@@ -17,7 +17,6 @@ import { FaArrowLeft, FaArrowRight } from "@/lib/iconLib";
 const { Title } = Typography;
 
 const NewsManagement: React.FC = () => {
-  const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [model] = useState<string>(""); // State to hold selected model
   const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
@@ -28,7 +27,7 @@ const NewsManagement: React.FC = () => {
   const [selectedBlog, setSelectedBlog] = useState(null);
 
   // Pass model into CategoriesList
-  const { queueData,next, isLoading, isError } = NewsList(
+  const { queueData, next, isLoading, isError } = NewsList(
     currentPage,
     model,
     refreshKey
@@ -40,7 +39,6 @@ const NewsManagement: React.FC = () => {
     setSelectedBlog(blog); // Set blog to be edited
     setIsDrawerVisible(true); // Open the drawer
   };
-
 
   const handleDelete = (newsId: string) => {
     // Show confirmation dialog before deletion
@@ -63,9 +61,9 @@ const NewsManagement: React.FC = () => {
       key: "full",
       width: 150,
       render: (_, record) => (
-          <Button onClick={() => handleViewDetails(record)}>
-            <EyeOutlined /> Xem Chi Tiết
-          </Button>
+        <Button onClick={() => handleViewDetails(record)}>
+          <EyeOutlined /> Xem Chi Tiết
+        </Button>
       ),
     },
     {
@@ -154,69 +152,64 @@ const NewsManagement: React.FC = () => {
 
         {/* Model selection */}
         <div className="flex justify-between items-center mb-4">
-          <Button onClick={handleRefresh} style={{marginLeft: "8px"}}>
-            <FaSync/> Làm mới
+          <Button onClick={handleRefresh} style={{ marginLeft: "8px" }}>
+            <FaSync /> Làm mới
           </Button>
           <Button type="primary" onClick={handleCreateBLog}>
             Tạo Tin Tức
           </Button>
         </div>
 
-        <div className="overflow-auto" style={{maxHeight: "800px"}}>
+        <div className="overflow-auto" style={{ maxHeight: "800px" }}>
           <Table
-              columns={columns}
-              dataSource={queueData}
-              rowKey="id"
-              pagination={false}
-              scroll={{y: 500}}
-              rowSelection={{
-                selectedRowKeys: selectedKeys,
-                onChange: (selectedRowKeys) =>
-                    setSelectedKeys(selectedRowKeys as number[]),
-              }}
+            columns={columns}
+            dataSource={queueData}
+            rowKey="id"
+            pagination={false}
+            scroll={{ y: 500 }}
           />
         </div>
         <div className="flex justify-center mt-8 items-center space-x-2">
           <button
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className={`flex items-center justify-center w-6 h-6 text-10 bg-gray-200 rounded-full hover:bg-gray-300 ${
-                  currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
-              }`}
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className={`flex items-center justify-center w-6 h-6 text-10 bg-gray-200 rounded-full hover:bg-gray-300 ${
+              currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
-            <FaArrowLeft/>
+            <FaArrowLeft />
           </button>
-          {Array.from({length: totalPages}, (_, i) => (
-              <button
-                  key={i}
-                  onClick={() => setCurrentPage(i + 1)}
-                  className={`w-6 h-6 text-10 rounded-full hover:bg-gray-300 ${
-                      currentPage === i + 1 ? "bg-blue-500 text-white" : "bg-gray-200"
-                  }`}
-              >
-                {i + 1}
-              </button>
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentPage(i + 1)}
+              className={`w-6 h-6 text-10 rounded-full hover:bg-gray-300 ${
+                currentPage === i + 1 ? "bg-blue-500 text-white" : "bg-gray-200"
+              }`}
+            >
+              {i + 1}
+            </button>
           ))}
           <button
-              onClick={() => setCurrentPage((prev) => prev + 1)}
-              disabled={!next}
-              className={`flex items-center justify-center w-6 h-6 text-10 bg-gray-200 rounded-full hover:bg-gray-300 ${
-                  !next ? "opacity-50 cursor-not-allowed" : ""
-              }`}
+            onClick={() => setCurrentPage((prev) => prev + 1)}
+            disabled={!next}
+            className={`flex items-center justify-center w-6 h-6 text-10 bg-gray-200 rounded-full hover:bg-gray-300 ${
+              !next ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
-            <FaArrowRight/>
+            <FaArrowRight />
           </button>
         </div>
       </div>
       <NewsDetailsModal
-          open={isDrawerOpen}
-          onClose={handleDrawerClose}
-          blog={selectedBlog}
+        open={isDrawerOpen}
+        onClose={handleDrawerClose}
+        blog={selectedBlog}
       />
       <EditNewsModal
-          open={isDrawerVisible}
-          onClose={handleDrawerClose}
-          news={selectedBlog} // Pass selected blog to EditBlogModal
+        open={isDrawerVisible}
+        onClose={handleDrawerClose}
+        news={selectedBlog} // Pass selected blog to EditBlogModal
       />
     </>
   );

@@ -58,7 +58,6 @@ const Page = () => {
       {/* Nút quay lại */}
       <BackButton />
       <Heading name="tạo sự kiện mới " />
-
       {/* Form */}
       <Form form={form} layout="vertical" onFinish={handleSubmit}>
         {/* Tên sự kiện */}

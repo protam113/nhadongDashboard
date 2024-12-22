@@ -31,7 +31,7 @@ const Page: React.FC = () => {
     setSelectedPostId(postId);
   };
   const handleViewDetails = (record: any) => {
-    router.push(`/event/event_list/${record.id}`);
+    router.push(`/event/vocation_list/${record.id}`);
   };
 
   const columns: ColumnsType<any> = [

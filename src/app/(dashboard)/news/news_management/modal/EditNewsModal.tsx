@@ -92,9 +92,13 @@ const EditNewsModal: React.FC<EditBlogModalProps> = ({
         const editBlog = {
           ...values,
           category: selectedCategories,
-          category_remove,
           image: fileList.map((file) => file.originFileObj || file.url),
         };
+
+        // Chỉ thêm `category_remove` nếu không rỗng
+        if (category_remove.length > 0) {
+          editBlog.category_remove = category_remove;
+        }
 
         editBlogMutation({
           editNews: editBlog,

@@ -1,7 +1,7 @@
 "use client"; // Ensures this is a client component
 
 import React, { useState } from "react";
-import { Table, Button, Spin, Modal } from "antd";
+import { Table, Button, Spin, Modal, Select } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { FaSync } from "react-icons/fa"; // Import refresh icon
 import { EyeOutlined } from "@ant-design/icons";
@@ -17,28 +17,37 @@ import {
 } from "@/lib/iconLib";
 import PushButton from "@/components/Button/PushButton";
 import DonationDetailDrawer from "@/components/drawer/DonationDetailDrawer";
-import { useDeleteDonation } from "@/hooks/donation/useDonation";
+import {
+  useDeleteDonation,
+  useEditDonation,
+} from "@/hooks/donation/useDonation";
 import EditDonationModal from "./drawer/EditDonation";
 
 const Page: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [category] = useState<string>(""); // State to hold selected model
+  const [visibility] = useState<string>("show"); // State to hold selected model
   const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedBlog, setSelectedBlog] = useState(null); // State for selected blog
   const { mutate } = useDeleteDonation();
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
+  const [selectedPostId, setSelectedPostId] = useState<string>(""); // State to hold the selected event ID
+  const { mutate: updateDonation } = useEditDonation();
 
   // Pass model into CategoriesList
   const { queueData, next, isLoading, isError } = DonateList(
     currentPage,
-    category,
+    visibility,
     refreshKey
   );
 
   const handleEdit = (blog: any) => {
     setSelectedBlog(blog); // Set blog to be edited
     setIsDrawerVisible(true); // Open the drawer
+  };
+
+  const handleSelectDonation = (postId: string) => {
+    setSelectedPostId(postId); // Lưu postId khi người dùng chọn sự kiện
   };
 
   const handleDelete = (categoryId: string) => {
@@ -88,7 +97,27 @@ const Page: React.FC = () => {
       dataIndex: "visibility",
       key: "visibility",
       width: 400,
-      render: (text) => <span>{text}</span>,
+      render: (text, record) => (
+        <Select
+          defaultValue={text}
+          onChange={(newStatus) => {
+            // Send the full object with only status updated
+            const updatedEvent = {
+              ...record, // Get all properties of the event
+              visibility: newStatus, // Update only the status
+            };
+            updateDonation({
+              editDonation: updatedEvent,
+              blogId: selectedPostId,
+            }); // Send the full event object to the mutate function
+            handleSelectDonation(record.id); // Now handleSelectEvent is called here
+          }}
+          options={[
+            { value: "show", label: "Mở" },
+            { value: "hide", label: "Đóng" },
+          ]}
+        />
+      ),
     },
     {
       title: "Action",

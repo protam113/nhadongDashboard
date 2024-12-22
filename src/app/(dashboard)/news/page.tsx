@@ -12,7 +12,6 @@ import { FaArrowLeft, FaArrowRight } from "@/lib/iconLib";
 import Heading from "@/components/design/Heading";
 
 const News: React.FC = () => {
-  const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [model] = useState<string>(""); // State to hold selected model
   const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
@@ -118,11 +117,6 @@ const News: React.FC = () => {
             rowKey="id"
             pagination={false}
             scroll={{ y: 500 }}
-            rowSelection={{
-              selectedRowKeys: selectedKeys,
-              onChange: (selectedRowKeys) =>
-                setSelectedKeys(selectedRowKeys as number[]),
-            }}
           />
         </div>
         <div className="flex justify-center mt-8 items-center space-x-2">

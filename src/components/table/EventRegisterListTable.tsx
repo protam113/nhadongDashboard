@@ -1,7 +1,7 @@
 "use client"; // Ensures this is a client component
 
 import React, { useState } from "react";
-import { Table, Button, Spin } from "antd";
+import { Table, Button, Spin, Select, message } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import Heading from "@/components/design/Heading";
 import { Post } from "@/types/types";
@@ -14,11 +14,14 @@ const EventRegisterListTable: React.FC<Post> = ({ postId }) => {
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [refreshKey, setRefreshKey] = useState(0);
+  const [status, setStatus] = useState<string>("pending");
   const { mutate } = useSubmitEventRegisterList(postId);
+
   const { queueData, next, isLoading, isError } = RegisterList(
-    currentPage,
-    postId,
-    refreshKey
+    currentPage, // Correctly pass currentPage
+    postId, // Ensure postId is a valid UUID, not "pending"
+    status, // status will be "pending"
+    refreshKey // refreshKey for manual refresh
   );
 
   const totalPages = next ? currentPage + 1 : currentPage;
@@ -145,17 +148,49 @@ const EventRegisterListTable: React.FC<Post> = ({ postId }) => {
 
     // Ensure that we have selected data
     if (selectedData.length === 0) {
-      alert("No participants selected.");
+      message.warning("Không có id nào được chọn !.");
       return;
     }
 
-    // Submit each selected registration
-    selectedData.forEach((item) => {
-      mutate({
-        registration_id: item.id,
-        status: "approve",
-      });
-    });
+    try {
+      // Submit each selected registration
+      await Promise.all(
+        selectedData.map((item) =>
+          mutate({
+            registration_id: item.id,
+            status: "approve",
+          })
+        )
+      );
+    } catch (error) {
+      console.error("Error approving selected registrations:", error);
+    }
+  };
+  const handleReject = async () => {
+    // Convert item.id to a number for comparison
+    const selectedData = queueData.filter(
+      (item) => selectedKeys.includes(String(item.id)) // Ensure both are numbers
+    );
+
+    // Ensure that we have selected data
+    if (selectedData.length === 0) {
+      message.warning("Không có id nào được chọn !.");
+      return;
+    }
+
+    try {
+      // Submit each selected registration
+      await Promise.all(
+        selectedData.map((item) =>
+          mutate({
+            registration_id: item.id,
+            status: "reject",
+          })
+        )
+      );
+    } catch (error) {
+      console.error("Error approving selected registrations:", error);
+    }
   };
 
   return (
@@ -165,18 +200,40 @@ const EventRegisterListTable: React.FC<Post> = ({ postId }) => {
 
         {/* Model selection */}
         <div className="flex justify-between items-center mb-4">
-          <div>
+          <div className="flex items-center space-x-2">
+            <Select
+              value={status}
+              onChange={setStatus} // Cập nhật status khi người dùng chọn
+              style={{ width: 150 }}
+              options={[
+                { value: "pending", label: "Đang chờ" },
+                { value: "approve", label: "Phê duyệt" },
+                { value: "reject", label: "Từ chối" },
+              ]}
+            />
             <Button onClick={handleRefresh} style={{ marginLeft: "8px" }}>
               <FaSync /> Làm mới
             </Button>
+          </div>
+
+          {/* Phần các nút Phê Duyệt và Từ Chối */}
+          <div className="flex space-x-4">
             <Button
               type="primary"
               onClick={handleSubmit}
               style={{ marginBottom: "16px" }}
             >
-              Approve Selected
+              Phê Duyệt
+            </Button>
+            <Button
+              type="dashed"
+              onClick={handleReject}
+              style={{ marginBottom: "16px" }}
+            >
+              Từ Chối
             </Button>
           </div>
+
           <button
             onClick={handleExportExcel}
             className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600"

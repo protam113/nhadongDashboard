@@ -1,7 +1,7 @@
 "use client"; // Ensures this is a client component
 
 import React, { useState } from "react";
-import { Table, Button, Spin } from "antd";
+import { Table, Button, Spin, Select, message } from "antd"; // Import thêm Select
 import type { ColumnsType } from "antd/es/table";
 import { EyeOutlined } from "@ant-design/icons";
 import Heading from "@/components/design/Heading";
@@ -18,12 +18,15 @@ const VocationRegisterTable: React.FC<Post> = ({ postId }) => {
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedMember, setSelectedMember] = useState(null);
   const { mutate } = useSubmitEventRegisterList(postId);
+  const [status, setStatus] = useState<string>("pending"); // Thêm state cho status
 
   const { queueData, next, isLoading, isError } = RegisterList(
-    currentPage,
-    postId,
-    refreshKey
+    currentPage, // Correctly pass currentPage
+    postId, // Ensure postId is a valid UUID, not "pending"
+    status, // status will be "pending"
+    refreshKey // refreshKey for manual refresh
   );
+
   const totalPages = next ? currentPage + 1 : currentPage;
 
   const handleViewDetails = (member: any) => {
@@ -139,7 +142,7 @@ const VocationRegisterTable: React.FC<Post> = ({ postId }) => {
 
     // Ensure that we have selected data
     if (selectedData.length === 0) {
-      alert("No participants selected.");
+      message.warning("Không có id nào được chọn !");
       return;
     }
 
@@ -147,9 +150,35 @@ const VocationRegisterTable: React.FC<Post> = ({ postId }) => {
     selectedData.forEach((item) => {
       mutate({
         registration_id: item.id,
-        status: "approve",
+        status: "approve", // Use the selected status
       });
     });
+  };
+  const handleReject = async () => {
+    // Convert item.id to a number for comparison
+    const selectedData = queueData.filter(
+      (item) => selectedKeys.includes(String(item.id)) // Ensure both are numbers
+    );
+
+    // Ensure that we have selected data
+    if (selectedData.length === 0) {
+      message.warning("Không có id nào được chọn !.");
+      return;
+    }
+
+    try {
+      // Submit each selected registration
+      await Promise.all(
+        selectedData.map((item) =>
+          mutate({
+            registration_id: item.id,
+            status: "reject",
+          })
+        )
+      );
+    } catch (error) {
+      console.error("Error approving selected registrations:", error);
+    }
   };
 
   return (
@@ -157,21 +186,44 @@ const VocationRegisterTable: React.FC<Post> = ({ postId }) => {
       <div className="p-4">
         <Heading name="Danh sách người tham gia ơn gọi " />
 
-        {/* Model selection */}
-        <div className="flex justify-between items-center mb-4">
-          <div>
+        {/* Thêm thẻ select cho status */}
+        <div className="flex justify-between items-center mb-4 space-x-4">
+          {/* Phần chọn trạng thái */}
+          <div className="flex items-center space-x-2">
+            <Select
+              value={status}
+              onChange={setStatus} // Cập nhật status khi người dùng chọn
+              style={{ width: 150 }}
+              options={[
+                { value: "pending", label: "Đang chờ" },
+                { value: "approve", label: "Phê duyệt" },
+                { value: "reject", label: "Từ chối" },
+              ]}
+            />
             <Button onClick={handleRefresh} style={{ marginLeft: "8px" }}>
               <FaSync /> Làm mới
             </Button>
+          </div>
+
+          {/* Phần các nút Phê Duyệt và Từ Chối */}
+          <div className="flex space-x-4">
             <Button
               type="primary"
               onClick={handleSubmit}
               style={{ marginBottom: "16px" }}
             >
-              Approve Selected
+              Phê Duyệt
+            </Button>
+            <Button
+              type="dashed"
+              onClick={handleReject}
+              style={{ marginBottom: "16px" }}
+            >
+              Từ Chối
             </Button>
           </div>
         </div>
+
         <div className="overflow-auto" style={{ maxHeight: "800px" }}>
           <Table
             columns={columns}

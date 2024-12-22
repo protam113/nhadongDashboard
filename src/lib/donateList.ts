@@ -5,9 +5,9 @@ import { useDonationList } from "@/hooks/donation/useDonation";
 
 // NewsList.ts
 
-export const DonateList = (currentPage: number, category: string, refreshKey: number) => {
+export const DonateList = (currentPage: number, visibility: string, refreshKey: number) => {
 
-    const filters = category.trim() === "" ? {} : { category };
+    const filters = visibility.trim() === "" ? {} : { visibility };
 
     const { data, isLoading, isError } = useDonationList(currentPage,
         filters // Use the category chosen by the news
