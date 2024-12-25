@@ -15,6 +15,7 @@ const endpoints = {
     changePassword: process.env.NEXT_PUBLIC_CHANGE_PASSWORD,
     codePassword: process.env.NEXT_PUBLIC_RESET_PASSWORD,
     verifyCode: process.env.NEXT_PUBLIC_VERIFY_CODE,
+    logout: process.env.NEXT_PUBLIC_LOGOUT,
 
      //current user lgin
     currentUser: process.env.NEXT_PUBLIC_CURRENT_USER,

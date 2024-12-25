@@ -428,10 +428,66 @@ const useCreateGroupRole = (groupId: string) => {
     },
     onSuccess: () => {
       message.success("Role đã được thêm thành công");
-      queryClient.invalidateQueries({ queryKey: ["groupList"] });
+      queryClient.invalidateQueries({ queryKey: ["groupRoleList"] });
     },
     onError: (error) => {
       console.error(error.message || "Failed to create roles group.");
+    },
+  });
+};
+
+/** 
+ Xóa Role Group
+**/
+
+const DeleteRole = async (groupId: string, roleId: string, token: string) => {
+  if (!token) throw new Error("No token available");
+
+  try {
+    if (!endpoints.groupRole) {
+      throw null;
+    }
+    const url = `${endpoints.groupRole.replace(":id", groupId)}?role=${roleId}`;
+    const response = await handleAPI(url, "DELETE", null, token);
+    return response.data;
+  } catch (error: any) {
+    console.error("Error deleting role:", error.response?.data);
+    throw new Error(error.response?.data?.message || "Failed to delete role");
+  }
+};
+
+const useDeleteRole = () => {
+  const queryClient = useQueryClient();
+  const { getToken } = useAuth();
+  const [token, setToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchToken = async () => {
+      const userToken = await getToken();
+      setToken(userToken);
+    };
+    fetchToken();
+  }, [getToken]);
+
+  return useMutation({
+    mutationFn: async ({
+      groupId,
+      roleId,
+    }: {
+      groupId: string;
+      roleId: string;
+    }) => {
+      if (!token) {
+        throw new Error("Token is not available");
+      }
+      return DeleteRole(groupId, roleId, token);
+    },
+    onSuccess: () => {
+      message.success("Xóa Vai Trò Thành Công!");
+      queryClient.invalidateQueries({ queryKey: ["groupRoleList"] });
+    },
+    onError: (error: any) => {
+      console.error(error.message || "Failed to delete role.");
     },
   });
 };
@@ -443,4 +499,5 @@ export {
   useEditGroup,
   useGroupRoleList,
   useCreateGroupRole,
+  useDeleteRole,
 };

@@ -42,7 +42,7 @@ const CommentsQueueTable: React.FC = () => {
   };
 
   const handleBulkReject = () => {
-    handleBulkUpdate(selectedKeys, "rejected");
+    handleBulkUpdate(selectedKeys, "reject");
     setSelectedKeys([]);
   };
 

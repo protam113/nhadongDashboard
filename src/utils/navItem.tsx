@@ -175,7 +175,6 @@ export const NavItems = () => {
     },
     {
       name: "Danh Mục",
-      link: "/danh_muc",
       key: "2",
       icon: <MdAddToQueue />,
       children: [

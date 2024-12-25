@@ -66,7 +66,6 @@ const EditMissionModal: React.FC<EditBlogModalProps> = ({
       }
     }
   }, [document, form]);
-  console.log("🚀 ~ document:", document);
 
   const handleCategoryChange = (value: string) => {
     setSelectedCategory(value);

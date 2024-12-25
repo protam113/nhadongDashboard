@@ -1,30 +1,14 @@
 // pages/User.tsx
 "use client";
 
-import React, {
-  // , { useState, useEffect }
-  useState,
-} from "react";
-import {
-  Table,
-  // , Typography, Button, Image
-  Spin,
-  Pagination,
-  Button,
-  Modal,
-  message,
-} from "antd";
-// import type { ColumnsType } from 'antd/es/table';
-// import { PlusOutlined } from '@ant-design/icons';
+import React, { useState } from "react";
+import { Table, Spin, Button, Modal, message } from "antd";
 import { useBlockUser, useUserList } from "@/hooks/user/useUsers";
 import { FaSync } from "react-icons/fa";
 import UserDrawer from "@/components/drawer/userDrawer";
 import { EyeOutlined } from "@ant-design/icons";
 import Heading from "@/components/design/Heading";
-
-// const { Title } = Typography;
-
-// Define the structure for user data
+import { FaArrowLeft, FaArrowRight } from "@/lib/iconLib";
 
 const UserPage: React.FC = () => {
   const [currentPage, setCurrentPage] = React.useState(1);
@@ -37,11 +21,14 @@ const UserPage: React.FC = () => {
   const { data, isLoading, isError, isFetching } = useUserList(
     currentPage,
     {
-      role: ["ab84fe7e-4810-44eb-9dc9-04ddffb5441b"],
+      role: ["89dbc4ef-09f3-4898-aa29-8b93ee2aa6f3"],
       blocked: ["false"],
     },
     refreshKey
   ); // Truyền currentPage vào hook
+  const next = data?.next;
+  const totalPages = next ? currentPage + 1 : currentPage;
+
   // Xử lý lỗi
   if (isError) {
     return <div>Error fetching users</div>;
@@ -180,16 +167,36 @@ const UserPage: React.FC = () => {
               setSelectedKeys(selectedRowKeys as string[]),
           }}
         />
-        <div className="flex justify-center mt-4">
-          <Pagination
-            current={currentPage} // Trang hiện tại
-            pageSize={20}
-            total={data?.count || 0} // Tổng số người dùng
-            onChange={(page) => {
-              setCurrentPage(page); // Cập nhật trang hiện tại
-            }}
-            showSizeChanger={false}
-          />
+        <div className="flex justify-center mt-8 items-center space-x-2">
+          <button
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className={`flex items-center justify-center w-6 h-6 text-10 bg-gray-200 rounded-full hover:bg-gray-300 ${
+              currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+          >
+            <FaArrowLeft />
+          </button>
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentPage(i + 1)}
+              className={`w-6 h-6 text-10 rounded-full hover:bg-gray-300 ${
+                currentPage === i + 1 ? "bg-blue-500 text-white" : "bg-gray-200"
+              }`}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button
+            onClick={() => setCurrentPage((prev) => prev + 1)}
+            disabled={!next}
+            className={`flex items-center justify-center w-6 h-6 text-10 bg-gray-200 rounded-full hover:bg-gray-300 ${
+              !next ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+          >
+            <FaArrowRight />
+          </button>
         </div>
         {isFetching && <Spin size="small" />}{" "}
         {/* Hiển thị loading khi đang tải dữ liệu */}

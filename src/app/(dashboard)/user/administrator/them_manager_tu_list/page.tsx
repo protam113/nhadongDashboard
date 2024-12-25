@@ -15,7 +15,7 @@ const UserAddToManagerPage: React.FC = () => {
   const { data, isLoading, isError, isFetching } = useUserList(
     currentPage,
     {
-      role: ["ab84fe7e-4810-44eb-9dc9-04ddffb5441b"],
+      role: ["89dbc4ef-09f3-4898-aa29-8b93ee2aa6f3"],
       blocked: ["false"],
     },
     refreshKey

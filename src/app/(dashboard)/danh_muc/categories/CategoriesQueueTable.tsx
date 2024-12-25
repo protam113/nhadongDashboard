@@ -33,7 +33,7 @@ const CategoriesQueueTable: React.FC = () => {
     try {
       // Gọi hàm handleBulkUpdate với status 'approved' và chờ kết quả
       const response = await handleBulkUpdate(selectedKeys, "approve");
-      console.log("Approve Response:", response); // Log giá trị trả về từ API
+      console.error("Approve Response:", response); // Log giá trị trả về từ API
     } catch (error) {
       console.error("Error during approval:", error); // Log lỗi nếu có
     }
@@ -45,7 +45,7 @@ const CategoriesQueueTable: React.FC = () => {
     try {
       // Gọi hàm handleBulkUpdate với status 'approved' và chờ kết quả
       const response = await handleBulkUpdate(selectedKeys, "reject");
-      console.log("Approve Response:", response); // Log giá trị trả về từ API
+      console.error("Approve Response:", response); // Log giá trị trả về từ API
     } catch (error) {
       console.error("Error during approval:", error); // Log lỗi nếu có
     }
@@ -81,7 +81,6 @@ const CategoriesQueueTable: React.FC = () => {
       key: "data",
       width: 350,
       render: (data) => {
-        // Kiểm tra nếu có cả `new_data` và `old_data`
         const newData = data?.new_data;
         const oldData = data?.old_data;
 
@@ -89,7 +88,7 @@ const CategoriesQueueTable: React.FC = () => {
           return (
             <div>
               <p>
-                <strong>Mới:</strong> {newData}
+                <strong>Mới:</strong> {newData.name || JSON.stringify(newData)}
               </p>
               <p>
                 <strong>Cũ:</strong> {oldData.name}
@@ -100,7 +99,8 @@ const CategoriesQueueTable: React.FC = () => {
           return (
             <div>
               <p>
-                <strong>Dữ Liệu Cập Nhật:</strong> {newData}
+                <strong>Dữ Liệu Cập Nhật:</strong>
+                {newData.name || JSON.stringify(newData)}
               </p>
             </div>
           );
@@ -108,8 +108,8 @@ const CategoriesQueueTable: React.FC = () => {
           return (
             <div>
               <strong>Dữ Liệu:</strong>
-              <p>Model :{oldData.model}</p>
-              <p>Tên Thể Loại :{oldData.name}</p>
+              <p>Model: {oldData.model}</p>
+              <p>Tên Thể Loại: {oldData.name}</p>
             </div>
           );
         } else {

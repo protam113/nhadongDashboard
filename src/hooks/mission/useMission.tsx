@@ -89,10 +89,7 @@ const CreateMission = async (newDoc: NewDocs, token: string) => {
   for (const key in newDoc) {
     const value = newDoc[key as keyof NewDocs];
 
-    if (key === "content") {
-      // Xử lý content nếu là object hoặc JSON string
-      formData.append(key, JSON.stringify(value));
-    } else if (key === "category") {
+    if (key === "category") {
       // Gửi category là một chuỗi đơn, không cần phải là mảng
       formData.append("category", value as string);
     } else if (key === "image" && typeof value === "string") {
@@ -152,7 +149,7 @@ const useCreateMission = () => {
       queryClient.invalidateQueries({ queryKey: ["missionList"] });
     },
     onError: (error) => {
-      console.log(error.message || "Failed to create docs.");
+      console.error(error.message || "Failed to create docs.");
     },
   });
 };
