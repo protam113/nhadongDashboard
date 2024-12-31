@@ -194,6 +194,44 @@ export interface FetchEventListResponse {
   
 
 
+  /**
+   thông kê truy cậpcập
+  **/
+
+
+  export interface StatisticalResponse  {
+    today_views: number;
+    total_views: number;
+    filtered_views: Array<{
+      id: number;
+      total_views: number;
+      date: string;
+    }>;
+  }
+
+    /**
+   thông kê người dùng
+  **/
+
+
+   export interface StatisticalUserResponse  {
+    total_users: number;
+    admin_percentage: string;
+    manager_percentage: string;
+    no_role_percentage: string;
+    user_details: {
+      admin_count: number;
+      manager_count: number;
+      no_role_count: number;
+    }
+    daily_user_counts: Array<{
+      count: number;
+      date: string;
+    }>;
+  }
+
+
+
 /**
  BrowseQueue Interface
  **/

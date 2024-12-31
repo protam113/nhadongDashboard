@@ -89,6 +89,10 @@ const endpoints = {
 
      chatHistory:process.env.NEXT_PUBLIC_CHAT_HISTORY,
      chat:process.env.NEXT_PUBLIC_CHAT,
+
+     //statistical
+     statistical:process.env.NEXT_PUBLIC_STATICAL,
+     userStatistical:process.env.NEXT_PUBLIC_USER_STATICAL,
 };
 
 export { baseURL, endpoints };
