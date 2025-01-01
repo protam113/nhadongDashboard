@@ -43,6 +43,14 @@ const DropdownMenu: React.FC = () => {
       label: <a href="/auth">Bảo Mật</a>, // Updated link to settings
       key: "2",
     },
+    ...(userInfo?.role.name === "admin"
+      ? [
+          {
+            label: <a href="/statical">Thống Kê</a>,
+            key: "4",
+          },
+        ]
+      : []),
     {
       type: "divider",
     },

@@ -93,6 +93,9 @@ const endpoints = {
      //statistical
      statistical:process.env.NEXT_PUBLIC_STATICAL,
      userStatistical:process.env.NEXT_PUBLIC_USER_STATICAL,
+
+     galery: process.env.NEXT_PUBLIC_GALERY,
+
 };
 
 export { baseURL, endpoints };

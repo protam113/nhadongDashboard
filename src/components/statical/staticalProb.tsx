@@ -3,13 +3,19 @@
 import { useState } from "react";
 import { DatePicker, Button, Spin, Alert } from "antd";
 import { Line } from "@ant-design/plots";
+import dayjs from "dayjs";
+
 import { StaticalData } from "@/lib/staticalData";
 
 const { RangePicker } = DatePicker;
 
 const StaticalProb = () => {
-  const [startDay, setStartDay] = useState<string | null>(null);
-  const [endDay, setEndDay] = useState<string | null>(null);
+  const [startDay, setStartDay] = useState<string>(
+    dayjs().startOf("month").format("YYYY-MM-DD")
+  );
+  const [endDay, setEndDay] = useState<string>(
+    dayjs().endOf("month").format("YYYY-MM-DD")
+  );
   const [refreshKey, setRefreshKey] = useState(0);
 
   const handleDateChange = (dates: any, dateStrings: [string, string]) => {
@@ -50,16 +56,27 @@ const StaticalProb = () => {
   };
 
   return (
-    <div>
+    <div className="w-full">
       <p>Thông Kê Truy Cập</p>
-      <RangePicker onChange={handleDateChange} />
-      <Button
-        type="primary"
-        onClick={handleFetchData}
-        disabled={!startDay || !endDay}
-      >
-        Fetch Data
-      </Button>
+      <div className="flex items-center space-x-2" style={{ marginBottom: 20 }}>
+        <RangePicker
+          onChange={handleDateChange}
+          defaultValue={[
+            dayjs(startDay, "YYYY-MM-DD"),
+            dayjs(endDay, "YYYY-MM-DD"),
+          ]}
+        />
+        <div className="mr-2">
+          <Button
+            type="primary"
+            onClick={handleFetchData}
+            disabled={!startDay || !endDay}
+          >
+            Fetch Data
+          </Button>
+        </div>
+      </div>
+
       {isLoading && <Spin />}
       {isError && <Alert message="Error fetching data" type="error" />}
       {!isLoading && !isError && (

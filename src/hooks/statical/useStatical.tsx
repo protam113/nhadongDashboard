@@ -88,14 +88,12 @@ const fetchStatisticalUser = async (
   }
 
   try {
-    // Lọc bỏ các giá trị không hợp lệ
     const validFilters = Object.fromEntries(
       Object.entries(filters).filter(
-        ([value]) => value !== undefined && value !== "" // Bỏ qua key
+        ([, value]) => value !== undefined && value !== "" // Kiểm tra cả key và value
       )
     );
 
-    // Chuyển các giá trị thành chuỗi cho URLSearchParams
     const stringifiedFilters = Object.fromEntries(
       Object.entries(validFilters).map(([key, value]) => [
         key,
@@ -103,10 +101,8 @@ const fetchStatisticalUser = async (
       ])
     );
 
-    // Tạo chuỗi query
     const queryString = new URLSearchParams(stringifiedFilters).toString();
 
-    // Gọi API
     const response = await handleAPI(
       `${endpoints.userStatistical}${queryString ? `?${queryString}` : ""}`,
       "GET",
@@ -116,7 +112,7 @@ const fetchStatisticalUser = async (
 
     return response;
   } catch (error) {
-    console.error("Error fetching schedule list:", error);
+    console.error("Error fetching statistical data:", error);
     throw error;
   }
 };

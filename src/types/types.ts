@@ -59,6 +59,23 @@ export interface Filters {
     [key: string]: string | number | string[] | undefined;
 }
 
+/**
+ Galery Interface
+ **/
+
+interface GaleryList {
+  id: string;
+  image: string; // Chỉnh sửa để phù hợp với giá trị null trong JSON
+}
+
+export interface FetchGaleryListResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: GaleryList[];
+}
+
+
 export interface SectionField {
     type: 'title' | 'description' | 'content' | 'link';
     value: string;

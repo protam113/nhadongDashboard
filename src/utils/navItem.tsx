@@ -102,6 +102,11 @@ export const NavItems = () => {
           key: "19",
         },
         {
+          name: "Thư Viện Ảnh",
+          link: "/hoi_dong/gallery",
+          key: "18",
+        },
+        {
           name: "Sứ Vụ",
           link: "/hoi_dong/missio",
           key: "9",
