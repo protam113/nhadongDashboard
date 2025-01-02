@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { Drawer, Button } from "antd";
+import { Drawer, Button, Modal } from "antd";
 import { FeastDrawerProps } from "@/types/types";
 import CreateSchedule from "./createSchedule";
+import { useDeleteSchedule } from "@/hooks/schedule/useSchedule";
 
 const FeastDrawer: React.FC<FeastDrawerProps> = ({
   visible,
@@ -14,6 +15,28 @@ const FeastDrawer: React.FC<FeastDrawerProps> = ({
 }) => {
   const [isCreateScheduleDrawerVisible, setIsCreateScheduleDrawerVisible] =
     useState(false);
+  const { mutate } = useDeleteSchedule();
+
+  const handleDelete = () => {
+    if (!selectedFeast?.id || !scheduleId) {
+      console.error("Missing scheduleId or feastId");
+      return;
+    }
+
+    Modal.confirm({
+      title: "Xác nhận xóa lễ",
+      content: "Bạn có chắc chắn muốn xóa lễ này?",
+      okText: "Xóa",
+      okType: "danger",
+      cancelText: "Hủy",
+      onOk: () => {
+        mutate({
+          scheduleId: String(scheduleId),
+          feastId: String(selectedFeast.id),
+        });
+      },
+    });
+  };
 
   // Open the CreateSchedule drawer
   const handleCreateScheduleClick = () => {
@@ -52,6 +75,9 @@ const FeastDrawer: React.FC<FeastDrawerProps> = ({
                   <strong>Mô tả:</strong>{" "}
                   {selectedFeast.description || "Không có"}
                 </p>
+                <Button onClick={handleDelete} style={{ marginTop: 16 }}>
+                  Xóa Lễ
+                </Button>
               </div>
             ) : (
               <p>Không có lễ trong ngày này.</p>

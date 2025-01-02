@@ -1,9 +1,10 @@
 "use client";
 
 import React, { useState } from "react";
-import { Table, Spin, Pagination, message, Button, Modal } from "antd";
+import { Table, Spin, message, Button, Modal } from "antd";
 import { useUserList, useAddManager } from "@/hooks/user/useUsers";
 import Heading from "@/components/design/Heading";
+import { FaArrowLeft, FaArrowRight } from "@/lib/iconLib";
 
 const UserAddToManagerPage: React.FC = () => {
   const { mutate: addManagerMutation } = useAddManager();
@@ -20,6 +21,9 @@ const UserAddToManagerPage: React.FC = () => {
     },
     refreshKey
   );
+
+  const next = data?.next;
+  const totalPages = next ? currentPage + 1 : currentPage;
 
   if (isError) {
     return <div>Error fetching users</div>;
@@ -103,14 +107,36 @@ const UserAddToManagerPage: React.FC = () => {
         pagination={false}
       />
 
-      <div className="flex justify-center mt-4">
-        <Pagination
-          current={currentPage}
-          pageSize={20}
-          total={data?.count || 0}
-          onChange={(page) => setCurrentPage(page)}
-          showSizeChanger={false}
-        />
+      <div className="flex justify-center mt-8 items-center space-x-2">
+        <button
+          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+          disabled={currentPage === 1}
+          className={`flex items-center justify-center w-6 h-6 text-10 bg-gray-200 rounded-full hover:bg-gray-300 ${
+            currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+        >
+          <FaArrowLeft />
+        </button>
+        {Array.from({ length: totalPages }, (_, i) => (
+          <button
+            key={i}
+            onClick={() => setCurrentPage(i + 1)}
+            className={`w-6 h-6 text-10 rounded-full hover:bg-gray-300 ${
+              currentPage === i + 1 ? "bg-blue-500 text-white" : "bg-gray-200"
+            }`}
+          >
+            {i + 1}
+          </button>
+        ))}
+        <button
+          onClick={() => setCurrentPage((prev) => prev + 1)}
+          disabled={!next}
+          className={`flex items-center justify-center w-6 h-6 text-10 bg-gray-200 rounded-full hover:bg-gray-300 ${
+            !next ? "opacity-50 cursor-not-allowed" : ""
+          }`}
+        >
+          <FaArrowRight />
+        </button>
       </div>
 
       {isFetching && <Spin size="small" />}

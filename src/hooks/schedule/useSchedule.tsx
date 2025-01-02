@@ -4,6 +4,7 @@ import { endpoints } from "@/apis/api";
 import { useAuth } from "@/context/authContext";
 import { useEffect, useState } from "react";
 import { ScheduleList, Filters, CreateSchedule } from "@/types/types";
+import { message } from "antd";
 
 // Hàm fetch dữ liệu lịch
 const fetchScheduleList = async (
@@ -136,8 +137,8 @@ const useCreateSchedule = (scheduleId: string) => {
       return CreateScheduleItem(scheduleId, newSchedule, token);
     },
     onSuccess: () => {
-      console.log("Category created successfully!");
-      queryClient.invalidateQueries({ queryKey: ["categoriesList"] });
+      message.success("Thêm Lễ Thành Công!");
+      queryClient.invalidateQueries({ queryKey: ["scheduleList"] });
     },
     onError: (error: any) => {
       console.error(error.message || "Failed to create category.");
@@ -145,4 +146,72 @@ const useCreateSchedule = (scheduleId: string) => {
   });
 };
 
-export { useScheduleList, useCreateSchedule };
+const DeleteFeast = async (
+  scheduleId: string,
+  feastId: string,
+  token: string
+) => {
+  if (!token) throw new Error("No token available");
+  if (!scheduleId || !feastId) throw new Error("Missing scheduleId or feastId");
+
+  try {
+    if (!endpoints.schedule) {
+      throw new Error("API endpoint for schedule is not defined");
+    }
+
+    // Tạo URL với scheduleId và feast_id
+    const url = `${endpoints.schedule.replace(
+      ":id",
+      scheduleId
+    )}?feast_id=${encodeURIComponent(feastId)}`;
+
+    // Gửi yêu cầu DELETE
+    const response = await handleAPI(url, "DELETE", null, token);
+    return response.data;
+  } catch (error: any) {
+    console.error(
+      "Error deleting feast:",
+      error.response?.data || error.message
+    );
+    throw new Error(error.response?.data?.message || "Failed to delete feast");
+  }
+};
+
+const useDeleteSchedule = () => {
+  const queryClient = useQueryClient();
+  const { getToken } = useAuth();
+  const [token, setToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchToken = async () => {
+      const userToken = await getToken();
+      setToken(userToken);
+    };
+    fetchToken();
+  }, [getToken]);
+
+  return useMutation({
+    mutationFn: async ({
+      scheduleId,
+      feastId,
+    }: {
+      scheduleId: string;
+      feastId: string;
+    }) => {
+      if (!token) {
+        throw new Error("Token is not available");
+      }
+      return DeleteFeast(scheduleId, feastId, token);
+    },
+    onSuccess: () => {
+      message.success("Xóa lễ thành công!");
+      queryClient.invalidateQueries({ queryKey: ["scheduleList"] });
+    },
+    onError: (error: any) => {
+      console.error(error.message || "Failed to delete feast.");
+      message.error("Xóa lễ thất bại!");
+    },
+  });
+};
+
+export { useScheduleList, useCreateSchedule, useDeleteSchedule };
