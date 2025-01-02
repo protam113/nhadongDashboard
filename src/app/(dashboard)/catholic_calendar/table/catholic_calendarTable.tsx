@@ -3,10 +3,10 @@
 import React, { useState } from "react";
 import { Calendar, Badge, Button } from "antd";
 import type { BadgeProps, CalendarProps } from "antd";
-import type { Dayjs } from "dayjs";
+import dayjs, { Dayjs } from "dayjs";
 import { useScheduleList } from "@/hooks/schedule/useSchedule";
-import FeastDrawer from "../modal/ScheduleModal";
 import { FaSync } from "@/lib/iconLib";
+import FeastDrawer from "../modal/ScheduleModal";
 
 // Màu sắc cho các loại lễ
 const feastTypeColors: Record<string, BadgeProps["status"]> = {
@@ -37,23 +37,29 @@ const sortFeasts = (feasts: any[]) => {
 };
 
 const CatholicCalendarTable: React.FC = () => {
-  const [year] = useState<string>(new Date().getFullYear().toString());
-  const [refreshKey, setRefreshKey] = useState<number>(0); // State to refresh data
   const [selectedFeast, setSelectedFeast] = useState<any>(null);
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
-  const [ScheduleId, setScheduleId] = useState<string>(""); // Store the selected schedule ID
+  const [ScheduleId, setScheduleId] = useState<string>("");
+  const [mode, setMode] = useState<"month" | "year">("month"); // Để điều chỉnh chế độ xem (tháng/năm)
+
+  const [currentDate, setCurrentDate] = useState<Dayjs>(dayjs()); // Ngày hiện tại
+  const { year, month } = {
+    year: currentDate.year().toString(),
+    month: (currentDate.month() + 1).toString(),
+  };
 
   const {
     data: queueData,
     isLoading,
     isError,
-  } = useScheduleList({ year: year }, refreshKey);
+  } = useScheduleList({ year, month }, 0);
 
-  const handleRefresh = () => {
-    setRefreshKey((prev) => prev + 1); // Refresh data manually
+  const handlePanelChange = (date: Dayjs, newMode: "month" | "year") => {
+    setCurrentDate(date);
+    setMode(newMode); // Lưu lại chế độ xem
   };
-  // Hiển thị lễ theo ngày
+
   const dateCellRender = (value: Dayjs) => {
     const currentDate = value.format("YYYY-MM-DD");
     const dayData = queueData?.find((item: any) => item.day === currentDate);
@@ -62,10 +68,10 @@ const CatholicCalendarTable: React.FC = () => {
     return (
       <div
         onClick={() => {
-          setSelectedDate(currentDate); // Lưu ngày được chọn
-          setSelectedFeast(sortedFeasts.length ? sortedFeasts[0] : null); // Lưu lễ đầu tiên nếu có
-          setScheduleId(dayData?.id || null); // Lưu ID của lễ
-          setIsDrawerVisible(true); // Mở Drawer
+          setSelectedDate(currentDate);
+          setSelectedFeast(sortedFeasts.length ? sortedFeasts[0] : null);
+          setScheduleId(dayData?.id || null);
+          setIsDrawerVisible(true);
         }}
         style={{ cursor: "pointer" }}
       >
@@ -90,20 +96,27 @@ const CatholicCalendarTable: React.FC = () => {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
-        <Button onClick={handleRefresh} style={{ marginLeft: "8px" }}>
+      {/* Nút làm mới */}
+      <div style={{ marginBottom: "16px" }}>
+        <Button onClick={() => setCurrentDate(dayjs())}>
           <FaSync /> Làm mới
         </Button>
       </div>
+
       {isLoading ? (
         <p>Loading...</p>
       ) : isError ? (
         <p>Error loading data</p>
       ) : (
-        <Calendar cellRender={cellRender} />
+        <Calendar
+          cellRender={cellRender}
+          mode={mode}
+          value={currentDate}
+          onPanelChange={handlePanelChange}
+        />
       )}
 
-      {/* Sử dụng FeastDrawer */}
+      {/* Drawer chi tiết */}
       <FeastDrawer
         visible={isDrawerVisible}
         onClose={() => setIsDrawerVisible(false)}

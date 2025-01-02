@@ -1,4 +1,4 @@
-// src/layout.tsx
+// src/app/layout.tsx
 "use client";
 
 import "../styles/globals.css";
@@ -15,23 +15,74 @@ export default function RootLayout({
     <ReactQueryProvider>
       <html lang="en">
         <head>
-          <title>
-            {metadata.title ? String(metadata.title) : "Default Title"}
-          </title>
+          {/* Basic Meta Tags */}
+          <title>{metadata.title?.toString() || "Default Title"}</title>
           <meta
             name="description"
-            content={metadata.description || "Default description"}
+            content={metadata.description?.toString() || "Default description"}
           />
-          {/* Assuming logo is a valid image path, ensure it renders correctly */}
-          <link
-            rel="icon"
-            href={
-              typeof appInfo.logo === "string"
-                ? appInfo.logo
-                : "/fallback-icon.svg"
+          <meta
+            name="keywords"
+            content={
+              Array.isArray(metadata.keywords)
+                ? metadata.keywords.join(", ")
+                : metadata.keywords?.toString()
             }
-            type="image/svg+xml"
           />
+
+          {/* Favicon */}
+          <link rel="icon" href={appInfo.logo} type="image/svg+xml" />
+          <link rel="apple-touch-icon" href={appInfo.logo} />
+
+          {/* Viewport for Mobile */}
+          <meta
+            name="viewport"
+            content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"
+          />
+          <meta name="theme-color" content={metadata.themeColor?.toString()} />
+
+          {/* Open Graph Tags */}
+          <meta property="og:type" content="website" />
+          <meta
+            property="og:title"
+            content={metadata.openGraph?.title?.toString() || appInfo.title}
+          />
+          <meta
+            property="og:description"
+            content={
+              metadata.openGraph?.description?.toString() || appInfo.description
+            }
+          />
+          <meta
+            property="og:image"
+            content={`${appInfo.domain}${appInfo.ogImage}`}
+          />
+          <meta property="og:url" content={appInfo.domain} />
+          <meta
+            property="og:site_name"
+            content={metadata.openGraph?.siteName?.toString() || appInfo.title}
+          />
+
+          {/* Twitter Card Tags */}
+          <meta name="twitter:card" content="summary_large_image" />
+          <meta
+            name="twitter:title"
+            content={metadata.twitter?.title?.toString() || appInfo.title}
+          />
+          <meta
+            name="twitter:description"
+            content={
+              metadata.twitter?.description?.toString() || appInfo.description
+            }
+          />
+          <meta
+            name="twitter:image"
+            content={`${appInfo.domain}${appInfo.ogImage}`}
+          />
+          <meta name="twitter:creator" content="@yourTwitterHandle" />
+
+          {/* Canonical URL */}
+          <link rel="canonical" href={appInfo.domain} />
         </head>
         <body>
           <AntdRegistry>{children}</AntdRegistry>
