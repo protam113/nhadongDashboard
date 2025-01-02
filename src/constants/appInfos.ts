@@ -5,11 +5,10 @@ export const appInfo = {
     logo: '/image_logo.png',
     title: 'Champagnat Dashboard',
     description: 'Chào mừng đến với Champagnat Dashboard',
-    domain: 'https://your-domain.com',
-    ogImage: '/og-image.png',
+    domain: 'https://dashboard.hoidonganhemducmaria.com',
+    ogImage: '/logo_default.png',
     themeColor: '#ffffff',
     keywords: 'dashboard, champagnat, analytics',
-    author: 'Your Company Name',
 } as const;
 
 // Đảm bảo các giá trị không null/undefined
@@ -43,7 +42,6 @@ export const metadata: Metadata = {
         title: appInfo.title,
         description: appInfo.description,
         images: [`${appInfo.domain}${appInfo.ogImage}`],
-        creator: '@yourTwitterHandle',
     },
     
     viewport: {

@@ -1,7 +1,7 @@
 "use client"; // Ensures this is a client component
 
 import React, { useState } from "react";
-import { Table, Button, Spin, Select } from "antd";
+import { Table, Button, Spin, Select, Modal } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { EventList } from "@/lib/eventList";
 import Heading from "@/components/design/Heading";
@@ -10,6 +10,9 @@ import { useUpdateEvent } from "@/hooks/event/useEventDetail";
 import { FaArrowLeft, FaArrowRight, FaSync } from "@/lib/iconLib";
 import { EyeOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
+import { useDeleteEvent } from "@/hooks/event/useEvent";
+import { MdOutlineDelete } from "react-icons/md";
+
 const Page: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [category] = useState<string>("vocation");
@@ -17,6 +20,7 @@ const Page: React.FC = () => {
   const [selectedPostId, setSelectedPostId] = useState<string>("");
   const { mutate } = useUpdateEvent(selectedPostId);
   const router = useRouter();
+  const { mutate: deleteEvent } = useDeleteEvent();
 
   // Pass model into CategoriesList
   const { queueData, next, isLoading, isError } = EventList(
@@ -24,6 +28,20 @@ const Page: React.FC = () => {
     category,
     refreshKey
   );
+
+  const handleDelete = (eventId: string) => {
+    // Show confirmation dialog before deletion
+    Modal.confirm({
+      title: "Xác nhận xóa",
+      content: "Bạn có chắc chắn muốn xóa ơn gọi này?",
+      okText: "Xóa",
+      okType: "danger",
+      cancelText: "Hủy",
+      onOk: () => {
+        deleteEvent(eventId);
+      },
+    });
+  };
 
   const totalPages = next ? currentPage + 1 : currentPage;
 
@@ -64,7 +82,7 @@ const Page: React.FC = () => {
       title: "Trạng Thái",
       dataIndex: "status",
       key: "status",
-      width: 400,
+      width: 300,
       render: (text, record) => (
         <Select
           defaultValue={text}
@@ -81,6 +99,19 @@ const Page: React.FC = () => {
             { value: "close", label: "Close" },
           ]}
         />
+      ),
+    },
+    {
+      title: "Action",
+      dataIndex: "action",
+      key: "action",
+      width: 100,
+      render: (_, record) => (
+        <>
+          <Button danger onClick={() => handleDelete(record.id)}>
+            <MdOutlineDelete className="text-albert-error" />
+          </Button>
+        </>
       ),
     },
   ];
