@@ -6,7 +6,7 @@ import React, { useState } from "react";
 
 const Page = () => {
   const [refreshKey] = useState(0); // State để làm mới dữ liệu
-  const model = "dfa93026-d9ca-47a8-87bb-34822dd6c0c5";
+  const model = "f970e50f-d7ca-441e-8142-da00d68ef09d";
   const {
     queueData: data,
     isLoading,
@@ -21,7 +21,7 @@ const Page = () => {
       <div className="text-right mb-4">
         <Button
           type="primary"
-          href="/hoi_dong/history_monastery/edit_history_monastery"
+          href="/dang_sang_lap/cuoc_doi_dang_sang_lap/edit_founder_history"
           size="large"
         >
           Chỉnh sửa thông tin

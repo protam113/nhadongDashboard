@@ -1,23 +1,23 @@
 import {
   MdDashboard,
   MdAddToQueue,
-  MdOutlineEventAvailable,
   MdGroup,
   MdManageSearch,
   MdOutlineAdminPanelSettings,
 } from "react-icons/md";
-import { FaNewspaper, FaFileAlt, FaChurch } from "react-icons/fa";
+import { FaNewspaper, FaFileAlt, FaChurch, FaPray } from "react-icons/fa";
 import { HiUserGroup } from "react-icons/hi2";
 import { SlNotebook, SlCalender } from "react-icons/sl";
 import { BiCategory } from "react-icons/bi";
 import { HiOutlineNewspaper } from "react-icons/hi";
 import { RiCommunityLine } from "react-icons/ri";
 import { BiDonateHeart } from "@/lib/iconLib";
+import { RiCommunityFill } from "react-icons/ri";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBullseye } from "@fortawesome/free-solid-svg-icons";
+import { IoDocumentsSharp } from "react-icons/io5";
 
-/**
-35,18
- **/
-
+// 35
 export const NavItems = () => {
   return [
     {
@@ -29,65 +29,26 @@ export const NavItems = () => {
     {
       name: "User",
       link: "/user",
-      key: "3",
+      key: "2",
       icon: <HiUserGroup />,
       children: [
         {
           name: "User",
           link: "/user/client_user", // Đổi link thành href
-          key: "7",
+          key: "3",
           icon: <MdGroup />,
         },
         {
           name: "Admin & Manager",
           link: "/user/administrator",
-          key: "8",
+          key: "4",
           icon: <MdOutlineAdminPanelSettings />,
         },
         {
           name: "Block List",
           link: "/user/block_list",
-          key: "27",
+          key: "5",
           icon: <MdOutlineAdminPanelSettings />,
-        },
-      ],
-    },
-    {
-      name: "Tin Tức",
-      link: "/news",
-      key: "4",
-      icon: <FaNewspaper />,
-      children: [
-        {
-          name: "Thể Loại",
-          link: "/news/news_categories",
-          key: "20",
-          icon: <BiCategory />,
-        },
-        {
-          name: "Quản Lý Tin Tức",
-          link: "/news/news_management",
-          key: "21",
-          icon: <HiOutlineNewspaper />,
-        },
-      ],
-    },
-    {
-      name: "Blog",
-      link: "/blog",
-      key: "5",
-      icon: <FaFileAlt />,
-      children: [
-        {
-          name: "Thể Loại",
-          link: "/blog/blog_categories",
-          key: "22",
-          icon: <BiCategory />,
-        },
-        {
-          name: "Quản Lý Blog",
-          link: "/blog/blog_management",
-          key: "23",
         },
       ],
     },
@@ -99,46 +60,160 @@ export const NavItems = () => {
         {
           name: "Lịch Sử Dòng",
           link: "/hoi_dong/history_monastery",
-          key: "19",
+          key: "7",
         },
         {
-          name: "Thư Viện Ảnh",
-          link: "/hoi_dong/gallery",
-          key: "18",
-        },
-        {
-          name: "Sứ Vụ",
-          link: "/hoi_dong/missio",
-          key: "9",
-          children: [
-            {
-              name: "Thể loại",
-              link: "/hoi_dong/missio/missio_categories",
-              key: "36",
-              icon: <BiCategory />,
-            },
-          ],
+          name: "Đặc Sủng Linh Đạo",
+          link: "/user/block_list",
+          key: "8",
         },
       ],
     },
     {
-      name: "Sự Kiện",
-      link: "/event",
-      key: "11",
-      icon: <MdOutlineEventAvailable />,
+      name: "Đấng Sáng Lập",
+      key: "9",
+      icon: <FaChurch />,
       children: [
         {
-          name: "Ơn Gọi",
-          link: "/event/vocation_list",
-          key: "24",
+          name: "Cuộc Đời Đấng Sáng Lập",
+          link: "/dang_sang_lap/cuoc_doi_dang_sang_lap",
+          key: "10",
+        },
+        {
+          name: "Thư Đấng Sáng Lập",
+          link: "/dang_sang_lap/thu_dang_sang_lap",
+          id: "11",
+        },
+      ],
+    },
+    {
+      name: "Danh Mục",
+      key: "31",
+      icon: <MdAddToQueue />,
+      children: [
+        {
+          name: "Hàng Đợi",
+          link: "/danh_muc/queue",
+          key: "32",
+          icon: <MdManageSearch />,
+        },
+        {
+          name: "Thể Loại",
+          link: "/danh_muc/categories",
+          key: "33",
+          icon: <MdManageSearch />,
+        },
+      ],
+    },
+    {
+      name: "Tin Tức",
+      link: "/news",
+      key: "12",
+      icon: <FaNewspaper />,
+      children: [
+        {
+          name: "Thể Loại",
+          link: "/news/news_categories",
+          key: "13",
           icon: <BiCategory />,
         },
         {
-          name: "Sự Kiện",
-          link: "/event/event_list",
-          key: "28",
+          name: "Quản Lý Tin Tức",
+          link: "/news/news_management",
+          key: "14",
+          icon: <HiOutlineNewspaper />,
+        },
+      ],
+    },
+    {
+      name: "Giáo Hội",
+      link: "/blog",
+      key: "15",
+      icon: <FaFileAlt />,
+      children: [
+        {
+          name: "Thể Loại",
+          link: "/blog/blog_categories",
+          key: "16",
           icon: <BiCategory />,
         },
+        {
+          name: "Quản Lý Blog",
+          link: "/blog/blog_management",
+          key: "17",
+        },
+      ],
+    },
+    {
+      name: "Sứ Vụ",
+      link: "/hoi_dong/missio",
+      key: "18",
+      icon: <FontAwesomeIcon icon={faBullseye} />,
+      children: [
+        {
+          name: "Thể loại",
+          link: "/hoi_dong/missio/missio_categories",
+          key: "19",
+          icon: <BiCategory />,
+        },
+      ],
+    },
+    {
+      name: "Tài Liệu ",
+      link: "/study/document",
+      key: "20",
+      icon: <IoDocumentsSharp />,
+      children: [
+        {
+          name: "Quản Lý Tài Liệu",
+          link: "/study/document/document_manager",
+          key: "21",
+          icon: <MdManageSearch />,
+        },
+      ],
+    },
+    {
+      name: "Cầu Nguyện",
+      link: "/pray",
+      key: "22",
+      icon: <FaPray />,
+    },
+    {
+      name: "Bác Ái Xã Hội",
+      icon: <RiCommunityFill />,
+      children: [
+        {
+          name: "Sự Kiện",
+          link: "/bac_ai_xa_hoi/event_list",
+          key: "23",
+          icon: <BiCategory />,
+        },
+        {
+          name: "Quyên Góp",
+          link: "/bac_ai_xa_hoi/donation",
+          key: "24",
+          icon: <BiDonateHeart />,
+        },
+      ],
+    },
+    {
+      name: "Ơn Gọi",
+      link: "/vocation",
+      key: "25",
+      icon: <BiCategory />,
+      children: [
+        {
+          name: "Tìm Hiểu Về Ơn Gọi",
+          link: "/vocation/learn_vocation",
+          key: "36",
+          icon: <BiCategory />,
+        },
+        // {
+        //   name: "Quyên Góp",
+        //   link: "/vocation",
+        //   key: "35",
+        //   icon: <BiDonateHeart />,
+        // },
       ],
     },
     {
@@ -147,60 +222,42 @@ export const NavItems = () => {
       key: "26",
       icon: <SlCalender />,
     },
-    {
-      name: "Quyên Góp",
-      link: "/donation",
-      key: "1010",
-      icon: <BiDonateHeart />,
-    },
+
     {
       name: "Học Tập",
-      key: "12",
+      key: "27",
       icon: <SlNotebook />,
       children: [
         {
-          name: "Tài Liệu ",
-          link: "/study/document",
-          key: "15",
-          children: [
-            {
-              name: "Quản Lý Tài Liệu",
-              link: "/study/document/document_manager",
-              key: "13",
-              icon: <MdManageSearch />,
-            },
-          ],
-        },
-        {
           name: "Thuong AI",
           link: "/study/chatAI",
-          key: "16",
+          key: "28",
         },
       ],
     },
     {
-      name: "Danh Mục",
-      key: "2",
+      name: "Thư Viện",
       icon: <MdAddToQueue />,
       children: [
         {
-          name: "Hàng Đợi",
-          link: "/danh_muc/queue",
-          key: "25",
+          name: "Ảnh",
+          link: "/thu_vien_anh",
+          key: "29",
           icon: <MdManageSearch />,
         },
         {
-          name: "Thể Loại",
-          link: "/danh_muc/categories",
-          key: "38",
+          name: "Video",
+          link: "/thu_vien_vieo",
+          key: "30",
           icon: <MdManageSearch />,
         },
       ],
     },
+
     {
       name: "Cộng Đoàn",
       link: "/cong_doan",
-      key: "17",
+      key: "34",
       icon: <RiCommunityLine />,
     },
   ];

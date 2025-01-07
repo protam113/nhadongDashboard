@@ -3,8 +3,6 @@
 
 // queueLogic.ts
 import {useActiveUser, useUserList} from "@/hooks/user/useUsers";
-import { message } from "antd";
-
 
 export const UserList = (currentPage: number,is_active: string,blocked: string
                           , refreshKey: number
@@ -26,14 +24,7 @@ export const UserList = (currentPage: number,is_active: string,blocked: string
             id: selectedKeys,
             status: status,
         };
-        activeUser(browseManager, {
-            onSuccess: () => {
-                message.success("User status updated successfully!"); // Thông báo sau khi thành công
-            },            
-            onError: (error: any) => {
-                console.error("Error in browseQueue:", error);  // Log lỗi nếu có
-            }
-        });
+        activeUser(browseManager);
     };
 
 

@@ -1,15 +1,11 @@
 "use client";
-import { useHistoryMonastery } from "@/hooks/history_monastery/useHistoryMonastery";
-import { HistoryMonasteryResponse } from "@/types/types";
+import { useHistory } from "@/hooks/history_monastery/useHistoryMonastery";
 
 // Đảm bảo đây là client component
 
-export const HistoryMonasteryData = (refreshKey: number): {
-  queueData: HistoryMonasteryResponse | null;
-  isLoading: boolean;
-  isError: boolean;
-} => {
-  const { data, isLoading, isError } = useHistoryMonastery(refreshKey);
+export const HistoryMonasteryData = (refreshKey: number,model: string) => {
+
+  const { data, isLoading, isError } = useHistory(refreshKey,{category: [model],});
 
   const queueData = data || null;
 

@@ -5,15 +5,16 @@ import React, { useState, useEffect } from "react";
 import { Button, Form, Spin } from "antd";
 import { HistoryMonasteryData } from "@/lib/historyMonasteryData";
 import { useUpdateHistory } from "@/hooks/history_monastery/useHistoryMonastery";
+import BackButton from "@/components/Button/BackButton";
 
 const Page = () => {
   const [form] = Form.useForm();
   const [refreshKey] = useState(0); // State để làm mới dữ liệu
   const [about, setAbout] = useState<string>(""); // State để chứa nội dung đã chỉnh sửa
   const [initialContent, setInitialContent] = useState<string>(""); // State để lưu nội dung ban đầu
-  const [historyId] = useState<string>("5");
+  const [historyId] = useState<string>("2");
   const { mutate } = useUpdateHistory();
-  const model = "dfa93026-d9ca-47a8-87bb-34822dd6c0c5";
+  const model = "f970e50f-d7ca-441e-8142-da00d68ef09d";
   const {
     queueData: data,
     isLoading,
@@ -41,19 +42,22 @@ const Page = () => {
   if (isError || !data) return <div>Error loading queue data.</div>; // Kiểm tra nếu `data` không tồn tại
 
   return (
-    <Form form={form}>
-      <HistoryEditRichText
-        onChange={setAbout} // Cập nhật `about` khi người dùng thay đổi
-        initialContent={initialContent} // Truyền dữ liệu ban đầu vào editor
-      />
-      <Button
-        type="primary"
-        onClick={handleSave}
-        disabled={about === initialContent}
-      >
-        Save Changes
-      </Button>
-    </Form>
+    <div>
+      <BackButton />
+      <Form form={form}>
+        <HistoryEditRichText
+          onChange={setAbout} // Cập nhật `about` khi người dùng thay đổi
+          initialContent={initialContent} // Truyền dữ liệu ban đầu vào editor
+        />
+        <Button
+          type="primary"
+          onClick={handleSave}
+          disabled={about === initialContent}
+        >
+          Save Changes
+        </Button>
+      </Form>
+    </div>
   );
 };
 

@@ -32,10 +32,10 @@ const UserQueueList: React.FC = () => {
     setRefreshKey((prev) => prev + 1); // Refresh data manually
   };
 
-  // const handleBulkReject = () => {
-  //     handleActiveUser(selectedKeys, 'rejected');
-  //     setSelectedKeys([]);
-  // };
+  const handleBulkReject = () => {
+    handleActiveUser(selectedKeys, "rejected");
+    setSelectedKeys([]);
+  };
 
   const columns: ColumnsType<any> = [
     {
@@ -82,6 +82,14 @@ const UserQueueList: React.FC = () => {
           style={{ marginBottom: "16px" }}
         >
           Chấp Thuận
+        </Button>
+        <Button
+          type="default"
+          danger
+          onClick={handleBulkReject}
+          style={{ marginBottom: "16px" }}
+        >
+          Từ Chối
         </Button>
       </div>
       <div className="overflow-auto" style={{ maxHeight: "800px" }}>

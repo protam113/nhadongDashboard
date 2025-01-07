@@ -11,9 +11,9 @@ const Page = () => {
   const [refreshKey] = useState(0); // State để làm mới dữ liệu
   const [about, setAbout] = useState<string>(""); // State để chứa nội dung đã chỉnh sửa
   const [initialContent, setInitialContent] = useState<string>(""); // State để lưu nội dung ban đầu
-  const [historyId] = useState<string>("5");
+  const [historyId] = useState<string>("3");
   const { mutate } = useUpdateHistory();
-  const model = "dfa93026-d9ca-47a8-87bb-34822dd6c0c5";
+  const model = "7449116f-1299-4b67-97b1-c5061a3d2dd5";
   const {
     queueData: data,
     isLoading,

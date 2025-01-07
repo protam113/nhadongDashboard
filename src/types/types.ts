@@ -12,10 +12,10 @@ export interface AuthContextType {
     getToken: () => string | null; // Thêm getToken vào kiểu AuthContextType
 }
 
-/**
- PushButtonProps Interface
- **/
 
+/*
+  Khai Báo Thuộc Tính Category
+*/
 interface CategoryList {
     id: number;
     name: string;
@@ -650,11 +650,51 @@ export interface NewGroupMember {
 
 
 // Khai Báo Các Biến Có trong Queue
+interface RequestUser {
+  id: string;
+  username: string;
+  first_name: string;
+  last_name: string;
+  profile_image: string;
+
+}
+
+interface BrowsedUser {
+  id: string;
+  username: string;
+  first_name: string;
+  last_name: string;
+  profile_image: string;
+
+}
+
+interface OldData {
+  id: string;
+  name: string;
+  image: string;
+  model: string;
+}
+
+interface NewData {
+  id: string;
+  name: string;
+  image: string;
+  model: string;
+}
+
+
+interface Data {
+  old_data: OldData | null;
+  new_data: NewData | null;
+}
+
 interface Queue {
-  id: number;
+  id: string;
+  request_user:RequestUser | null;
+  browsed_user:BrowsedUser | null;
   created_date: string;
   updated_date: string;
-  data: string;
+  data: Data;
   description: string;
   type: string;
   action: string;
@@ -669,7 +709,9 @@ export interface FetchQueueListResponse {
   results: Queue[];
 }
 
-
+/*
+  Khai Báo Thuộc Tính Role
+*/
 interface Role {
   id: number;
   name: string;

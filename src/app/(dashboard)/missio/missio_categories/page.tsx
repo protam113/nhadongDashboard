@@ -1,42 +1,39 @@
-"use client"; // Ensures this is a client component
+"use client";
 
 import React, { useState } from "react";
-import { Table, Button, Spin, Select, Modal, Image } from "antd";
+import { Table, Button, Spin, Modal, Image } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { FaSync } from "react-icons/fa"; // Import refresh icon
+import { FaSync } from "react-icons/fa";
 import { CategoriesList } from "@/lib/categoriesList";
-import { useRouter } from "next/navigation";
 import { useDeleteCategory } from "@/hooks/cateogry/useCategories";
-import { MdOutlineDelete } from "react-icons/md";
 import { FaRegEdit } from "react-icons/fa";
-import CategoriesQueueTable from "@/app/(dashboard)/danh_muc/categories/CategoriesQueueTable";
+// import CreateBlogCategory from "./CreateBlogCategory";
 import EditBlogCategory from "@/app/(dashboard)/blog/blog_categories/EditBlogCategory";
 import Heading from "@/components/design/Heading";
-import { FaArrowLeft, FaArrowRight } from "@/lib/iconLib";
+import MissioQueueTable from "./missioQueueTable";
+import CreateMissioCategory from "./CreateMissioCategory";
+import { FaArrowLeft, FaArrowRight, MdOutlineDelete } from "@/lib/iconLib";
 
-const { Option } = Select;
-
-const Categories: React.FC = () => {
+const MissioCategories: React.FC = () => {
   const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [model, setModel] = useState<string>(""); // State to hold selected model
-  const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
-  const router = useRouter(); // Hook for navigation
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [isCreateModalVisible, setIsCreateModalVisible] = useState(false); // For creating category
   const [isEditModalVisible, setIsEditModalVisible] = useState(false); // For editing category
   const [editingCategory, setEditingCategory] = useState(null);
-  // Pass model into CategoriesList
+  const [isCreateLoading, setIsCreateLoading] = useState<boolean>(false);
+
+  const { mutate: deleteCategory } = useDeleteCategory();
+
   const { queueData, next, isLoading, isError } = CategoriesList(
     currentPage,
-    model,
+    "mission",
     refreshKey
   );
 
   const totalPages = next ? currentPage + 1 : currentPage;
 
-  const { mutate: deleteCategory } = useDeleteCategory();
-
   const handleDelete = (categoryId: string) => {
-    // Show confirmation dialog before deletion
     Modal.confirm({
       title: "Xác nhận xóa",
       content: "Bạn có chắc chắn muốn xóa thể loại này?",
@@ -47,6 +44,11 @@ const Categories: React.FC = () => {
         deleteCategory(categoryId);
       },
     });
+  };
+
+  // Handle loading change
+  const handleLoadingChange = (isLoading: boolean) => {
+    setIsCreateLoading(isLoading);
   };
 
   const handleEdit = (editCategory: any) => {
@@ -77,7 +79,7 @@ const Categories: React.FC = () => {
       title: "Hình Ảnh",
       dataIndex: "image",
       key: "image",
-      width: 150,
+      width: 200,
       render: (fileUrl: string) => (
         <Image
           width={100}
@@ -114,17 +116,16 @@ const Categories: React.FC = () => {
   if (isLoading) return <Spin size="large" />;
   if (isError) return <div>Error loading queue data.</div>;
 
-  const handleModelChange = (value: string) => {
-    setModel(value);
-    setRefreshKey((prev) => prev + 1); // Refresh data when model changes
-  };
-
   const handleRefresh = () => {
-    setRefreshKey((prev) => prev + 1); // Refresh data manually
+    setRefreshKey((prev) => prev + 1);
   };
 
   const handleCreateCategory = () => {
-    router.push("/danh_muc/categories/create_category"); // Navigate to the create category page
+    setIsCreateModalVisible(true); // Show the modal when "Create Category" is clicked
+  };
+
+  const handleCancelCreateModal = () => {
+    setIsCreateModalVisible(false); // Hide the create category modal
   };
 
   const handleCancelEditModal = () => {
@@ -135,35 +136,17 @@ const Categories: React.FC = () => {
   return (
     <>
       <div className="p-4">
-        <Heading name="quản lý toàn bộ thể loại  " />
+        <Heading name="quản lý thể loại sứ vụ  " />
 
-        {/* Model selection */}
         <div className="flex justify-between items-center mb-4">
-          <div className="mb-4">
-            {/* Phần chữ Bộ Lọc */}
-            <p className="mb-2">Bộ Lọc</p>
-
-            {/* Phần Select và Button kế nhau */}
-            <div className="flex items-center">
-              <Select
-                value={model}
-                onChange={handleModelChange}
-                placeholder="Chọn model"
-                style={{ width: 200 }}
-              >
-                <Option value="blog">Giáo Hội</Option>
-                <Option value="news">Tin Tức</Option>
-                <Option value="document">Tư Liệu</Option>
-                <Option value="mission">Sứ Vụ</Option>
-                <Option value="messageformfounder">Thư Đấng Sáng Lập</Option>
-              </Select>
-
-              <Button onClick={handleRefresh} style={{ marginLeft: "8px" }}>
-                <FaSync /> Làm mới
-              </Button>
-            </div>
-          </div>
-          <Button type="primary" onClick={handleCreateCategory}>
+          <Button onClick={handleRefresh}>
+            <FaSync /> Làm mới
+          </Button>
+          <Button
+            type="primary"
+            onClick={handleCreateCategory}
+            loading={isCreateLoading}
+          >
             Tạo Thể Loại
           </Button>
         </div>
@@ -213,8 +196,21 @@ const Categories: React.FC = () => {
             <FaArrowRight />
           </button>
         </div>
-        <CategoriesQueueTable />
+
+        <MissioQueueTable />
       </div>
+
+      {/* Modal tạo thể loại */}
+      <Modal
+        title="Tạo Thể Loại"
+        visible={isCreateModalVisible}
+        onCancel={handleCancelCreateModal}
+        footer={null}
+        width={600}
+      >
+        <CreateMissioCategory onLoadingChange={handleLoadingChange} />
+      </Modal>
+      {/* Modal sửa thể loại */}
       <Modal
         title="Sửa Thể Loại"
         visible={isEditModalVisible}
@@ -222,7 +218,6 @@ const Categories: React.FC = () => {
         footer={null}
         width={600}
       >
-        {/* eslint-disable-next-line react/jsx-no-undef */}
         <EditBlogCategory category={editingCategory} />{" "}
         {/* Hiển thị thông tin thể loại */}
       </Modal>
@@ -230,4 +225,4 @@ const Categories: React.FC = () => {
   );
 };
 
-export default Categories;
+export default MissioCategories;
