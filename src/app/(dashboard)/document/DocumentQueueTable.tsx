@@ -5,6 +5,7 @@ import { Table, Button, Spin, Pagination } from "antd";
 import { ReloadOutlined, PlusOutlined, MinusOutlined } from "@ant-design/icons"; // Icon từ Ant Design
 import type { ColumnsType } from "antd/es/table";
 import { UserQueue } from "@/lib/userQueue";
+import { SpinLoading, Error } from "@/components/design/index";
 
 const DocumentQueueList: React.FC = () => {
   const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
@@ -154,8 +155,8 @@ const DocumentQueueList: React.FC = () => {
     },
   ];
 
-  if (isLoading) return <Spin size="large" />;
-  if (isError) return <div>Error loading queue data.</div>;
+  if (isLoading) return <SpinLoading />;
+  if (isError) return <Error />;
 
   return (
     <div className="p-4">

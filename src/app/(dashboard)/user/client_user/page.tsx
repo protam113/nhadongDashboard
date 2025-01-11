@@ -21,7 +21,7 @@ const UserPage: React.FC = () => {
   const { data, isLoading, isError, isFetching } = useUserList(
     currentPage,
     {
-      role: ["3df87eaf-2eae-4f87-ae8d-b5043673c88a"],
+      role: ["9ae68c0e-9a70-4159-b970-56fafef1d023"],
       blocked: ["false"],
     },
     refreshKey

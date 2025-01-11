@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Button,
   Col,
@@ -8,6 +8,7 @@ import {
   Form,
   Image,
   Input,
+  message,
   Row,
   Select,
   Space,
@@ -19,12 +20,21 @@ import { CategoriesList } from "@/lib/categoriesList";
 import { UploadFile } from "antd/lib/upload/interface";
 import EditContentSection from "@/components/main/blog/EditContentSection";
 import { useEditMessage } from "@/hooks/message/useMessage";
+import { RcFile } from "antd/es/upload";
+import EditMoreType from "@/components/metamedia/Edittype";
 
 interface EditBlogModalProps {
   open: boolean;
   onClose: () => void;
   document: Document | null; // Cho phép null nếu blog chưa được load
 }
+
+type BlogData = {
+  file_type: string[];
+  file: RcFile[];
+  metadata: string[];
+  media_remove?: string[]; // Nếu bạn cần lưu media_remove
+};
 
 const EditMessageModal: React.FC<EditBlogModalProps> = ({
   open,
@@ -43,6 +53,11 @@ const EditMessageModal: React.FC<EditBlogModalProps> = ({
     0
   );
   const { mutate: editBlogMutation } = useEditMessage();
+  const [blogData, setBlogData] = useState<BlogData>({
+    file_type: [],
+    file: [],
+    metadata: [],
+  });
 
   useEffect(() => {
     if (document) {
@@ -75,13 +90,57 @@ const EditMessageModal: React.FC<EditBlogModalProps> = ({
     setSelectedCategory(value);
   };
 
+  const handleDataChange = useCallback(
+    (data: {
+      filetype: string[];
+      file: (string | RcFile | null)[]; // Allowing string, RcFile, or null
+      metadata: string[];
+      media_remove?: string[];
+    }) => {
+      const { filetype, file, metadata, media_remove } = data;
+
+      if (filetype) {
+        setBlogData((prevData) => ({
+          ...prevData,
+          file_type: filetype, // Cập nhật file_type
+        }));
+      }
+
+      if (file) {
+        // Filter out invalid files (null or strings)
+        const validFiles = file.filter(
+          (item): item is RcFile => item !== null && !(typeof item === "string")
+        );
+        setBlogData((prevData) => ({
+          ...prevData,
+          file: validFiles, // Cập nhật mảng tệp file chỉ với RcFile hợp lệ
+        }));
+      }
+      if (metadata) {
+        setBlogData((prevData) => ({
+          ...prevData,
+          metadata: metadata, // Cập nhật metadata
+        }));
+      }
+
+      // Cập nhật media_remove nếu có
+      if (media_remove) {
+        setBlogData((prevData) => ({
+          ...prevData,
+          media_remove: media_remove, // Cập nhật danh sách các media đã bị xóa
+        }));
+      }
+    },
+    [] // Không phụ thuộc vào bất kỳ giá trị nào ngoài data
+  );
+
   const handleChange: UploadProps["onChange"] = ({ fileList }) => {
     setFileList(fileList);
   };
 
   const handleSubmit = () => {
     if (!document) {
-      console.error("Document is null, cannot edit.");
+      message.warning("Không thể thể cập nhật bài viết !!.");
       return;
     }
 
@@ -96,7 +155,15 @@ const EditMessageModal: React.FC<EditBlogModalProps> = ({
               ? [initialCategory]
               : [],
           image: fileList.map((file) => file.originFileObj || file.url),
+          // Include all media-related fields
+          file_type: blogData.file_type,
+          file: blogData.file,
+          metadata: blogData.metadata,
         };
+
+        if (blogData.media_remove && blogData.media_remove.length > 0) {
+          editBlog.media_remove = blogData.media_remove;
+        }
 
         editBlogMutation({
           editDoc: editBlog,
@@ -208,6 +275,19 @@ const EditMessageModal: React.FC<EditBlogModalProps> = ({
                   placeholder="Chọn thể loại"
                 />
               )}
+            </Form.Item>
+            <Form.Item label="Media">
+              <EditMoreType
+                onDataChange={handleDataChange}
+                media={
+                  document?.media?.map((item) => ({
+                    id: item.id ?? "",
+                    file: item.file,
+                    file_type: item.file_type ?? "",
+                    metadata: JSON.stringify(item.metadata),
+                  })) ?? []
+                }
+              />
             </Form.Item>
           </Col>
         </Row>

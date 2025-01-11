@@ -5,7 +5,8 @@ import { Doughnut } from "react-chartjs-2";
 import { Chart, ArcElement, Tooltip, Legend } from "chart.js";
 import { useStatisticalUser } from "@/hooks/statical/useStatical";
 import dayjs from "dayjs";
-import { DatePicker, Button, Spin, Alert, Select } from "antd";
+import { DatePicker, Button, Select } from "antd";
+import { SpinLoading, Error } from "@/components/design/index";
 
 const { RangePicker } = DatePicker;
 const { Option } = Select;
@@ -48,11 +49,11 @@ const StaticalUserProb = () => {
 
   // Kiểm tra trạng thái loading và lỗi
   if (isLoading) {
-    return <Spin size="large" />;
+    return <SpinLoading />;
   }
 
   if (isError) {
-    return <Alert message="Error fetching data" type="error" />;
+    return <Error />;
   }
 
   // Kiểm tra dữ liệu

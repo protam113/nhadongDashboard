@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import {
   Form,
   Input,
@@ -10,6 +10,8 @@ import {
   Select,
   message,
   Image,
+  Row,
+  Col,
 } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { RcFile } from "antd/lib/upload";
@@ -19,6 +21,7 @@ import BackButton from "@/components/Button/BackButton";
 import Heading from "@/components/design/Heading";
 import ContentSection from "@/components/main/blog/ContentSection";
 import { useCreateMessage } from "@/hooks/message/useMessage";
+import MoreType from "@/app/(dashboard)/blog/blog_management/create_blog/MoreType";
 
 const { TextArea } = Input;
 
@@ -34,6 +37,9 @@ const Page: React.FC = () => {
     content: "",
     category: "",
     link: "",
+    file_type: [] as string[],
+    file: [] as RcFile[],
+    metadata: [] as string[],
   });
   const [currentPage] = useState(1);
   const [refreshKey] = useState(0);
@@ -49,6 +55,35 @@ const Page: React.FC = () => {
   const handleCategoryChange = (value: string) => {
     setBlogData({ ...blogData, category: value });
   };
+
+  const handleDataChange = useCallback(
+    (data: { filetype: string[]; file: RcFile[]; metadata: string[] }) => {
+      const { filetype, file, metadata } = data;
+
+      // Cập nhật từng phần một như handleCategoryChange
+      if (filetype) {
+        setBlogData((prevData) => ({
+          ...prevData,
+          file_type: filetype, // Cập nhật file_type
+        }));
+      }
+
+      if (file) {
+        setBlogData((prevData) => ({
+          ...prevData,
+          file: file, // Cập nhật mảng tệp file
+        }));
+      }
+
+      if (metadata) {
+        setBlogData((prevData) => ({
+          ...prevData,
+          metadata: metadata,
+        }));
+      }
+    },
+    [] // Không phụ thuộc vào bất kỳ giá trị nào ngoài data
+  );
 
   const handleChange: UploadProps["onChange"] = ({ fileList }) => {
     setFileList(fileList);
@@ -101,6 +136,9 @@ const Page: React.FC = () => {
         content: "",
         category: "",
         link: "",
+        file_type: [],
+        file: [],
+        metadata: [],
       });
     } catch (error) {
       console.error(error);
@@ -118,91 +156,99 @@ const Page: React.FC = () => {
 
       <Card bordered={false}>
         <Form form={form} layout="vertical" onFinish={handleSaveBlog}>
-          <Form.Item
-            label="Tiêu đề"
-            name="title"
-            rules={[{ required: true, message: "Vui lòng nhập tiêu đề!" }]}
-          >
-            <Input
-              value={blogData.title}
-              onChange={(e) =>
-                setBlogData({ ...blogData, title: e.target.value })
-              }
-            />
-          </Form.Item>
-          <Form.Item
-            label="Mô tả"
-            name="description"
-            rules={[{ required: true, message: "Vui lòng nhập mô tả!" }]}
-          >
-            <TextArea
-              value={blogData.description}
-              onChange={(e) =>
-                setBlogData({ ...blogData, description: e.target.value })
-              }
-            />
-          </Form.Item>
-          <Form.Item label="Hình ảnh chính">
-            <Upload
-              listType="picture-card"
-              fileList={fileList}
-              onPreview={handlePreview}
-              onChange={handleChange}
-              beforeUpload={() => false} // Ngăn tự động tải lên
-            >
-              {fileList.length >= 1 ? null : uploadButton}
-            </Upload>
-
-            {previewImage && (
-              <Image
-                alt="Hình ảnh xem trước bài viết"
-                wrapperStyle={{ display: "none" }}
-                preview={{
-                  visible: previewOpen,
-                  onVisibleChange: (visible) => setPreviewOpen(visible),
-                }}
-                src={previewImage}
-              />
-            )}
-          </Form.Item>
-          <Form.Item label="Nôi Dung Chi Tiết">
-            <ContentSection
-              onChange={setContent}
-              initialContent={blogData.content}
-            />
-          </Form.Item>
-          <Form.Item label="Link" name="Link">
-            <Input
-              value={blogData.link}
-              onChange={(e) =>
-                setBlogData({ ...blogData, link: e.target.value })
-              }
-            />
-          </Form.Item>
-
-          <Form.Item label="Thể loại">
-            {isLoading ? (
-              <p>Đang tải thể loại...</p>
-            ) : isError ? (
-              <p>Có lỗi khi tải thể loại</p>
-            ) : (
-              <Select
-                value={blogData.category} // Chỉ lưu một thể loại
-                onChange={handleCategoryChange} // Cập nhật blogData với thể loại được chọn
-                style={{ width: "100%" }}
-                placeholder="Chọn thể loại"
+          <Row gutter={[16, 0]}>
+            <Col span={12}>
+              <Form.Item
+                label="Tiêu đề"
+                name="title"
+                rules={[{ required: true, message: "Vui lòng nhập tiêu đề!" }]}
               >
-                {queueData?.map((category: any) => (
-                  <Select.Option
-                    key={category.id}
-                    value={category.id.toString()}
+                <Input
+                  value={blogData.title}
+                  onChange={(e) =>
+                    setBlogData({ ...blogData, title: e.target.value })
+                  }
+                />
+              </Form.Item>
+              <Form.Item
+                label="Mô tả"
+                name="description"
+                rules={[{ required: true, message: "Vui lòng nhập mô tả!" }]}
+              >
+                <TextArea
+                  value={blogData.description}
+                  onChange={(e) =>
+                    setBlogData({ ...blogData, description: e.target.value })
+                  }
+                />
+              </Form.Item>
+              <Form.Item label="Hình ảnh chính">
+                <Upload
+                  listType="picture-card"
+                  fileList={fileList}
+                  onPreview={handlePreview}
+                  onChange={handleChange}
+                  beforeUpload={() => false} // Ngăn tự động tải lên
+                >
+                  {fileList.length >= 1 ? null : uploadButton}
+                </Upload>
+
+                {previewImage && (
+                  <Image
+                    alt="Hình ảnh xem trước bài viết"
+                    wrapperStyle={{ display: "none" }}
+                    preview={{
+                      visible: previewOpen,
+                      onVisibleChange: (visible) => setPreviewOpen(visible),
+                    }}
+                    src={previewImage}
+                  />
+                )}
+              </Form.Item>
+              <Form.Item label="Nôi Dung Chi Tiết">
+                <ContentSection
+                  onChange={setContent}
+                  initialContent={blogData.content}
+                />
+              </Form.Item>
+              <Form.Item label="Link" name="Link">
+                <Input
+                  value={blogData.link}
+                  onChange={(e) =>
+                    setBlogData({ ...blogData, link: e.target.value })
+                  }
+                />
+              </Form.Item>
+
+              <Form.Item label="Thể loại">
+                {isLoading ? (
+                  <p>Đang tải thể loại...</p>
+                ) : isError ? (
+                  <p>Có lỗi khi tải thể loại</p>
+                ) : (
+                  <Select
+                    value={blogData.category} // Chỉ lưu một thể loại
+                    onChange={handleCategoryChange} // Cập nhật blogData với thể loại được chọn
+                    style={{ width: "100%" }}
+                    placeholder="Chọn thể loại"
                   >
-                    {category.name}
-                  </Select.Option>
-                ))}
-              </Select>
-            )}
-          </Form.Item>
+                    {queueData?.map((category: any) => (
+                      <Select.Option
+                        key={category.id}
+                        value={category.id.toString()}
+                      >
+                        {category.name}
+                      </Select.Option>
+                    ))}
+                  </Select>
+                )}
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Heading name="Thêm Hình Ảnh Hoặc PDF" />
+              <MoreType onDataChange={handleDataChange} />
+            </Col>
+          </Row>
 
           <Form.Item style={{ textAlign: "center" }}>
             <Button

@@ -55,7 +55,7 @@ const User = () => {
   const [refreshKey] = useState(0); // State to refresh data
   const { data, isLoading, isError, isFetching } = useUserList(
     currentPage,
-    {},
+    { blocked: ["false"] },
     refreshKey
   ); // Truyền currentPage vào hook
 

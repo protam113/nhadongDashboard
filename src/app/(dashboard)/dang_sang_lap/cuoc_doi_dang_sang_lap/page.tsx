@@ -1,8 +1,9 @@
 "use client";
 
 import { HistoryMonasteryData } from "@/lib/historyMonasteryData";
-import { Button, Spin } from "antd";
+import { Button } from "antd";
 import React, { useState } from "react";
+import { SpinLoading, Error } from "@/components/design/index";
 
 const Page = () => {
   const [refreshKey] = useState(0); // State để làm mới dữ liệu
@@ -13,8 +14,28 @@ const Page = () => {
     isError,
   } = HistoryMonasteryData(refreshKey, model);
 
-  if (isLoading) return <Spin size="large" />;
-  if (isError || !data) return <div>Error loading queue data.</div>; // Kiểm tra nếu `data` không tồn tại
+  if (isLoading) {
+    return <SpinLoading />;
+  }
+  if (isError) {
+    return <Error />;
+  }
+  if (!data) {
+    return (
+      <div
+        style={{
+          fontFamily: "Arial, sans-serif",
+          fontSize: "18px",
+          fontWeight: "bold",
+          color: "#ff4d4f", // Màu đỏ cảnh báo
+          textAlign: "center",
+          marginTop: "20px",
+        }}
+      >
+        Hãy cập nhật thông tin website.
+      </div>
+    );
+  }
 
   return (
     <div className="p-6 max-w-5xl mx-auto">

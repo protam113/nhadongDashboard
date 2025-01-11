@@ -100,6 +100,15 @@ const CreateDocs = async (newDoc: NewDocs, token: string) => {
     if (key === "category") {
       // Gửi category là một chuỗi đơn, không cần phải là mảng
       formData.append("category", value as string);
+    }
+    if (key === "file" && Array.isArray(value)) {
+      value.forEach((file) => formData.append("file", file));
+    } else if (key === "file_type" && Array.isArray(value)) {
+      // Xử lý file
+      value.forEach((string) => formData.append("file_type", string));
+    } else if (key === "metadata" && Array.isArray(value)) {
+      // Xử lý metadata
+      value.forEach((string) => formData.append("metadata", string));
     } else if (key === "image" && typeof value === "string") {
       // Nếu là URL hình ảnh
       formData.append(key, value);
@@ -240,6 +249,15 @@ const EditDocument = async (
       if (typeof value === "string") {
         formData.append("category", value); // Nếu đã là string thì truyền trực tiếp
       }
+    }
+    if (key === "file" && Array.isArray(value)) {
+      value.forEach((file) => formData.append("file", file));
+    } else if (key === "file_type" && Array.isArray(value)) {
+      // Xử lý file
+      value.forEach((string) => formData.append("file_type", string));
+    } else if (key === "metadata" && Array.isArray(value)) {
+      // Xử lý metadata
+      value.forEach((string) => formData.append("metadata", string));
     } else if (key === "image") {
       // Xử lý trường image
       if (typeof value === "string") {

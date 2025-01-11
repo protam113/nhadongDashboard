@@ -1,20 +1,22 @@
 "use client";
 
 import React, { useState } from "react";
-import { Table, Button, Spin, Modal, Image } from "antd";
+import { Table, Button, Modal, Image } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { FaSync } from "react-icons/fa";
 import { CategoriesList } from "@/lib/categoriesList";
 import { useDeleteCategory } from "@/hooks/cateogry/useCategories";
-import { FaRegEdit } from "react-icons/fa";
-// import CreateBlogCategory from "./CreateBlogCategory";
 import EditBlogCategory from "@/app/(dashboard)/blog/blog_categories/EditBlogCategory";
-import Heading from "@/components/design/Heading";
-import MissioQueueTable from "./missioQueueTable";
-import CreateMissioCategory from "./CreateMissioCategory";
-import { FaArrowLeft, FaArrowRight, MdOutlineDelete } from "@/lib/iconLib";
+import CreateDocsCategoryModal from "./modal/CreateDocsCategoryModal";
+import {
+  FaArrowLeft,
+  FaArrowRight,
+  MdOutlineDelete,
+  FaRegEdit,
+  FaSync,
+} from "@/lib/iconLib";
+import { SpinLoading, Error, Heading } from "@/components/design/index";
 
-const MissioCategories: React.FC = () => {
+const DocumentCategoriesTable: React.FC = () => {
   const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -25,14 +27,13 @@ const MissioCategories: React.FC = () => {
 
   const { mutate: deleteCategory } = useDeleteCategory();
 
-  const { queueData,next, isLoading, isError } = CategoriesList(
+  const { queueData, next, isLoading, isError } = CategoriesList(
     currentPage,
-    "mission",
+    "document",
     refreshKey
   );
 
   const totalPages = next ? currentPage + 1 : currentPage;
-
 
   const handleDelete = (categoryId: string) => {
     Modal.confirm({
@@ -45,11 +46,6 @@ const MissioCategories: React.FC = () => {
         deleteCategory(categoryId);
       },
     });
-  };
-
-  // Handle loading change
-  const handleLoadingChange = (isLoading: boolean) => {
-    setIsCreateLoading(isLoading);
   };
 
   const handleEdit = (editCategory: any) => {
@@ -67,7 +63,7 @@ const MissioCategories: React.FC = () => {
       dataIndex: "id",
       key: "id",
       width: 80,
-      render: (_, __, index) => <span>{index + 1}</span>, // index + 1
+      render: (_, __, index) => <span>{index + 1}</span>, // Dynamically assign the ID based on index
     },
     {
       title: "Tên Thể Loại",
@@ -114,8 +110,8 @@ const MissioCategories: React.FC = () => {
     },
   ];
 
-  if (isLoading) return <Spin size="large" />;
-  if (isError) return <div>Error loading queue data.</div>;
+  if (isLoading) return <SpinLoading />;
+  if (isError) return <Error />;
 
   const handleRefresh = () => {
     setRefreshKey((prev) => prev + 1);
@@ -134,96 +130,101 @@ const MissioCategories: React.FC = () => {
     setEditingCategory(null); // Reset editing category
   };
 
+  const handleLoadingChange = (isLoading: boolean) => {
+    setIsCreateLoading(isLoading);
+  };
+
   return (
     <>
       <div className="p-4">
-        <Heading name="quản lý thể loại sứ vụ  "/>
+        <Heading name="Quản Lý Thể Loại Tài Liệu (Document)" />
 
         <div className="flex justify-between items-center mb-4">
           <Button onClick={handleRefresh}>
-            <FaSync/> Làm mới
+            <FaSync /> Làm mới
           </Button>
           <Button
-              type="primary"
-              onClick={handleCreateCategory}
-              loading={isCreateLoading}
+            type="primary"
+            onClick={handleCreateCategory}
+            loading={isCreateLoading}
           >
             Tạo Thể Loại
           </Button>
         </div>
 
-        <div className="overflow-auto" style={{maxHeight: "800px"}}>
+        <div className="overflow-auto" style={{ maxHeight: "800px" }}>
           <Table
-              columns={columns}
-              dataSource={queueData}
-              rowKey="id"
-              pagination={false}
-              scroll={{y: 500}}
-              rowSelection={{
-                selectedRowKeys: selectedKeys,
-                onChange: (selectedRowKeys) =>
-                    setSelectedKeys(selectedRowKeys as number[]),
-              }}
+            columns={columns}
+            dataSource={queueData}
+            rowKey="id"
+            pagination={false}
+            scroll={{ y: 500 }}
+            rowSelection={{
+              selectedRowKeys: selectedKeys,
+              onChange: (selectedRowKeys) =>
+                setSelectedKeys(selectedRowKeys as number[]),
+            }}
           />
         </div>
         <div className="flex justify-center mt-8 items-center space-x-2">
           <button
-              onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-              disabled={currentPage === 1}
-              className={`flex items-center justify-center w-6 h-6 text-10 bg-gray-200 rounded-full hover:bg-gray-300 ${
-                  currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
-              }`}
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className={`flex items-center justify-center w-6 h-6 text-10 bg-gray-200 rounded-full hover:bg-gray-300 ${
+              currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
-            <FaArrowLeft/>
+            <FaArrowLeft />
           </button>
-          {Array.from({length: totalPages}, (_, i) => (
-              <button
-                  key={i}
-                  onClick={() => setCurrentPage(i + 1)}
-                  className={`w-6 h-6 text-10 rounded-full hover:bg-gray-300 ${
-                      currentPage === i + 1 ? "bg-blue-500 text-white" : "bg-gray-200"
-                  }`}
-              >
-                {i + 1}
-              </button>
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentPage(i + 1)}
+              className={`w-6 h-6 text-10 rounded-full hover:bg-gray-300 ${
+                currentPage === i + 1 ? "bg-blue-500 text-white" : "bg-gray-200"
+              }`}
+            >
+              {i + 1}
+            </button>
           ))}
           <button
-              onClick={() => setCurrentPage((prev) => prev + 1)}
-              disabled={!next}
-              className={`flex items-center justify-center w-6 h-6 text-10 bg-gray-200 rounded-full hover:bg-gray-300 ${
-                  !next ? "opacity-50 cursor-not-allowed" : ""
-              }`}
+            onClick={() => setCurrentPage((prev) => prev + 1)}
+            disabled={!next}
+            className={`flex items-center justify-center w-6 h-6 text-10 bg-gray-200 rounded-full hover:bg-gray-300 ${
+              !next ? "opacity-50 cursor-not-allowed" : ""
+            }`}
           >
-            <FaArrowRight/>
+            <FaArrowRight />
           </button>
         </div>
-
-        <MissioQueueTable/>
       </div>
 
       {/* Modal tạo thể loại */}
       <Modal
-          title="Tạo Thể Loại"
-          visible={isCreateModalVisible}
-          onCancel={handleCancelCreateModal}
-          footer={null}
-          width={600}
+        title="Tạo Thể Loại"
+        visible={isCreateModalVisible}
+        onCancel={handleCancelCreateModal}
+        footer={null}
+        width={600}
       >
-        <CreateMissioCategory onLoadingChange={handleLoadingChange}/>
+        <CreateDocsCategoryModal onLoadingChange={handleLoadingChange} />{" "}
+        {/* Render CreateBlogCategory form */}
       </Modal>
+
       {/* Modal sửa thể loại */}
+
       <Modal
-          title="Sửa Thể Loại"
-          visible={isEditModalVisible}
-          onCancel={handleCancelEditModal}
-          footer={null}
-          width={600}
+        title="Sửa Thể Loại"
+        visible={isEditModalVisible}
+        onCancel={handleCancelEditModal}
+        footer={null}
+        width={600}
       >
-        <EditBlogCategory category={editingCategory}/>{" "}
-        {/* Hiển thị thông tin thể loại */}
+        <EditBlogCategory category={editingCategory} />{" "}
+        {/* Render CreateBlogCategory form */}
       </Modal>
     </>
   );
 };
 
-export default MissioCategories;
+export default DocumentCategoriesTable;

@@ -1,18 +1,21 @@
 "use client"; // Ensures this is a client component
 
 import React, { useState } from "react";
-import { Table, Button, Spin, Select, Modal, Image } from "antd";
+import { Table, Button, Select, Modal, Image } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { FaSync } from "react-icons/fa"; // Import refresh icon
 import { CategoriesList } from "@/lib/categoriesList";
 import { useRouter } from "next/navigation";
 import { useDeleteCategory } from "@/hooks/cateogry/useCategories";
-import { MdOutlineDelete } from "react-icons/md";
-import { FaRegEdit } from "react-icons/fa";
 import CategoriesQueueTable from "@/app/(dashboard)/danh_muc/categories/CategoriesQueueTable";
 import EditBlogCategory from "@/app/(dashboard)/blog/blog_categories/EditBlogCategory";
-import Heading from "@/components/design/Heading";
-import { FaArrowLeft, FaArrowRight } from "@/lib/iconLib";
+import {
+  FaArrowLeft,
+  FaArrowRight,
+  FaSync,
+  MdOutlineDelete,
+  FaRegEdit,
+} from "@/lib/iconLib";
+import { SpinLoading, Error, Heading } from "@/components/design/index";
 
 const { Option } = Select;
 
@@ -110,9 +113,8 @@ const Categories: React.FC = () => {
       ),
     },
   ];
-
-  if (isLoading) return <Spin size="large" />;
-  if (isError) return <div>Error loading queue data.</div>;
+  if (isLoading) return <SpinLoading />;
+  if (isError) return <Error />;
 
   const handleModelChange = (value: string) => {
     setModel(value);

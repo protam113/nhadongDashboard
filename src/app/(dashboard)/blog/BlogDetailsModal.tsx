@@ -81,6 +81,44 @@ const BlogDetailsDrawer: React.FC<BlogDetailsDrawerProps> = ({
           </span>
         ))}
       </div>
+      <Divider />
+      <Paragraph className="text-gray-800 mb-2">
+        <strong>Hình Ảnh Bổ Sung:</strong>
+      </Paragraph>
+      <div className="mb-2">
+        {blog.media.map((media: any) => (
+          <div key={media.id} className="mb-2">
+            <span className="bg-indigo-500 text-white py-1 px-2 rounded-full text-sm">
+              {media.file_type}
+            </span>
+            <div className="mt-2">
+              {media.file_type === "PDF" ? (
+                <div className="relative overflow-hidden w-full h-[600px]">
+                  <iframe
+                    src={media.file}
+                    title="PDF Preview"
+                    className="w-full h-full"
+                    style={{
+                      border: "none",
+                    }}
+                  />
+                </div>
+              ) : media.file_type === "IMAGE" ? (
+                <div className="relative overflow-hidden w-full h-[200px]">
+                  <Image
+                    src={media.file}
+                    alt="Blog Image"
+                    className="rounded-lg shadow-md"
+                    style={{ width: "100%", height: "auto" }}
+                  />
+                </div>
+              ) : (
+                <p className="text-red-500">Không hỗ trợ loại tệp này</p>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
 
       <Divider />
       <div className="flex items-center mt-4">

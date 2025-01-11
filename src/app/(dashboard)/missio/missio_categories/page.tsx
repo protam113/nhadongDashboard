@@ -1,18 +1,21 @@
 "use client";
 
 import React, { useState } from "react";
-import { Table, Button, Spin, Modal, Image } from "antd";
+import { Table, Button, Modal, Image } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { FaSync } from "react-icons/fa";
 import { CategoriesList } from "@/lib/categoriesList";
 import { useDeleteCategory } from "@/hooks/cateogry/useCategories";
-import { FaRegEdit } from "react-icons/fa";
-// import CreateBlogCategory from "./CreateBlogCategory";
 import EditBlogCategory from "@/app/(dashboard)/blog/blog_categories/EditBlogCategory";
-import Heading from "@/components/design/Heading";
 import MissioQueueTable from "./missioQueueTable";
 import CreateMissioCategory from "./CreateMissioCategory";
-import { FaArrowLeft, FaArrowRight, MdOutlineDelete } from "@/lib/iconLib";
+import {
+  FaArrowLeft,
+  FaArrowRight,
+  MdOutlineDelete,
+  FaRegEdit,
+  FaSync,
+} from "@/lib/iconLib";
+import { SpinLoading, Error, Heading } from "@/components/design/index";
 
 const MissioCategories: React.FC = () => {
   const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
@@ -113,8 +116,8 @@ const MissioCategories: React.FC = () => {
     },
   ];
 
-  if (isLoading) return <Spin size="large" />;
-  if (isError) return <div>Error loading queue data.</div>;
+  if (isLoading) return <SpinLoading />;
+  if (isError) return <Error />;
 
   const handleRefresh = () => {
     setRefreshKey((prev) => prev + 1);

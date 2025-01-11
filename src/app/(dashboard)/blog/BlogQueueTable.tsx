@@ -6,6 +6,8 @@ import { ReloadOutlined } from "@ant-design/icons"; // Icon từ Ant Design
 import type { ColumnsType } from "antd/es/table";
 import { UserQueue } from "@/lib/userQueue";
 import { FaArrowLeft, FaArrowRight } from "@/lib/iconLib";
+import SpinLoading from "@/components/design/Spin";
+import Error from "@/components/design/Error";
 
 const BlogQueueList: React.FC = () => {
   const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
@@ -122,8 +124,8 @@ const BlogQueueList: React.FC = () => {
     },
   ];
 
-  if (isLoading) return <Spin size="large" />;
-  if (isError) return <div>Error loading queue data.</div>;
+  if (isLoading) return <SpinLoading />;
+  if (isError) return <Error />;
 
   return (
     <div className="p-4">

@@ -5,17 +5,17 @@ import { Table, Button, Spin, Select } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { useQueueManagement } from "@/logic/queueLogic";
 import { ReloadOutlined } from "@ant-design/icons";
-import Heading from "@/components/design/Heading";
 import { FaArrowLeft, FaArrowRight } from "@/lib/iconLib";
+import { SpinLoading, Error, Heading } from "@/components/design/index";
 
 const { Option } = Select;
 
 const Queue: React.FC = () => {
   const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [refreshKey, setRefreshKey] = useState(0); // State để làm mới dữ liệu
-  const [isRefreshing, setIsRefreshing] = useState(false); // State để kiểm tra trạng thái làm mới
-  const [type, setType] = useState<string>(""); // State to hold selected model
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const [type, setType] = useState<string>("");
   const [isExpanded, setIsExpanded] = useState(false);
 
   const { queueData, next, isLoading, isError, handleBulkUpdate } =
@@ -23,9 +23,9 @@ const Queue: React.FC = () => {
   const totalPages = next ? currentPage + 1 : currentPage;
 
   const handleRefresh = () => {
-    setIsRefreshing(true); // Bắt đầu làm mới
-    setRefreshKey((prevKey) => prevKey + 1); // Cập nhật `refreshKey` để làm mới dữ liệu
-    setTimeout(() => setIsRefreshing(false), 1000); // Đặt lại trạng thái sau 1 giây (có thể điều chỉnh thời gian)
+    setIsRefreshing(true);
+    setRefreshKey((prevKey) => prevKey + 1);
+    setTimeout(() => setIsRefreshing(false), 1000);
   };
 
   const handleBulkApprove = async () => {
@@ -164,8 +164,8 @@ const Queue: React.FC = () => {
     },
   ];
 
-  if (isLoading) return <Spin size="large" />;
-  if (isError) return <div>Error loading queue data.</div>;
+  if (isLoading) return <SpinLoading />;
+  if (isError) return <Error />;
 
   const handleTypeChange = (value: string) => {
     setType(value);

@@ -5,7 +5,7 @@ import {
   MdManageSearch,
   MdOutlineAdminPanelSettings,
 } from "react-icons/md";
-import { FaNewspaper, FaFileAlt, FaChurch, FaPray } from "react-icons/fa";
+import { FaNewspaper, FaFileAlt, FaChurch } from "react-icons/fa";
 import { HiUserGroup } from "react-icons/hi2";
 import { SlNotebook, SlCalender } from "react-icons/sl";
 import { BiCategory } from "react-icons/bi";
@@ -64,7 +64,7 @@ export const NavItems = () => {
         },
         {
           name: "Đặc Sủng Linh Đạo",
-          link: "/user/block_list",
+          link: "/hoi_dong/dac_sung_linh_dao",
           key: "8",
         },
       ],
@@ -82,7 +82,7 @@ export const NavItems = () => {
         {
           name: "Thư Đấng Sáng Lập",
           link: "/dang_sang_lap/thu_dang_sang_lap",
-          id: "11",
+          key: "11",
         },
       ],
     },
@@ -146,13 +146,13 @@ export const NavItems = () => {
     },
     {
       name: "Sứ Vụ",
-      link: "/hoi_dong/missio",
+      link: "/missio",
       key: "18",
       icon: <FontAwesomeIcon icon={faBullseye} />,
       children: [
         {
           name: "Thể loại",
-          link: "/hoi_dong/missio/missio_categories",
+          link: "/missio/missio_categories",
           key: "19",
           icon: <BiCategory />,
         },
@@ -160,27 +160,28 @@ export const NavItems = () => {
     },
     {
       name: "Tài Liệu ",
-      link: "/study/document",
+      link: "/document",
       key: "20",
       icon: <IoDocumentsSharp />,
       children: [
         {
           name: "Quản Lý Tài Liệu",
-          link: "/study/document/document_manager",
+          link: "/document/document_manager",
           key: "21",
           icon: <MdManageSearch />,
         },
       ],
     },
-    {
-      name: "Cầu Nguyện",
-      link: "/pray",
-      key: "22",
-      icon: <FaPray />,
-    },
+    // {
+    //   name: "Cầu Nguyện",
+    //   link: "/pray",
+    //   key: "22",
+    //   icon: <FaPray />,
+    // },
     {
       name: "Bác Ái Xã Hội",
       icon: <RiCommunityFill />,
+      key: "35",
       children: [
         {
           name: "Sự Kiện",
@@ -198,7 +199,6 @@ export const NavItems = () => {
     },
     {
       name: "Ơn Gọi",
-      link: "/vocation",
       key: "25",
       icon: <BiCategory />,
       children: [
@@ -238,6 +238,8 @@ export const NavItems = () => {
     {
       name: "Thư Viện",
       icon: <MdAddToQueue />,
+      key: "37",
+
       children: [
         {
           name: "Ảnh",

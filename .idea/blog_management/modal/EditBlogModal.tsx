@@ -3,72 +3,73 @@
 import React, { useEffect, useState } from "react";
 import {
   Button,
+  Checkbox,
   Col,
   Drawer,
   Form,
   Image,
   Input,
   Row,
-  Select,
   Space,
   Upload,
   UploadProps,
 } from "antd";
-import { Document } from "@/types/types";
+import { Blog } from "@/types/types";
 import { CategoriesList } from "@/lib/categoriesList";
 import { UploadFile } from "antd/lib/upload/interface";
+import { useEditBlog } from "@/hooks/blog/useBlog";
 import EditContentSection from "@/components/main/blog/EditContentSection";
-import { useEditDocument } from "@/hooks/document/useDocs";
 
 interface EditBlogModalProps {
   open: boolean;
   onClose: () => void;
-  document: Document | null; // Cho phép null nếu blog chưa được load
+  blog: Blog | null; // Cho phép null nếu blog chưa được load
 }
 
-const EditDocumentModal: React.FC<EditBlogModalProps> = ({
+const EditBlogModal: React.FC<EditBlogModalProps> = ({
   open,
   onClose,
-  document,
+  blog,
 }) => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [initialCategory, setInitialCategory] = useState<string | null>(null);
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
+  const [initialCategories, setInitialCategories] = useState<string[]>([]);
   const [previewImage] = useState<string>("");
   const [previewOpen, setPreviewOpen] = useState<boolean>(false);
-  const { queueData, isLoading, isError } = CategoriesList(1, "document", 0);
-  const { mutate: editBlogMutation } = useEditDocument();
+  const { queueData, isLoading, isError } = CategoriesList(1, "blog", 0);
+  const { mutate: editBlogMutation } = useEditBlog();
 
   useEffect(() => {
-    if (document) {
-      const categoryId = document.category?.id.toString() || null;
-      setInitialCategory(categoryId); // Lưu thể loại ban đầu
-      setSelectedCategory(categoryId); // Thiết lập giá trị thể loại hiện tại
+    if (blog) {
+      const categoryIds =
+        blog.categories?.map((category) => category.id.toString()) || [];
+      setInitialCategories(categoryIds); // Lưu thể loại ban đầu
+      setSelectedCategories(categoryIds);
 
       form.setFieldsValue({
-        title: document.title,
-        description: document.description,
-        content: document.content,
-        link: document.link,
-        category: categoryId,
+        title: blog.title,
+        description: blog.description,
+        content: blog.content,
+        link: blog.link,
+        category: categoryIds,
       });
 
-      if (document.image) {
+      if (blog.image) {
         setFileList([
           {
             uid: "-1",
             name: "image.png",
             status: "done",
-            url: document.image,
+            url: blog.image,
           },
         ]);
       }
     }
-  }, [document, form]);
+  }, [blog, form]);
 
-  const handleCategoryChange = (value: string) => {
-    setSelectedCategory(value);
+  const handleCategoryChange = (checkedValues: string[]) => {
+    setSelectedCategories(checkedValues);
   };
 
   const handleChange: UploadProps["onChange"] = ({ fileList }) => {
@@ -76,31 +77,36 @@ const EditDocumentModal: React.FC<EditBlogModalProps> = ({
   };
 
   const handleSubmit = () => {
-    if (!document) {
-      console.error("Document is null, cannot edit.");
+    if (!blog) {
+      console.error("Blog is null, cannot edit.");
       return;
     }
 
     form
       .validateFields()
       .then((values) => {
+        const category_remove = initialCategories.filter(
+          (category) => !selectedCategories.includes(category)
+        );
+
         const editBlog = {
           ...values,
-          category: selectedCategory ? [selectedCategory] : [],
-          category_remove:
-            initialCategory && initialCategory !== selectedCategory
-              ? [initialCategory]
-              : [],
+          category: selectedCategories,
           image: fileList.map((file) => file.originFileObj || file.url),
         };
 
+        // Chỉ thêm `category_remove` nếu không rỗng
+        if (category_remove.length > 0) {
+          editBlog.category_remove = category_remove;
+        }
+
         editBlogMutation({
-          editDoc: editBlog,
-          blogId: document.id,
+          editBlog: editBlog,
+          blogId: blog.id,
         });
       })
       .catch((info) => {
-        console.error("Validation failed:", info);
+        console.error("Lỗi khi xác thực form:", info);
       });
   };
 
@@ -121,13 +127,13 @@ const EditDocumentModal: React.FC<EditBlogModalProps> = ({
     >
       <Form form={form} layout="vertical" hideRequiredMark>
         <Row gutter={16}>
-          <Col span={24}>
+          <Col span={12}>
             <Form.Item
               name="title"
               label="Tiêu Đề"
               rules={[{ required: true, message: "Hãy nhập tiêu đề" }]}
             >
-              <Input.TextArea rows={4} placeholder="Nhập tiêu đề" />
+              <Input placeholder="Nhập tiêu đề" />
             </Form.Item>
           </Col>
           <Col span={24}>
@@ -145,12 +151,10 @@ const EditDocumentModal: React.FC<EditBlogModalProps> = ({
               label="Nội dung chi tiết"
               rules={[{ required: true, message: "Hãy nhập nội dung" }]}
             >
-              {document && (
-                <EditContentSection
-                  onChange={(content) => form.setFieldValue("content", content)}
-                  initialContent={document.content || ""}
-                />
-              )}
+              <EditContentSection
+                onChange={(content) => form.setFieldValue("content", content)}
+                initialContent={blog?.content || ""}
+              />
             </Form.Item>
           </Col>
 
@@ -193,15 +197,13 @@ const EditDocumentModal: React.FC<EditBlogModalProps> = ({
               ) : isError ? (
                 <p>Có lỗi khi tải thể loại</p>
               ) : (
-                <Select
+                <Checkbox.Group
                   options={queueData?.map((category: any) => ({
                     label: category.name,
                     value: category.id.toString(),
                   }))}
-                  value={selectedCategory}
+                  value={selectedCategories}
                   onChange={handleCategoryChange}
-                  allowClear
-                  placeholder="Chọn thể loại"
                 />
               )}
             </Form.Item>
@@ -212,4 +214,4 @@ const EditDocumentModal: React.FC<EditBlogModalProps> = ({
   );
 };
 
-export default EditDocumentModal;
+export default EditBlogModal;

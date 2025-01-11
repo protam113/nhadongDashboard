@@ -94,15 +94,23 @@ const CreateBlog = async (newBlog: NewPost, token: string) => {
     const value = newBlog[key as keyof NewPost];
 
     if (key === "category" && Array.isArray(value)) {
-      value.forEach((id) => formData.append("category", id)); // Gửi từng ID
+      // Xử lý category
+      value.forEach((id) => formData.append("category", id));
+    } // Nếu là mảng file
+    if (key === "file" && Array.isArray(value)) {
+      value.forEach((file) => formData.append("file", file));
+    } else if (key === "file_type" && Array.isArray(value)) {
+      // Xử lý file
+      value.forEach((string) => formData.append("file_type", string));
+    } else if (key === "metadata" && Array.isArray(value)) {
+      // Xử lý metadata
+      value.forEach((string) => formData.append("metadata", string));
     } else if (key === "image" && typeof value === "string") {
       // Nếu là URL hình ảnh
       formData.append(key, value);
     } else if (key === "image" && Array.isArray(value)) {
       // Nếu là mảng hình ảnh tải lên
-      value.forEach((file) => {
-        formData.append("image", file);
-      });
+      value.forEach((file) => formData.append("image", file));
     } else if (value) {
       // Thêm các trường khác
       formData.append(key, value as string);
@@ -228,6 +236,15 @@ const EditBlog = async (editBlog: EditPost, blogId: string, token: string) => {
 
     if (key === "category" && Array.isArray(value)) {
       value.forEach((id) => formData.append("category", id));
+    }
+    if (key === "file" && Array.isArray(value)) {
+      value.forEach((file) => formData.append("file", file));
+    } else if (key === "file_type" && Array.isArray(value)) {
+      // Xử lý file
+      value.forEach((string) => formData.append("file_type", string));
+    } else if (key === "metadata" && Array.isArray(value)) {
+      // Xử lý metadata
+      value.forEach((string) => formData.append("metadata", string));
     } else if (key === "image") {
       // Xử lý trường image
       if (typeof value === "string") {
@@ -242,7 +259,6 @@ const EditBlog = async (editBlog: EditPost, blogId: string, token: string) => {
         });
       }
     } else if (value !== null && value !== undefined) {
-      // Thêm các trường khác vào formData
       formData.append(key, value as string);
     }
   }

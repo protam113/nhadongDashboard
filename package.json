@@ -24,6 +24,7 @@
     "@tiptap/starter-kit": "^2.10.3",
     "@types/react-redux": "^7.1.34",
     "antd": "^5.22.7",
+    "antd-img-crop": "^4.24.0",
     "axios": "^1.7.7",
     "chart.js": "^4.4.7",
     "crypto-js": "^4.2.0",

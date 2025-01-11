@@ -1,56 +1,64 @@
 "use client"; // Ensures this is a client component
 
 import React, { useState } from "react";
-import { Table, Button, Spin, Modal } from "antd";
+import { Table, Button, Modal, Select } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { FaSync } from "react-icons/fa"; // Import refresh icon
-import { MdOutlineDelete } from "react-icons/md";
-import { FaRegEdit } from "react-icons/fa";
 import { EyeOutlined } from "@ant-design/icons";
-import Heading from "@/components/design/Heading";
-import { MissionList } from "@/lib/missionList";
-import MissionQueueList from "./MissionQueueList";
-import PushButton from "@/components/Button/PushButton";
-import { useDeleteMission } from "@/hooks/mission/useMission";
-import MissioDetailsDrawer from "./missioDetailModal";
-import { FaArrowLeft, FaArrowRight } from "@/lib/iconLib";
-import EditMissionModal from "./drawer/EditMission";
+import { DocsList } from "@/lib/docslist";
+import Link from "next/link";
+import { CategoriesList } from "@/lib/categoriesList";
+import BackButton from "@/components/Button/BackButton";
+import {
+  FaArrowLeft,
+  FaArrowRight,
+  FaSync,
+  MdOutlineDelete,
+  FaRegEdit,
+} from "@/lib/iconLib";
+import { useDeleteDoc } from "@/hooks/document/useDocs";
+import { SpinLoading, Error, Heading } from "@/components/design/index";
+import DocsDetailsModal from "../DocumentDetailModal";
+
+const { Option } = Select;
 
 const Page: React.FC = () => {
+  const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
-  const [selectedBlog, setSelectedBlog] = useState(null); // State for selected blog
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const { mutate } = useDeleteMission();
+  const { mutate } = useDeleteDoc();
   const [selectedDoc, setSelectedDoc] = useState(null);
-  const [isDrawerVisible, setIsDrawerVisible] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [model, setModel] = useState<string>(""); // State to hold selected model
 
   // Pass model into CategoriesList
-  const { queueData, next, isLoading, isError } = MissionList(
-    currentPage,
-    "",
-    refreshKey
-  );
+  const {
+    queueData: document,
+    next,
+    isLoading: isDocumentLoad,
+    isError: isDocumentError,
+  } = DocsList(currentPage, model, refreshKey);
+  const {
+    queueData: category,
+    isLoading: isCategoryLoad,
+    isError: isCategoryError,
+  } = CategoriesList(currentPage, "document", refreshKey);
 
   const totalPages = next ? currentPage + 1 : currentPage;
 
-  const handleEdit = (blog: any) => {
-    setSelectedDoc(blog); // Set blog to be edited
-    setIsDrawerVisible(true); // Open the drawer
-  };
-  const handleDelete = (postId: string) => {
+  const handleDelete = (blogId: string) => {
     // Show confirmation dialog before deletion
     Modal.confirm({
       title: "Xác nhận xóa",
-      content: "Bạn có chắc chắn muốn xóa bài viết này?",
+      content: "Bạn có chắc chắn muốn xóa tài liệuliệu này?",
       okText: "Xóa",
       okType: "danger",
       cancelText: "Hủy",
       onOk: () => {
-        mutate(postId);
+        mutate(blogId);
       },
     });
   };
+
   const columns: ColumnsType<any> = [
     {
       title: "Chi Tiết",
@@ -68,7 +76,7 @@ const Page: React.FC = () => {
       dataIndex: "id",
       key: "id",
       width: 60,
-      render: (_: any, record: any, index: number) => index + 1, // This will display index + 1 as the ID
+      render: (_, __, index) => <span>{index + 1}</span>, // Dynamically assign the ID based on index
     },
     {
       title: "Tiêu Đề",
@@ -107,7 +115,7 @@ const Page: React.FC = () => {
           <Button danger onClick={() => handleDelete(record.id)}>
             <MdOutlineDelete className="text-albert-error" />
           </Button>
-          <Button type="primary" onClick={() => handleEdit(record)}>
+          <Button>
             <FaRegEdit />
           </Button>
         </>
@@ -115,47 +123,93 @@ const Page: React.FC = () => {
     },
   ];
 
-  if (isLoading) return <Spin size="large" />;
-  if (isError) return <div>Error loading queue data.</div>;
+  if (isDocumentLoad) return <SpinLoading />;
+  if (isDocumentError) return <Error />;
 
-  const handleViewDetails = (blog: any) => {
-    setSelectedBlog(blog);
-    setIsDrawerOpen(true);
+  const handleViewDetails = (doc: any) => {
+    setSelectedDoc(doc);
+    setIsModalVisible(true);
   };
 
-  const handleDrawerClose = () => {
-    setIsDrawerOpen(false);
-    setSelectedBlog(null);
-    setIsDrawerVisible(false); // Close the drawer
+  // Function to handle closing the modal
+  const handleModalClose = () => {
+    setIsModalVisible(false);
+    setSelectedDoc(null);
+  };
+
+  const handleModelChange = (value: string) => {
+    setModel(value);
+    setRefreshKey((prev) => prev + 1); // Refresh data when model changes
   };
 
   const handleRefresh = () => {
-    setRefreshKey((prev) => prev + 1); // Refresh data manually
+    setModel(""); // Đặt lại giá trị của model
+    setRefreshKey((prev) => prev + 1); // Làm mới dữ liệu
   };
 
   return (
     <>
       <div className="p-4">
-        <Heading name="Quản Lý Sứ Vụ" />
+        <BackButton />
+        <Heading name="Quản Lý Thể Loại Tài Liệu (Document)" />
 
         {/* Model selection */}
         <div className="flex justify-between items-center mb-4">
-          <Button onClick={handleRefresh} style={{ marginLeft: "8px" }}>
-            <FaSync /> Làm mới
-          </Button>
-          <PushButton
-            href="/hoi_dong/missio/create_missio"
-            label={"Tạo Sứ Vụ"}
-          />
+          <div>
+            <Select
+              value={model}
+              onChange={handleModelChange}
+              placeholder="Chọn thể loại"
+              style={{ width: 200 }}
+            >
+              {isCategoryLoad ? (
+                <Option value="" disabled>
+                  Đang tải...
+                </Option>
+              ) : isCategoryError ? (
+                <Option value="" disabled>
+                  Lỗi tải thể loại
+                </Option>
+              ) : (
+                category?.map((category) => (
+                  <Option key={category.id} value={category.id}>
+                    {category.name}
+                  </Option>
+                ))
+              )}
+            </Select>
+
+            <Button onClick={handleRefresh} style={{ marginLeft: "8px" }}>
+              <FaSync /> Làm mới
+            </Button>
+          </div>
+          <Link href="/study/document/create_document">
+            {" "}
+            {/* Change the URL as needed */}
+            <Button
+              style={{
+                marginLeft: "8px",
+                backgroundColor: "#4CAF50",
+                color: "white",
+              }}
+            >
+              Tạo Mới
+            </Button>
+          </Link>
         </div>
 
         <div className="overflow-auto" style={{ maxHeight: "800px" }}>
           <Table
             columns={columns}
-            dataSource={queueData}
+            dataSource={document}
             rowKey="id"
             pagination={false}
             scroll={{ y: 500 }}
+            rowSelection={{
+              selectedRowKeys: selectedKeys,
+              onChange: (selectedRowKeys) =>
+                setSelectedKeys(selectedRowKeys as number[]),
+            }}
           />
         </div>
         <div className="flex justify-center mt-8 items-center space-x-2">
@@ -189,18 +243,11 @@ const Page: React.FC = () => {
             <FaArrowRight />
           </button>
         </div>
-        <Heading name="Quản lý hàng đợi duyệt sứ vụ" />
-        <MissionQueueList />
       </div>
-      <MissioDetailsDrawer
-        open={isDrawerOpen}
-        onClose={handleDrawerClose}
-        blog={selectedBlog}
-      />
-      <EditMissionModal
-        open={isDrawerVisible}
-        onClose={handleDrawerClose}
-        document={selectedDoc} // Pass selected blog to EditBlogModal
+      <DocsDetailsModal
+        visible={isModalVisible}
+        onClose={handleModalClose}
+        doc={selectedDoc}
       />
     </>
   );

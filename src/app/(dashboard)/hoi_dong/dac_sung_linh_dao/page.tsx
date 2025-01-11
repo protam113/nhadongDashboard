@@ -13,9 +13,56 @@ const Page = () => {
     isError,
   } = HistoryMonasteryData(refreshKey, model);
 
-  if (isLoading) return <Spin size="large" />;
-  if (isError || !data) return <div>Error loading queue data.</div>; // Kiểm tra nếu `data` không tồn tại
-
+  if (isLoading) {
+    return (
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          height: "80vh", // Chiều cao toàn màn hình
+        }}
+      >
+        <Spin size="large" />
+      </div>
+    );
+  }
+  if (isError) {
+    return (
+      <div
+        style={{
+          textAlign: "center",
+          marginTop: "50px",
+          fontFamily: "Arial, sans-serif",
+          color: "#ff4d4f",
+        }}
+      >
+        <h1 style={{ fontSize: "24px", fontWeight: "bold" }}>
+          Lỗi tải dữ liệu
+        </h1>
+        <p>
+          Hệ thống không thể tải dữ liệu. Vui lòng kiểm tra kết nối mạng hoặc
+          thử lại sau.
+        </p>
+      </div>
+    );
+  }
+  if (!data) {
+    return (
+      <div
+        style={{
+          fontFamily: "Arial, sans-serif",
+          fontSize: "18px",
+          fontWeight: "bold",
+          color: "#ff4d4f", // Màu đỏ cảnh báo
+          textAlign: "center",
+          marginTop: "20px",
+        }}
+      >
+        Hãy cập nhật thông tin website.
+      </div>
+    );
+  }
   return (
     <div className="p-6 max-w-5xl mx-auto">
       <div className="text-right mb-4">

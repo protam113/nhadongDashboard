@@ -1,20 +1,22 @@
 "use client"; // Ensures this is a client component
 
 import React, { useState } from "react";
-import { Table, Button, Typography, Spin, Modal } from "antd";
+import { Table, Button, Modal } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { FaSync } from "react-icons/fa"; // Import refresh icon
 import { useRouter } from "next/navigation";
-import { MdOutlineDelete } from "react-icons/md";
-import { FaRegEdit } from "react-icons/fa";
 import { EyeOutlined } from "@ant-design/icons";
 import { NewsList } from "@/lib/newsList";
 import { useDeleteNews } from "@/hooks/new/useNews";
 import EditNewsModal from "@/app/(dashboard)/news/news_management/modal/EditNewsModal";
 import NewsDetailsModal from "@/app/(dashboard)/news/NewsDetailsModal";
-import { FaArrowLeft, FaArrowRight } from "@/lib/iconLib";
-
-const { Title } = Typography;
+import {
+  FaArrowLeft,
+  FaArrowRight,
+  FaRegEdit,
+  MdOutlineDelete,
+  FaSync,
+} from "@/lib/iconLib";
+import { SpinLoading, Error, Heading } from "@/components/design/index";
 
 const NewsManagement: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -123,8 +125,8 @@ const NewsManagement: React.FC = () => {
     },
   ];
 
-  if (isLoading) return <Spin size="large" />;
-  if (isError) return <div>Error loading queue data.</div>;
+  if (isLoading) return <SpinLoading />;
+  if (isError) return <Error />;
 
   const handleDrawerClose = () => {
     setIsDrawerOpen(false);
@@ -148,7 +150,7 @@ const NewsManagement: React.FC = () => {
   return (
     <>
       <div className="p-4">
-        <Title level={2}>Quản Lý Tin Tức</Title>
+        <Heading name="Quản Lý tin tức" />
 
         {/* Model selection */}
         <div className="flex justify-between items-center mb-4">

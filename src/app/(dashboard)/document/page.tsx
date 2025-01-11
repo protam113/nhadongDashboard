@@ -1,16 +1,12 @@
 "use client"; // Ensures this is a client component
 
 import React, { useState } from "react";
-import { Table, Button, Spin, Modal } from "antd";
+import { Table, Button, Modal } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { EyeOutlined } from "@ant-design/icons";
-import DocumentCategoriesTable from "@/app/(dashboard)/study/document/DocumentCategoriesTable";
-import DocumentQueueList from "@/app/(dashboard)/study/document/DocumentQueueTable";
 import { DocsList } from "@/lib/docslist";
-import DocsDetailsModal from "@/app/(dashboard)/study/document/DocumentDetailModal";
 import Link from "next/link";
 import BackButton from "@/components/Button/BackButton";
-import Heading from "@/components/design/Heading";
 import { useDeleteDoc } from "@/hooks/document/useDocs";
 import {
   FaArrowLeft,
@@ -20,6 +16,10 @@ import {
   FaRegEdit,
 } from "@/lib/iconLib";
 import EditDocumentModal from "./modal/EditDocumentDrawer";
+import { SpinLoading, Error, Heading } from "@/components/design/index";
+import DocsDetailsModal from "./DocumentDetailModal";
+import DocumentCategoriesTable from "./DocumentCategoriesTable";
+import DocumentQueueList from "./DocumentQueueTable";
 
 const Documents: React.FC = () => {
   const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
@@ -123,8 +123,8 @@ const Documents: React.FC = () => {
     },
   ];
 
-  if (isLoading) return <Spin size="large" />;
-  if (isError) return <div>Error loading queue data.</div>;
+  if (isLoading) return <SpinLoading />;
+  if (isError) return <Error />;
 
   const handleViewDetails = (doc: any) => {
     setSelectedDoc(doc);

@@ -1,4 +1,4 @@
-import Container from "@/components/container/container";
+import Container from "@/components/design/container/container";
 import Heading from "@/components/design/Heading";
 import BlogsGallery from "@/components/main/thu_vien/BlogsGallery";
 import NewsGallery from "@/components/main/thu_vien/NewsGallery";

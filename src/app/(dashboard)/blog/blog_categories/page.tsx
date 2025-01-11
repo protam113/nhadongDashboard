@@ -1,17 +1,20 @@
 "use client";
 
 import React, { useState } from "react";
-import { Table, Button, Spin, Modal, Image } from "antd";
+import { Table, Button, Modal, Image } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { FaSync } from "react-icons/fa";
 import { CategoriesList } from "@/lib/categoriesList";
 import { useDeleteCategory } from "@/hooks/cateogry/useCategories";
-import { MdOutlineDelete } from "react-icons/md";
-import { FaRegEdit } from "react-icons/fa";
 import CreateBlogCategory from "./CreateBlogCategory";
 import EditBlogCategory from "@/app/(dashboard)/blog/blog_categories/EditBlogCategory";
-import Heading from "@/components/design/Heading";
-import { FaArrowLeft, FaArrowRight } from "@/lib/iconLib";
+import {
+  FaArrowLeft,
+  FaArrowRight,
+  FaRegEdit,
+  MdOutlineDelete,
+  FaSync,
+} from "@/lib/iconLib";
+import { SpinLoading, Error, Heading } from "@/components/design/index";
 
 const BlogCategories: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -110,8 +113,8 @@ const BlogCategories: React.FC = () => {
     },
   ];
 
-  if (isLoading) return <Spin size="large" />;
-  if (isError) return <div>Error loading queue data.</div>;
+  if (isLoading) return <SpinLoading />;
+  if (isError) return <Error />;
 
   const handleRefresh = () => {
     setRefreshKey((prev) => prev + 1);

@@ -1,15 +1,14 @@
 "use client"; // Ensures this is a client component
 
 import React, { useState } from "react";
-import { Table, Button, Spin } from "antd";
+import { Table, Button } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { FaSync } from "react-icons/fa"; // Import refresh icon
 import { EyeOutlined } from "@ant-design/icons";
 import { NewsList } from "@/lib/newsList";
 import NewsQueueList from "@/app/(dashboard)/news/NewsQueueTable";
 import NewsDetailsModal from "@/app/(dashboard)/news/NewsDetailsModal";
-import { FaArrowLeft, FaArrowRight } from "@/lib/iconLib";
-import Heading from "@/components/design/Heading";
+import { FaArrowLeft, FaArrowRight, FaSync } from "@/lib/iconLib";
+import { SpinLoading, Error, Heading } from "@/components/design/index";
 
 const News: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -80,8 +79,8 @@ const News: React.FC = () => {
     },
   ];
 
-  if (isLoading) return <Spin size="large" />;
-  if (isError) return <div>Error loading queue data.</div>;
+  if (isLoading) return <SpinLoading />;
+  if (isError) return <Error />;
 
   const handleViewDetails = (news: any) => {
     setSelectedNews(news);

@@ -1,7 +1,7 @@
 "use client"; // Ensures this is a client component
 
 import React, { useState } from "react";
-import { Table, Button, Spin, Modal, Image } from "antd";
+import { Table, Button, Modal, Image } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { GroupList } from "@/lib/groupList";
 import CreateGroup from "@/app/(dashboard)/cong_doan/modal/CreateGroupModal";
@@ -11,7 +11,6 @@ import EditGroup from "@/app/(dashboard)/cong_doan/modal/EditGroupModal";
 import { EyeOutlined } from "@ant-design/icons";
 import GroupDetailModal from "@/app/(dashboard)/cong_doan/modal/GroupDetailModal";
 import BackButton from "@/components/Button/BackButton";
-import Heading from "@/components/design/Heading";
 import {
   FaArrowLeft,
   FaArrowRight,
@@ -19,6 +18,7 @@ import {
   FaRegEdit,
   FaSync,
 } from "@/lib/iconLib";
+import { SpinLoading, Error, Heading } from "@/components/design/index";
 
 const Groups: React.FC = () => {
   const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
@@ -155,9 +155,8 @@ const Groups: React.FC = () => {
     },
   ];
 
-  if (isLoading) return <Spin size="large" />;
-  if (isError) return <div>Error loading queue data.</div>;
-
+  if (isLoading) return <SpinLoading />;
+  if (isError) return <Error />;
   const handleRefresh = () => {
     setRefreshKey((prev) => prev + 1); // Refresh data manually
   };

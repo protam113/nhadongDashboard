@@ -1,13 +1,13 @@
 "use client";
 
-import React, { useState, useCallback } from "react";
+import React, { useCallback, useState } from "react";
 import {
   Form,
   Input,
   Button,
   Upload,
   Card,
-  Checkbox,
+  Select,
   message,
   Image,
   Row,
@@ -18,9 +18,9 @@ import { RcFile } from "antd/lib/upload";
 import { CategoriesList } from "@/lib/categoriesList";
 import { UploadFile, UploadProps } from "antd/lib/upload/interface";
 import BackButton from "@/components/Button/BackButton";
-import Heading from "@/components/design/Heading"; // Import kiểu dữ liệu
+import Heading from "@/components/design/Heading";
 import ContentSection from "@/components/main/blog/ContentSection";
-import { useCreateNews } from "@/hooks/new/useNews";
+import { useCreateDoc } from "@/hooks/document/useDocs";
 import MoreType from "@/app/(dashboard)/blog/blog_management/create_blog/MoreType";
 
 const { TextArea } = Input;
@@ -33,9 +33,9 @@ const Page: React.FC = () => {
   const [blogData, setBlogData] = useState({
     title: "",
     description: "",
-    image: [] as RcFile[],
+    image: [] as RcFile[], // Đổi từ `null` thành mảng `File[]`
     content: "",
-    category: [] as string[],
+    category: "",
     link: "",
     file_type: [] as string[],
     file: [] as RcFile[],
@@ -43,12 +43,12 @@ const Page: React.FC = () => {
   });
 
   const [loading, setLoading] = useState(false);
-  const { mutate: createBlogMutation } = useCreateNews();
+  const { mutate } = useCreateDoc();
   const [form] = Form.useForm();
-  const { queueData, isLoading, isError } = CategoriesList(1, "news", 0);
+  const { queueData, isLoading, isError } = CategoriesList(1, "document", 0);
 
-  const handleCategoryChange = (checkedValues: string[]) => {
-    setBlogData({ ...blogData, category: checkedValues });
+  const handleCategoryChange = (value: string) => {
+    setBlogData({ ...blogData, category: value });
   };
 
   const handleDataChange = useCallback(
@@ -109,12 +109,6 @@ const Page: React.FC = () => {
   const handleSaveBlog = async () => {
     setLoading(true);
     try {
-      if (blogData.category.length === 0) {
-        message.error("Vui lòng chọn ít nhất một thể loại!");
-        setLoading(false);
-        return;
-      }
-
       if (blogData.image.length === 0) {
         message.error("Vui lòng tải lên một hình ảnh!");
         setLoading(false);
@@ -128,14 +122,14 @@ const Page: React.FC = () => {
         metadata: blogData.metadata.map((item) => JSON.stringify(item)),
       };
 
-      createBlogMutation(blogDataToSend); // Call mutation to create blog
+      mutate(blogDataToSend); // Call mutation to create blog
       form.resetFields();
       setBlogData({
         title: "",
         description: "",
         image: [],
         content: "",
-        category: [],
+        category: "",
         link: "",
         file_type: [],
         file: [],
@@ -146,15 +140,14 @@ const Page: React.FC = () => {
       message.error("Có lỗi xảy ra khi thêm bài viết.");
     } finally {
       setLoading(false);
-      // router.back();
     }
   };
 
   return (
-    <div style={{ padding: "20px", maxWidth: "1400px", margin: "0 auto" }}>
+    <div style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
       <BackButton />
 
-      <Heading name="Tạo bài viết mới" />
+      <Heading name="tạo sứ vụ mới  " />
 
       <Card bordered={false}>
         <Form form={form} layout="vertical" onFinish={handleSaveBlog}>
@@ -168,10 +161,7 @@ const Page: React.FC = () => {
                 <Input
                   value={blogData.title}
                   onChange={(e) =>
-                    setBlogData((prevData) => ({
-                      ...prevData,
-                      title: e.target.value,
-                    }))
+                    setBlogData({ ...blogData, title: e.target.value })
                   }
                 />
               </Form.Item>
@@ -183,10 +173,7 @@ const Page: React.FC = () => {
                 <TextArea
                   value={blogData.description}
                   onChange={(e) =>
-                    setBlogData((prevData) => ({
-                      ...prevData,
-                      description: e.target.value,
-                    }))
+                    setBlogData({ ...blogData, description: e.target.value })
                   }
                 />
               </Form.Item>
@@ -196,7 +183,7 @@ const Page: React.FC = () => {
                   fileList={fileList}
                   onPreview={handlePreview}
                   onChange={handleChange}
-                  beforeUpload={() => false}
+                  beforeUpload={() => false} // Ngăn tự động tải lên
                 >
                   {fileList.length >= 1 ? null : uploadButton}
                 </Upload>
@@ -213,40 +200,46 @@ const Page: React.FC = () => {
                   />
                 )}
               </Form.Item>
-              <Form.Item label="Nội dung chi tiết">
+              <Form.Item label="Nôi Dung Chi Tiết">
                 <ContentSection
                   onChange={setContent}
                   initialContent={blogData.content}
                 />
               </Form.Item>
-              <Form.Item label="Link">
+              <Form.Item label="Link" name="Link">
                 <Input
                   value={blogData.link}
                   onChange={(e) =>
-                    setBlogData((prevData) => ({
-                      ...prevData,
-                      link: e.target.value,
-                    }))
+                    setBlogData({ ...blogData, link: e.target.value })
                   }
                 />
               </Form.Item>
+
               <Form.Item label="Thể loại">
                 {isLoading ? (
                   <p>Đang tải thể loại...</p>
                 ) : isError ? (
                   <p>Có lỗi khi tải thể loại</p>
                 ) : (
-                  <Checkbox.Group
-                    options={queueData?.map((category: any) => ({
-                      label: category.name,
-                      value: category.id.toString(),
-                    }))}
-                    onChange={handleCategoryChange}
-                    value={blogData.category}
-                  />
+                  <Select
+                    value={blogData.category} // Chỉ lưu một thể loại
+                    onChange={handleCategoryChange} // Cập nhật blogData với thể loại được chọn
+                    style={{ width: "100%" }}
+                    placeholder="Chọn thể loại"
+                  >
+                    {queueData?.map((category: any) => (
+                      <Select.Option
+                        key={category.id}
+                        value={category.id.toString()}
+                      >
+                        {category.name}
+                      </Select.Option>
+                    ))}
+                  </Select>
                 )}
               </Form.Item>
             </Col>
+
             <Col span={12}>
               <Heading name="Thêm Hình Ảnh Hoặc PDF" />
               <MoreType onDataChange={handleDataChange} />

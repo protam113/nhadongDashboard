@@ -1,20 +1,18 @@
 "use client"; // Ensures this is a client component
 
 import React, { useState } from "react";
-import { Table, Button, Spin, Modal } from "antd";
+import { Table, Button, Modal } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { FaSync } from "react-icons/fa"; // Import refresh icon
 import { MdOutlineDelete } from "react-icons/md";
-import { FaRegEdit } from "react-icons/fa";
 import { EyeOutlined } from "@ant-design/icons";
-import Heading from "@/components/design/Heading";
 import PushButton from "@/components/Button/PushButton";
-import { FaArrowLeft, FaArrowRight } from "@/lib/iconLib";
+import { FaArrowLeft, FaArrowRight, FaSync, FaRegEdit } from "@/lib/iconLib";
 import { MessageList } from "@/lib/messageList";
 import MessageQueueList from "./MessageQueueList";
 import MessageDetailsDrawer from "./messageDetailModal";
 import { useDeleteMessage } from "@/hooks/message/useMessage";
 import EditMessageModal from "./drawer/EditMessage";
+import { SpinLoading, Error, Heading } from "@/components/design/index";
 
 const Page: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -115,8 +113,8 @@ const Page: React.FC = () => {
     },
   ];
 
-  if (isLoading) return <Spin size="large" />;
-  if (isError) return <div>Error loading queue data.</div>;
+  if (isLoading) return <SpinLoading />;
+  if (isError) return <Error />;
 
   const handleViewDetails = (blog: any) => {
     setSelectedBlog(blog);

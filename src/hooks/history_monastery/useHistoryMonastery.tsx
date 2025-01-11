@@ -79,9 +79,11 @@ const useHistory = (refreshKey: number, filters: Filters = {}) => {
 
 interface updateHistory {
   about: string;
+  title: string | null;
+  image: File[] | string | null;
 }
 
-const CreateBlog = async (
+const UpdateHistoryMonastery = async (
   updateHistory: updateHistory,
   historyId: string,
   token: string
@@ -92,8 +94,20 @@ const CreateBlog = async (
   for (const key in updateHistory) {
     const value = updateHistory[key as keyof updateHistory];
 
-    if (value) {
-      // Thêm các trường khác
+    if (key === "image") {
+      // Xử lý trường image
+      if (typeof value === "string") {
+        // Nếu là URL, thêm vào formData
+        formData.append("image", value); // Thêm URL vào FormData
+      } else if (Array.isArray(value)) {
+        value.forEach((file) => {
+          // Kiểm tra nếu file là đối tượng kiểu File
+          if (file instanceof File) {
+            formData.append("image", file); // Thêm từng file vào FormData
+          }
+        });
+      }
+    } else if (value !== null && value !== undefined) {
       formData.append(key, value as string);
     }
   }
@@ -140,7 +154,7 @@ const useUpdateHistory = () => {
       if (!token) {
         throw new Error("Token is not available");
       }
-      return CreateBlog(updateHistory, historyId, token);
+      return UpdateHistoryMonastery(updateHistory, historyId, token);
     },
     onSuccess: () => {
       message.success("Thông tin về nhà dòng đã được cập nhật thành công!");

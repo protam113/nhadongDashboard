@@ -7,6 +7,7 @@ import dayjs, { Dayjs } from "dayjs";
 import { useScheduleList } from "@/hooks/schedule/useSchedule";
 import { FaSync } from "@/lib/iconLib";
 import FeastDrawer from "../modal/ScheduleModal";
+import { SpinLoading, Error } from "@/components/design/index";
 
 // Màu sắc cho các loại lễ
 const feastTypeColors: Record<string, BadgeProps["status"]> = {
@@ -104,9 +105,13 @@ const CatholicCalendarTable: React.FC = () => {
       </div>
 
       {isLoading ? (
-        <p>Loading...</p>
+        <>
+          <SpinLoading />
+        </>
       ) : isError ? (
-        <p>Error loading data</p>
+        <>
+          <Error />
+        </>
       ) : (
         <Calendar
           cellRender={cellRender}

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Button,
   Checkbox,
@@ -19,12 +19,21 @@ import { CategoriesList } from "@/lib/categoriesList";
 import { UploadFile } from "antd/lib/upload/interface";
 import EditContentSection from "@/components/main/blog/EditContentSection";
 import { useEditNews } from "@/hooks/new/useNews";
+import { RcFile } from "antd/es/upload";
+import EditMoreType from "@/components/metamedia/Edittype";
 
 interface EditBlogModalProps {
   open: boolean;
   onClose: () => void;
   news: Blog | null; // Cho phép null nếu blog chưa được load
 }
+
+type BlogData = {
+  file_type: string[];
+  file: RcFile[];
+  metadata: string[];
+  media_remove?: string[]; // Nếu bạn cần lưu media_remove
+};
 
 const EditNewsModal: React.FC<EditBlogModalProps> = ({
   open,
@@ -39,6 +48,11 @@ const EditNewsModal: React.FC<EditBlogModalProps> = ({
   const [previewOpen, setPreviewOpen] = useState<boolean>(false);
   const { queueData, isLoading, isError } = CategoriesList(1, "news", 0);
   const { mutate: editBlogMutation } = useEditNews();
+  const [blogData, setBlogData] = useState<BlogData>({
+    file_type: [],
+    file: [],
+    metadata: [],
+  });
 
   useEffect(() => {
     if (news) {
@@ -76,6 +90,50 @@ const EditNewsModal: React.FC<EditBlogModalProps> = ({
     setFileList(fileList);
   };
 
+  const handleDataChange = useCallback(
+    (data: {
+      filetype: string[];
+      file: (string | RcFile | null)[]; // Allowing string, RcFile, or null
+      metadata: string[];
+      media_remove?: string[];
+    }) => {
+      const { filetype, file, metadata, media_remove } = data;
+
+      if (filetype) {
+        setBlogData((prevData) => ({
+          ...prevData,
+          file_type: filetype, // Cập nhật file_type
+        }));
+      }
+
+      if (file) {
+        // Filter out invalid files (null or strings)
+        const validFiles = file.filter(
+          (item): item is RcFile => item !== null && !(typeof item === "string")
+        );
+        setBlogData((prevData) => ({
+          ...prevData,
+          file: validFiles, // Cập nhật mảng tệp file chỉ với RcFile hợp lệ
+        }));
+      }
+      if (metadata) {
+        setBlogData((prevData) => ({
+          ...prevData,
+          metadata: metadata, // Cập nhật metadata
+        }));
+      }
+
+      // Cập nhật media_remove nếu có
+      if (media_remove) {
+        setBlogData((prevData) => ({
+          ...prevData,
+          media_remove: media_remove, // Cập nhật danh sách các media đã bị xóa
+        }));
+      }
+    },
+    [] // Không phụ thuộc vào bất kỳ giá trị nào ngoài data
+  );
+
   const handleSubmit = () => {
     if (!news) {
       console.error("Blog is null, cannot edit.");
@@ -92,12 +150,17 @@ const EditNewsModal: React.FC<EditBlogModalProps> = ({
         const editBlog = {
           ...values,
           category: selectedCategories,
+          category_remove:
+            category_remove.length > 0 ? category_remove : undefined,
           image: fileList.map((file) => file.originFileObj || file.url),
+          // Include all media-related fields
+          file_type: blogData.file_type,
+          file: blogData.file,
+          metadata: blogData.metadata,
         };
 
-        // Chỉ thêm `category_remove` nếu không rỗng
-        if (category_remove.length > 0) {
-          editBlog.category_remove = category_remove;
+        if (blogData.media_remove && blogData.media_remove.length > 0) {
+          editBlog.media_remove = blogData.media_remove;
         }
 
         editBlogMutation({
@@ -109,7 +172,6 @@ const EditNewsModal: React.FC<EditBlogModalProps> = ({
         console.error("Lỗi khi xác thực form:", info);
       });
   };
-  console.log("🚀 ~ news?.content:", news?.content);
 
   return (
     <Drawer
@@ -209,6 +271,19 @@ const EditNewsModal: React.FC<EditBlogModalProps> = ({
                   onChange={handleCategoryChange}
                 />
               )}
+            </Form.Item>
+            <Form.Item label="Media">
+              <EditMoreType
+                onDataChange={handleDataChange}
+                media={
+                  news?.media?.map((item) => ({
+                    id: item.id ?? "",
+                    file: item.file,
+                    file_type: item.file_type ?? "",
+                    metadata: JSON.stringify(item.metadata),
+                  })) ?? []
+                }
+              />
             </Form.Item>
           </Col>
         </Row>

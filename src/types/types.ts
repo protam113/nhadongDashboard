@@ -102,6 +102,8 @@ export interface Blog {
     created_date: string;
     updated_date: string;
     categories: Category[];
+    media: Media[] | null;
+
 }
 
 export interface Document {
@@ -114,6 +116,7 @@ export interface Document {
   created_date: string;
   updated_date: string;
   category: Category;
+  media: Media[] | null;
 }
 
 
@@ -149,6 +152,9 @@ export interface NewDocs {
     link: string;
     category: string; // Mảng danh mục
     image: File[] | string;
+    file_type: string[]  | null; 
+    file: File[] | string  | null;
+    metadata: string[] | null;
   }
 
   
@@ -160,6 +166,10 @@ export interface NewDocs {
     category: string | null; // Mảng danh mục
     image: File[] | string | null; // Hình ảnh chính cho bài viết
     category_remove:string | null;
+    file_type: string[]  | null; 
+    file: File[] | string | null;
+    metadata: string[] | null;
+    media_remove:string[] | null;
   }
 
 
@@ -267,7 +277,10 @@ export interface FetchEventListResponse {
 
 export interface HistoryMonasteryResponse {
     id:string,
-    about:string,
+    about:string ,
+    title:string,
+    image:string,
+    category:string,
 }
 
 
@@ -278,11 +291,13 @@ export interface DocsList {
     id: string;
     title: string;
     description: string;
-    content: string; // Có thể cần điều chỉnh nếu cấu trúc khác
+    content: string;
     link: string;
-    image: string | null; // Chỉnh sửa để phù hợp với giá trị null trong JSON
+    image: string | null; 
     category: Category;
-    user: User; // Sử dụng interface User đã khai báo ở trên
+    user: User;
+    media: Media[] | null;
+
 }
 
 
@@ -461,13 +476,13 @@ export interface NewChat {
 
 
 interface PostCategory {
-    id: number;
+    id: string;
     name: string;
     file: string;
   }
   
   interface User {
-    id: number;
+    id: string;
     username: string;
     first_name: string;
     last_name: string;
@@ -475,18 +490,27 @@ interface PostCategory {
     phone_number: string | null;
     profile_image: string;
   }
+
+  interface Media {
+    id:string | null;
+    file:string| null;
+    file_type:string| null;
+    metadata:string| null;
+  }
+
   
   interface PostList {
-    id: number;
+    id: string;
     title: string;
     description: string;
     content: string; // Có thể cần điều chỉnh nếu cấu trúc khác
     link: string;
     image: string | null; // Chỉnh sửa để phù hợp với giá trị null trong JSON
     categories: PostCategory[];
-    user: User; // Sử dụng interface User đã khai báo ở trên
+    user: User; 
+    media: Media[] | null;
+    created_date:string;
   }
-  
   // Khai Báo Các Thuộc Tính Không Có trong trường hiển thị
  export interface FetchBLogsListResponse {
     count: number;
@@ -496,14 +520,16 @@ interface PostCategory {
   }
   
 
-
   export interface NewPost {
     title: string;
     description: string;
     content: string; // Mảng nội dung chi tiết
     link: string;
     category: string[]; // Mảng danh mục
-    image: File[] | string; // Hình ảnh chính cho bài viết
+    image: File[] | string[]; // Hình ảnh chính cho bài viết
+    file_type: string[]  | null; 
+    file: File[] | string  | null;
+    metadata: string[] | null;
   }
 
   export interface EditPost {
@@ -514,6 +540,10 @@ interface PostCategory {
     category: string[] | null; // Mảng danh mục
     image: File[] | string | null; // Hình ảnh chính cho bài viết
     category_remove:string[] | null;
+    file_type: string[]  | null; 
+    file: File[] | string | null;
+    metadata: string[] | null;
+    media_remove:string[] | null;
   }
 
 
@@ -522,9 +552,6 @@ interface PostCategory {
 /**
   change password Interface
  **/
-
-
-
   export interface ChangePassword {
     old_password: string;
     new_password: string;

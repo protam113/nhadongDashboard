@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
-import { DatePicker, Button, Spin, Alert } from "antd";
+import { DatePicker, Button } from "antd";
 import { Line } from "@ant-design/plots";
 import dayjs from "dayjs";
+import { SpinLoading, Error } from "@/components/design/index";
 
 import { StaticalData } from "@/lib/staticalData";
 
@@ -77,8 +78,8 @@ const StaticalProb = () => {
         </div>
       </div>
 
-      {isLoading && <Spin />}
-      {isError && <Alert message="Error fetching data" type="error" />}
+      {isLoading && <SpinLoading />}
+      {isError && <Error />}
       {!isLoading && !isError && (
         <>
           <Line {...config} />
