@@ -149,7 +149,7 @@ const Page: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
+    <div style={{ padding: "20px", maxWidth: "100%", margin: "0 auto" }}>
       <BackButton />
 
       <Heading name="tạo thư đấng sáng lập mới  " />

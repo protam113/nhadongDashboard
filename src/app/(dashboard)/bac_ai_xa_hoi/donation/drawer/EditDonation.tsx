@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import {
   Button,
   Col,
@@ -17,12 +17,21 @@ import { Donation } from "@/types/types";
 import { UploadFile } from "antd/lib/upload/interface";
 import EditContentSection from "@/components/main/blog/EditContentSection";
 import { useEditDonation } from "@/hooks/donation/useDonation";
+import { RcFile } from "antd/es/upload";
+import EditMoreType from "@/components/metamedia/Edittype";
 
 interface EditBlogModalProps {
   open: boolean;
   onClose: () => void;
   blog: Donation | null;
 }
+
+type BlogData = {
+  file_type: string[];
+  file: RcFile[];
+  metadata: string[];
+  media_remove?: string[]; // Nếu bạn cần lưu media_remove
+};
 
 const EditDonationModal: React.FC<EditBlogModalProps> = ({
   open,
@@ -34,6 +43,11 @@ const EditDonationModal: React.FC<EditBlogModalProps> = ({
   const [previewImage, setPreviewImage] = useState<string>("");
   const [previewOpen, setPreviewOpen] = useState<boolean>(false);
   const { mutate } = useEditDonation();
+  const [blogData, setBlogData] = useState<BlogData>({
+    file_type: [],
+    file: [],
+    metadata: [],
+  });
 
   useEffect(() => {
     if (blog) {
@@ -61,6 +75,50 @@ const EditDonationModal: React.FC<EditBlogModalProps> = ({
     setFileList(fileList);
   };
 
+  const handleDataChange = useCallback(
+    (data: {
+      filetype: string[];
+      file: (string | RcFile | null)[]; // Allowing string, RcFile, or null
+      metadata: string[];
+      media_remove?: string[];
+    }) => {
+      const { filetype, file, metadata, media_remove } = data;
+
+      if (filetype) {
+        setBlogData((prevData) => ({
+          ...prevData,
+          file_type: filetype, // Cập nhật file_type
+        }));
+      }
+
+      if (file) {
+        // Filter out invalid files (null or strings)
+        const validFiles = file.filter(
+          (item): item is RcFile => item !== null && !(typeof item === "string")
+        );
+        setBlogData((prevData) => ({
+          ...prevData,
+          file: validFiles, // Cập nhật mảng tệp file chỉ với RcFile hợp lệ
+        }));
+      }
+      if (metadata) {
+        setBlogData((prevData) => ({
+          ...prevData,
+          metadata: metadata, // Cập nhật metadata
+        }));
+      }
+
+      // Cập nhật media_remove nếu có
+      if (media_remove) {
+        setBlogData((prevData) => ({
+          ...prevData,
+          media_remove: media_remove, // Cập nhật danh sách các media đã bị xóa
+        }));
+      }
+    },
+    [] // Không phụ thuộc vào bất kỳ giá trị nào ngoài data
+  );
+
   const handlePreview = (file: UploadFile) => {
     setPreviewImage(file.url || file.preview || "");
     setPreviewOpen(true);
@@ -78,7 +136,14 @@ const EditDonationModal: React.FC<EditBlogModalProps> = ({
         const editDonation = {
           ...values,
           image: fileList.map((file) => file.originFileObj || file.url),
+          file_type: blogData.file_type,
+          file: blogData.file,
+          metadata: blogData.metadata,
         };
+
+        if (blogData.media_remove && blogData.media_remove.length > 0) {
+          editDonation.media_remove = blogData.media_remove;
+        }
 
         mutate({
           editDonation: editDonation,
@@ -168,6 +233,19 @@ const EditDonationModal: React.FC<EditBlogModalProps> = ({
               />
             </Form.Item>
           </Col>
+          <Form.Item label="Media">
+            <EditMoreType
+              onDataChange={handleDataChange}
+              media={
+                blog?.media?.map((item) => ({
+                  id: item.id ?? "",
+                  file: item.file,
+                  file_type: item.file_type ?? "",
+                  metadata: JSON.stringify(item.metadata),
+                })) ?? []
+              }
+            />
+          </Form.Item>
         </Row>
       </Form>
     </Drawer>

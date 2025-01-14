@@ -251,6 +251,15 @@ const EditDonationD = async (
           }
         });
       }
+    }
+    if (key === "file" && Array.isArray(value)) {
+      value.forEach((file) => formData.append("file", file));
+    } else if (key === "file_type" && Array.isArray(value)) {
+      // Xử lý file
+      value.forEach((string) => formData.append("file_type", string));
+    } else if (key === "metadata" && Array.isArray(value)) {
+      // Xử lý metadata
+      value.forEach((string) => formData.append("metadata", string));
     } else if (value !== null && value !== undefined) {
       // Thêm các trường khác vào formData
       formData.append(key, value as string);

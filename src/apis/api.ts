@@ -100,6 +100,11 @@ const endpoints = {
      messages: process.env.NEXT_PUBLIC_MESSAGES,
      message: process.env.NEXT_PUBLIC_MESSAGE,
 
+     vocation: process.env.NEXT_PUBLIC_VOCATIONS,
+
+     //video
+     videos: process.env.NEXT_PUBLIC_VIDEOS,
+     video: process.env.NEXT_PUBLIC_VIDEO,
 };
 
 export { baseURL, endpoints };

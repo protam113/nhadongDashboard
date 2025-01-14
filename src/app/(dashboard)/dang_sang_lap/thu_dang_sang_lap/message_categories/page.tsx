@@ -7,7 +7,6 @@ import { CategoriesList } from "@/lib/categoriesList";
 import { useDeleteCategory } from "@/hooks/cateogry/useCategories";
 import EditBlogCategory from "@/app/(dashboard)/blog/blog_categories/EditBlogCategory";
 import Heading from "@/components/design/Heading";
-import CreateMissioCategory from "./CreateMissioCategory";
 import {
   FaArrowLeft,
   FaArrowRight,
@@ -17,8 +16,9 @@ import {
 } from "@/lib/iconLib";
 import BackButton from "@/components/Button/BackButton";
 import { SpinLoading, Error } from "@/components/design/index";
+import CreateMessageCategory from "./CreateMissioCategory";
 
-const MissioCategories: React.FC = () => {
+const Page: React.FC = () => {
   const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [refreshKey, setRefreshKey] = useState(0);
@@ -211,7 +211,7 @@ const MissioCategories: React.FC = () => {
         footer={null}
         width={600}
       >
-        <CreateMissioCategory onLoadingChange={handleLoadingChange} />
+        <CreateMessageCategory onLoadingChange={handleLoadingChange} />
       </Modal>
       {/* Modal sửa thể loại */}
       <Modal
@@ -228,4 +228,4 @@ const MissioCategories: React.FC = () => {
   );
 };
 
-export default MissioCategories;
+export default Page;

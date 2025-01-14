@@ -208,12 +208,12 @@ export const NavItems = () => {
           key: "36",
           icon: <BiCategory />,
         },
-        // {
-        //   name: "Quyên Góp",
-        //   link: "/vocation",
-        //   key: "35",
-        //   icon: <BiDonateHeart />,
-        // },
+        {
+          name: "Danh Sách Đăng Ký",
+          link: "/vocation/vocation_list",
+          key: "38",
+          icon: <BiDonateHeart />,
+        },
       ],
     },
     {

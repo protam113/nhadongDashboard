@@ -1,15 +1,17 @@
 import React, { useState } from "react";
 import { Input, Upload, Button, message, Progress, Image } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
-import { useCreateCategory } from "@/hooks/cateogry/useCategories";
 import { UploadFile, UploadProps } from "antd/lib/upload/interface";
 import { RcFile } from "antd/lib/upload";
+import { useCreateVideo } from "@/hooks/video/useVideo";
 
-const CreateMessageCategory: React.FC<{
+const CreateVideo: React.FC<{
   onLoadingChange: (isLoading: boolean, progress: number) => void;
 }> = ({ onLoadingChange }) => {
-  const { mutate: createCategory } = useCreateCategory();
-  const [name, setName] = useState<string>("");
+  const { mutate } = useCreateVideo();
+  const [content, setContent] = useState<string>("");
+  const [link, setLink] = useState<string>("");
+
   const [imageList, setImageList] = useState<UploadFile[]>([]);
   const [previewImage, setPreviewImage] = useState<string>("");
   const [previewOpen, setPreviewOpen] = useState<boolean>(false);
@@ -17,7 +19,7 @@ const CreateMessageCategory: React.FC<{
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const handleSubmit = async () => {
-    if (!name) {
+    if (!content) {
       message.error("Please fill all fields!");
       return;
     }
@@ -34,12 +36,8 @@ const CreateMessageCategory: React.FC<{
       }
 
       await new Promise((resolve, reject) => {
-        createCategory(
-          {
-            name,
-            model: "messageformfounder",
-            image: imageList[0]?.originFileObj ?? null,
-          },
+        mutate(
+          { content, link, image: imageList[0]?.originFileObj ?? null },
           {
             onSuccess: resolve,
             onError: reject,
@@ -80,12 +78,19 @@ const CreateMessageCategory: React.FC<{
 
   return (
     <div className="p-4">
-      <h2 className="text-18 font-bold mb-4">Tạo Thể Loại Sứ Vụ</h2>
-      <label className="block mb-2 font-medium text-gray-700">Name</label>
+      <h2 className="text-18 font-bold mb-4">Create Category</h2>
+      <label className="block mb-2 font-medium text-gray-700">Tiêu Đề</label>
       <Input
-        placeholder="Category Name"
-        value={name}
-        onChange={(e) => setName(e.target.value)}
+        placeholder="Tiêu Đề"
+        value={content}
+        onChange={(e) => setContent(e.target.value)}
+        className="mb-4"
+      />
+      <label className="block mb-2 font-medium text-gray-700">Đường Dẫn</label>
+      <Input
+        placeholder="Đường Dẫn"
+        value={link}
+        onChange={(e) => setLink(e.target.value)}
         className="mb-4"
       />
 
@@ -102,7 +107,7 @@ const CreateMessageCategory: React.FC<{
 
       {previewImage && (
         <Image
-          alt="Xem Trước Ảnh"
+          alt="Xem Ảnh Trước"
           wrapperStyle={{ display: "none" }}
           preview={{
             visible: previewOpen,
@@ -128,4 +133,4 @@ const CreateMessageCategory: React.FC<{
   );
 };
 
-export default CreateMessageCategory;
+export default CreateVideo;

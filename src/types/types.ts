@@ -131,7 +131,28 @@ export interface Document {
 }
 
 
+export interface UpdateVocation {
+  status: string;
+  id: string[];
+}
 
+interface MediaVideoList {
+  id: string;
+  content: string;
+  image: string;
+  link: string;
+  create_date: string;
+}
+
+export interface FetchMediaVideoResponse {
+  data: MediaVideoList[];
+}
+
+export interface NewVideo {
+  content:string,
+  link:string
+  image: File | string | null; // Use File type for file, or string if necessary
+}
 
 /**
  New Event Interface
@@ -316,6 +337,28 @@ export interface DocsList {
 }
 
 
+
+interface VocationList {
+  id:string,
+  name:   string,
+  status: string,
+  email:Date,
+  dob:string,
+  phone_number:string,
+  church:string,
+  reason:string,
+  created_date:string
+}
+
+
+export interface VocationRegisterListResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: VocationList[];
+}
+
+
 /**
  event register list Interface
  **/
@@ -327,32 +370,11 @@ export interface DocsList {
 }
 
 interface FieldsData {
-    dob?: Field;
     email?: Field;
-    image?: Field;
-    location?: Field;
-    pardoner?: Field;
     last_name?: Field;
     first_name?: Field;
-    baptism_day?: Field;
-    baptismal_at?: Field;
     phone_number?: Field;
-    dad_last_name?: Field;
-    mom_last_name?: Field;
-    dad_first_name?: Field;
-    mom_first_name?: Field;
-    confirmation_at?: Field;
-    parish_hometown?: Field;
-    baptism_day_form?: Field;
-    learning_process?: Field;
-    baptismal_sponsor?: Field;
-    confirmation_form?: Field;
-    confirmation_mass?: Field;
-    first_communion_day?: Field;
-    confirmation_sponsor?: Field;
-    religious_vocation_id?: Field;
-    brothers_and_sisters_name?: Field;
-    brothers_and_sisters_year?: Field;
+  
 }
 
  interface EventRegisterList {
@@ -416,6 +438,10 @@ export interface EditDonation {
   link: string| null;
   image: File[] | string| null; // Chỉnh sửa để phù hợp với giá trị null trong JSON
   visibility: string| null;
+  file_type: string[]  | null; 
+  file: File[] | string | null;
+  metadata: string[] | null;
+  media_remove:string[] | null;
 }
 
 export interface NewDonation {
@@ -434,6 +460,8 @@ export interface Donation {
   link: string;
   visibility: string;
   image: string;
+  media: Media[] | null;
+
 }
 
 
