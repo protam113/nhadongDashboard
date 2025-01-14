@@ -17,7 +17,6 @@ interface EditCategoryItem {
 const EditVideo: React.FC<{ video: any }> = ({ video }) => {
   const [content, setContent] = useState(video?.content || ""); // Hiển thị tên thể loại
   const [link, setLink] = useState(video?.link || ""); // Hiển thị tên thể loại
-
   const [imageList, setImageList] = useState<UploadFile<any>[]>(
     video?.image
       ? [

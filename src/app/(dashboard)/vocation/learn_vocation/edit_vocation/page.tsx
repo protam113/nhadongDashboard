@@ -18,7 +18,7 @@ const Page = () => {
 
   const [historyId] = useState<string>("ecb2b562-247c-430b-9147-2c42d77a5a87");
   const { mutate } = useUpdateHistory();
-  const model = "f33a306a-d0a2-4ab2-8e8b-01cb65f8ccb1";
+  const model = "3b164b58-18c6-454b-bfec-3e345f8fe33f";
   const {
     queueData: data,
     isLoading,

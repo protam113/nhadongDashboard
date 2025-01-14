@@ -16,7 +16,7 @@ const Page = () => {
           Chỉnh sửa thông tin
         </Button>
       </div>
-      <HistoryContent category="f33a306a-d0a2-4ab2-8e8b-01cb65f8ccb1" />
+      <HistoryContent category="316132a6-b1ca-4071-8515-bc4fd077e638" />
     </div>
   );
 };
