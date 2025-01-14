@@ -1,10 +1,7 @@
 "use client";
 
 import React from "react";
-import { Drawer, Typography, Divider, Button, Image } from "antd";
-import formatDate from "@/utils/formatDate";
-
-const { Paragraph } = Typography;
+import { Drawer, Button, Image } from "antd";
 
 interface BlogDetailsDrawerProps {
   open: boolean;
@@ -12,12 +9,14 @@ interface BlogDetailsDrawerProps {
   blog: any | null; // Accept blog data type as any
 }
 
-const BlogDetailsDrawer: React.FC<BlogDetailsDrawerProps> = ({
+const PostDetailDrawer: React.FC<BlogDetailsDrawerProps> = ({
   open,
   onClose,
   blog,
 }) => {
   if (!blog) return null;
+  const details = blog.old_data || blog;
+
   return (
     <Drawer
       open={open}
@@ -27,16 +26,10 @@ const BlogDetailsDrawer: React.FC<BlogDetailsDrawerProps> = ({
       bodyStyle={{ padding: "24px" }}
     >
       <div className="flex flex-col gap-4">
-        <h1 className="text-24 font-semibold text-center">{blog.title}</h1>
+        <h1 className="text-24 font-semibold text-center">{details.title}</h1>
         <div className="flex items-center justify-center text-gray-500 text-sm space-x-6">
-          <p className="mr-4">
-            {blog.user.first_name} {blog.user.last_name}
-          </p>
-          <div>
-            <strong>Email:</strong> {blog.user.email}
-          </div>
           <div className="flex items-center space-x-2">
-            {blog.categories.map((category: any) => (
+            {details.categories.map((category: any) => (
               <span
                 key={category.id}
                 className="bg-indigo-500 text-white py-1 px-3 rounded-full text-sm"
@@ -45,17 +38,16 @@ const BlogDetailsDrawer: React.FC<BlogDetailsDrawerProps> = ({
               </span>
             ))}
           </div>
-          <span>{formatDate(blog.created_date)}</span>
         </div>
 
         <div className="text-center mt-2 text-16">
-          <p>{blog.description}</p>
+          <p>{details.description}</p>
         </div>
 
         {blog.image && (
           <div className="mt-8 w-full max-w-3xl mx-auto">
             <Image
-              src={blog.image}
+              src={details.image}
               alt="Blog Image"
               className="w-full h-auto rounded-xl shadow-lg"
               width={800}
@@ -68,22 +60,21 @@ const BlogDetailsDrawer: React.FC<BlogDetailsDrawerProps> = ({
           <div
             className="content text-lg text-justify"
             dangerouslySetInnerHTML={{
-              __html: blog.content.replace(/\"/g, ""), // Xóa tất cả dấu "
+              __html: details.content ? blog.content.replace(/\"/g, "") : "",
             }}
           />
+
           {/* Source */}
           <div className="mt-6 mb-6">
             <p className="text-gray-500 font-semibold">Nguồn:</p>
-            <p className="text-blue-800">{blog.link}</p>
+            <p className="text-blue-800">{details.link}</p>
           </div>
         </div>
 
-        <Divider />
-        <Paragraph className="text-gray-800 mb-2">
-          <strong>Hình Ảnh Bổ Sung:</strong>
-        </Paragraph>
+        <strong>Hình Ảnh Bổ Sung:</strong>
+
         <div className="mb-2">
-          {blog.media.map((media: any) => (
+          {details.media.map((media: any) => (
             <div key={media.id} className="mb-2">
               <span className="bg-indigo-500 text-white py-1 px-2 rounded-full text-sm">
                 {media.file_type}
@@ -130,4 +121,4 @@ const BlogDetailsDrawer: React.FC<BlogDetailsDrawerProps> = ({
   );
 };
 
-export default BlogDetailsDrawer;
+export default PostDetailDrawer;

@@ -9,7 +9,7 @@ const Breadcrumb = () => {
   const pathArray = path?.split("/").filter((p) => p);
 
   return (
-    <div className="text-14 ml-4  text-gray-500">
+    <div className="text-14 ml-2 mt-2 text-gray-500">
       {/* Home */}
       <Link href="/" passHref>
         <span className="hover:text-blue-500 mr-1">home</span>

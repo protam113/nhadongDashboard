@@ -6,6 +6,7 @@ import { endpoints } from "@/apis/api";
 import { useAuth } from "@/context/authContext";
 import { useEffect, useState } from "react";
 import { Filters, FetchQueueListResponse } from "@/types/types";
+import { message } from "antd";
 
 const fetchQueueList = async (
   pageParam: number = 1,
@@ -132,7 +133,7 @@ const useBrowseQueue = () => {
       return CreateBrowseQueue(browseManager, token);
     },
     onSuccess: () => {
-      console.log("duyệt hàng đợi thành công");
+      message.success("duyệt hàng đợi thành công");
       queryClient.invalidateQueries({ queryKey: ["queueList"] });
     },
     onError: (error) => {

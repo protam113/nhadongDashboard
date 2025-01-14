@@ -16,6 +16,7 @@ import {
   FaRegEdit,
 } from "@/lib/iconLib";
 import { SpinLoading, Error, Heading } from "@/components/design/index";
+import { useUser } from "@/context/userProvider";
 
 const { Option } = Select;
 
@@ -27,6 +28,8 @@ const Categories: React.FC = () => {
   const router = useRouter(); // Hook for navigation
   const [isEditModalVisible, setIsEditModalVisible] = useState(false); // For editing category
   const [editingCategory, setEditingCategory] = useState(null);
+  const { userInfo } = useUser() || {};
+
   // Pass model into CategoriesList
   const { queueData, next, isLoading, isError } = CategoriesList(
     currentPage,
@@ -215,7 +218,11 @@ const Categories: React.FC = () => {
             <FaArrowRight />
           </button>
         </div>
-        <CategoriesQueueTable />
+        {userInfo?.role.name === "admin" ? (
+          <>
+            <CategoriesQueueTable />
+          </>
+        ) : null}
       </div>
       <Modal
         title="Sửa Thể Loại"

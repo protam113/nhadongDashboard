@@ -20,6 +20,7 @@ import { SpinLoading, Error, Heading } from "@/components/design/index";
 import DocsDetailsModal from "./DocumentDetailModal";
 import DocumentCategoriesTable from "./DocumentCategoriesTable";
 import DocumentQueueList from "./DocumentQueueTable";
+import { useUser } from "@/context/userProvider";
 
 const Documents: React.FC = () => {
   const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
@@ -30,6 +31,7 @@ const Documents: React.FC = () => {
   const [selectedDoc, setSelectedDoc] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
+  const { userInfo } = useUser() || {};
 
   // Pass model into CategoriesList
   const { queueData, next, isLoading, isError } = DocsList(
@@ -218,7 +220,12 @@ const Documents: React.FC = () => {
           </button>
         </div>
         <DocumentCategoriesTable />
-        <DocumentQueueList />
+        {userInfo?.role.name === "admin" ? (
+          <>
+            <Heading name="Quản lý hàng đợi duyệt bài viết" />
+            <DocumentQueueList />
+          </>
+        ) : null}
       </div>
       <DocsDetailsModal
         visible={isModalVisible}

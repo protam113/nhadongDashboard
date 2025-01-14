@@ -180,7 +180,7 @@ const EditBlogModal: React.FC<EditBlogModalProps> = ({
   return (
     <Drawer
       title="Chỉnh Sửa Bài Viết"
-      width={720}
+      width={900}
       onClose={onClose}
       open={open}
       extra={

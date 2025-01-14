@@ -36,11 +36,11 @@ const DropdownMenu: React.FC = () => {
       key: "0",
     },
     {
-      label: <a href="/setting">Cập Nhật Thông Tin Cá Nhân</a>, // Updated link to settings
+      label: <a href="/setting">Cập Nhật Thông Tin Cá Nhân</a>,
       key: "1",
     },
     {
-      label: <a href="/auth">Bảo Mật</a>, // Updated link to settings
+      label: <a href="/auth">Bảo Mật</a>,
       key: "2",
     },
     ...(userInfo?.role.name === "admin"

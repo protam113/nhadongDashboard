@@ -1,17 +1,22 @@
 "use client"; // Ensures this is a client component
 
 import React, { useState } from "react";
-import { Table, Button, Spin, Select, Modal } from "antd";
+import { Table, Button, Select, Modal } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { EventList } from "@/lib/eventList";
 import Heading from "@/components/design/Heading";
 import PushButton from "@/components/Button/PushButton";
 import { useUpdateEvent } from "@/hooks/event/useEventDetail";
-import { FaArrowLeft, FaArrowRight, FaSync } from "@/lib/iconLib";
+import {
+  FaArrowLeft,
+  FaArrowRight,
+  FaSync,
+  MdOutlineDelete,
+} from "@/lib/iconLib";
 import { EyeOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
 import { useDeleteEvent } from "@/hooks/event/useEvent";
-import { MdOutlineDelete } from "react-icons/md";
+import { SpinLoading, Error } from "@/components/design/index";
 
 const Page: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -116,8 +121,8 @@ const Page: React.FC = () => {
     },
   ];
 
-  if (isLoading) return <Spin size="large" />;
-  if (isError) return <div>Error loading queue data.</div>;
+  if (isLoading) return <SpinLoading />;
+  if (isError) return <Error />;
 
   const handleRefresh = () => {
     setRefreshKey((prev) => prev + 1); // Refresh data manually

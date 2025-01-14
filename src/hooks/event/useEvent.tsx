@@ -87,12 +87,18 @@ const CreateEvent = async (newDoc: NewEvent, token: string) => {
   for (const key in newDoc) {
     const value = newDoc[key as keyof NewEvent];
 
-    if (key === "description") {
-      // Xử lý content nếu là object hoặc JSON string
-      formData.append(key, JSON.stringify(value));
-    } else if (key === "image" && typeof value === "string") {
+    if (key === "image" && typeof value === "string") {
       // Nếu là URL hình ảnh
       formData.append(key, value);
+    }
+    if (key === "file" && Array.isArray(value)) {
+      value.forEach((file) => formData.append("file", file));
+    } else if (key === "file_type" && Array.isArray(value)) {
+      // Xử lý file
+      value.forEach((string) => formData.append("file_type", string));
+    } else if (key === "metadata" && Array.isArray(value)) {
+      // Xử lý metadata
+      value.forEach((string) => formData.append("metadata", string));
     } else if (key === "image" && Array.isArray(value)) {
       // Nếu là mảng hình ảnh tải lên
       value.forEach((file) => {

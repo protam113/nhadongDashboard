@@ -152,21 +152,23 @@ const CreateBlogPage: React.FC = () => {
   );
 
   return (
-    <div style={{ padding: "20px", maxWidth: "1400px", margin: "0 auto" }}>
+    <div style={{ padding: "20px", maxWidth: "100%", margin: "0 auto" }}>
       <BackButton />
 
       <Heading name="Tạo bài viết mới" />
 
       <Card bordered={false}>
         <Form form={form} layout="vertical" onFinish={handleSaveBlog}>
-          <Row gutter={[16, 0]}>
+          <Row gutter={[12, 24]}>
+            {/* Nhóm thông tin cơ bản */}
             <Col span={12}>
               <Form.Item
-                label="Tiêu đề"
+                label="Tiêu đề bài viết"
                 name="title"
                 rules={[{ required: true, message: "Vui lòng nhập tiêu đề!" }]}
               >
                 <Input
+                  placeholder="Nhập tiêu đề bài viết (ví dụ: Hướng dẫn nấu ăn)"
                   value={blogData.title}
                   onChange={(e) =>
                     setBlogData((prevData) => ({
@@ -176,12 +178,15 @@ const CreateBlogPage: React.FC = () => {
                   }
                 />
               </Form.Item>
+
               <Form.Item
-                label="Mô tả"
+                label="Mô tả ngắn gọn"
                 name="description"
                 rules={[{ required: true, message: "Vui lòng nhập mô tả!" }]}
               >
                 <TextArea
+                  placeholder="Nhập một đoạn mô tả ngắn về bài viết"
+                  rows={4}
                   value={blogData.description}
                   onChange={(e) =>
                     setBlogData((prevData) => ({
@@ -191,10 +196,14 @@ const CreateBlogPage: React.FC = () => {
                   }
                 />
               </Form.Item>
+            </Col>
+
+            {/* Nhóm hình ảnh */}
+            <Col span={12}>
               <Form.Item label="Hình ảnh chính">
                 <Tooltip
-                  title="Lưu ý: Vui lòng upload hình ảnh có kích thước 820x500px để hiển thị tốt nhất."
-                  placement="top"
+                  title="Vui lòng upload hình ảnh kích thước 820x500px."
+                  placement="topLeft"
                 >
                   <Upload
                     listType="picture-card"
@@ -206,11 +215,6 @@ const CreateBlogPage: React.FC = () => {
                     {fileList.length >= 1 ? null : uploadButton}
                   </Upload>
                 </Tooltip>
-                <span className="text-sm text-gray-600 mt-2 block">
-                  Lưu ý: Vui lòng upload hình ảnh có kích thước 820x500px để
-                  hiển thị tốt nhất.
-                </span>
-
                 {previewImage && (
                   <Image
                     alt="Hình ảnh xem trước bài viết"
@@ -223,14 +227,22 @@ const CreateBlogPage: React.FC = () => {
                   />
                 )}
               </Form.Item>
-              <Form.Item label="Nội dung chi tiết">
+            </Col>
+
+            {/* Nội dung và thể loại */}
+            <Col span={24}>
+              <Form.Item label="Nội dung bài viết">
                 <ContentSection
                   onChange={setContent}
                   initialContent={blogData.content}
                 />
               </Form.Item>
-              <Form.Item label="Link">
+            </Col>
+
+            <Col span={12}>
+              <Form.Item label="Link liên kết">
                 <Input
+                  placeholder="Nhập link liên kết đến bài viết khác"
                   value={blogData.link}
                   onChange={(e) =>
                     setBlogData((prevData) => ({
@@ -240,14 +252,17 @@ const CreateBlogPage: React.FC = () => {
                   }
                 />
               </Form.Item>
-              <Form.Item label="Thể loại">
+            </Col>
+
+            <Col span={12}>
+              <Form.Item label="Chọn thể loại">
                 {isLoading ? (
-                  <p>Đang tải thể loại...</p>
+                  <p>Đang tải danh sách thể loại...</p>
                 ) : isError ? (
-                  <p>Có lỗi khi tải thể loại</p>
+                  <p>Có lỗi khi tải danh sách thể loại.</p>
                 ) : (
                   <Checkbox.Group
-                    options={queueData?.map((category: any) => ({
+                    options={queueData?.map((category) => ({
                       label: category.name,
                       value: category.id.toString(),
                     }))}
@@ -257,9 +272,13 @@ const CreateBlogPage: React.FC = () => {
                 )}
               </Form.Item>
             </Col>
-            <Col span={12}>
-              <Heading name="Thêm Hình Ảnh Hoặc PDF" />
-              <MoreType onDataChange={handleDataChange} />
+
+            {/* Tài liệu bổ sung */}
+            <Col span={24}>
+              <div className="mb-4">
+                <Heading name="Thêm tài liệu hoặc PDF" />
+                <MoreType onDataChange={handleDataChange} />
+              </div>
             </Col>
           </Row>
 

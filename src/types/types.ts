@@ -12,6 +12,17 @@ export interface AuthContextType {
     getToken: () => string | null; // Thêm getToken vào kiểu AuthContextType
 }
 
+export interface TextParallaxContentProps {
+  subheading: string;
+  heading: string;
+  children: React.ReactNode;
+}
+
+export interface OverlayCopyProps {
+  subheading: string;
+  heading: string;
+}
+
 
 /*
   Khai Báo Thuộc Tính Category
@@ -132,7 +143,10 @@ export interface NewEvent {
     description: string;
     category: string; // Mảng danh mục
     status: string;
-    image: File[] | string | null;
+    image: string | File[] | null; 
+        file_type: string[]  | null; 
+    file: File[] | string  | null;
+    metadata: string[] | null;
 }
 
 
@@ -186,6 +200,7 @@ export interface EventList {
     image: string | null; // Chỉnh sửa để phù hợp với giá trị null trong JSON
     category: string;
     user: string;
+    media:Media[] | null;
 }
 
 // Khai Báo Các Thuộc Tính Không Có trong trường hiển thị
@@ -408,7 +423,7 @@ export interface NewDonation {
   description: string;
   content: string; // Có thể cần điều chỉnh nếu cấu trúc khác
   link: string;
-  image: File[] | string; // Chỉnh sửa để phù hợp với giá trị null trong JSON
+  image: File[] | string | null; // Chỉnh sửa để phù hợp với giá trị null trong JSON
   visibility: string;
 }
 export interface Donation {

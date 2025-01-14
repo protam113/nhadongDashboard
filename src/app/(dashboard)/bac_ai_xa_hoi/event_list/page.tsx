@@ -15,7 +15,7 @@ import { MdOutlineDelete } from "react-icons/md";
 
 const Page: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
-  const [category] = useState<string>("event"); // State to hold selected model
+  const [status, setStatus] = useState<string>(""); // State to hold selected model
   const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
   const [selectedPostId, setSelectedPostId] = useState<string>(""); // State to hold the selected event ID
   const { mutate } = useUpdateEvent(selectedPostId);
@@ -25,7 +25,7 @@ const Page: React.FC = () => {
   // Pass model into CategoriesList
   const { queueData, next, isLoading, isError } = EventList(
     currentPage,
-    category,
+    status,
     refreshKey
   );
   const totalPages = next ? currentPage + 1 : currentPage;
@@ -45,7 +45,7 @@ const Page: React.FC = () => {
   };
 
   const handleViewDetails = (record: any) => {
-    router.push(`/event/event_list/${record.id}`); // Chuyển hướng đến URL với ID
+    router.push(`/bac_ai_xa_hoi/event_list/${record.id}`); // Chuyển hướng đến URL với ID
   };
 
   const handleSelectEvent = (postId: string) => {
@@ -137,15 +137,32 @@ const Page: React.FC = () => {
 
         {/* Model selection */}
         <div className="flex justify-between items-center mb-4">
-          <Button onClick={handleRefresh} style={{ marginLeft: "8px" }}>
-            <FaSync /> Làm mới
-          </Button>
-          <PushButton
-            href="/event/event_list/create_event"
-            label={"Tạo Sự Kiện"}
-          />
+          <div className="flex items-center space-x-4">
+            <span>Lọc trạng thái:</span>
+            <Select
+              defaultValue=""
+              style={{ width: 150 }}
+              onChange={(value) => {
+                setStatus(value); // Cập nhật trạng thái
+                setCurrentPage(1); // Reset về trang đầu
+              }}
+              options={[
+                { value: "", label: "Tất cả" },
+                { value: "open", label: "Open" },
+                { value: "close", label: "Close" },
+              ]}
+            />
+          </div>
+          <div className="flex items-center space-x-4">
+            <Button onClick={handleRefresh} style={{ marginLeft: "8px" }}>
+              <FaSync /> Làm mới
+            </Button>
+            <PushButton
+              href="/bac_ai_xa_hoi/event_list/create_event"
+              label={"Tạo Sự Kiện"}
+            />
+          </div>
         </div>
-
         <div className="overflow-auto" style={{ maxHeight: "800px" }}>
           <Table
             columns={columns}

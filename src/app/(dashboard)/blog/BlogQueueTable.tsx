@@ -2,18 +2,24 @@
 
 import React, { useState } from "react";
 import { Table, Button, Spin } from "antd";
-import { ReloadOutlined } from "@ant-design/icons"; // Icon từ Ant Design
+import { EyeOutlined, ReloadOutlined } from "@ant-design/icons"; // Icon từ Ant Design
 import type { ColumnsType } from "antd/es/table";
 import { UserQueue } from "@/lib/userQueue";
 import { FaArrowLeft, FaArrowRight } from "@/lib/iconLib";
 import SpinLoading from "@/components/design/Spin";
 import Error from "@/components/design/Error";
+import PostDetailDrawer from "@/components/drawer/PostDetailDrawer";
+import PostEditDetailDrawer from "@/components/drawer/PostEditDetailDrawer";
 
 const BlogQueueList: React.FC = () => {
   const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [refreshKey, setRefreshKey] = useState(0); // State để làm mới dữ liệu
   const [isRefreshing, setIsRefreshing] = useState(false); // State để kiểm tra trạng thái làm mới
+  const [selectedPost, setSelectedPost] = useState(null); // State for selected blog
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false); // State mới
+  const [selectedEditPost, setSelectedEditPost] = useState(null); // State for selected blog
 
   // Gọi hook `UserQueue` và thêm `refreshKey` làm dependency để làm mới dữ liệu
   const { queueData, next, isLoading, isError, handleBulkUpdate } = UserQueue(
@@ -32,15 +38,30 @@ const BlogQueueList: React.FC = () => {
   };
 
   const handleBulkApprove = () => {
-    handleBulkUpdate(selectedKeys, "approved");
+    handleBulkUpdate(selectedKeys, "approve");
     setSelectedKeys([]);
   };
 
   const handleBulkReject = () => {
-    handleBulkUpdate(selectedKeys, "rejected");
+    handleBulkUpdate(selectedKeys, "reject");
     setSelectedKeys([]);
   };
 
+  const handleViewDetails = (blog: any) => {
+    setSelectedPost(blog.data?.old_data || blog); // Kiểm tra nếu dữ liệu nằm trong old_data
+    setIsDrawerOpen(true);
+  };
+
+  const handleViewEditDetails = (blog: any) => {
+    setSelectedEditPost(blog.data?.new_data || blog); // Kiểm tra nếu dữ liệu nằm trong old_data
+    setIsEditDrawerOpen(true); // Mở Drawer chỉnh sửa
+  };
+
+  const handleDrawerClose = () => {
+    setIsDrawerOpen(false);
+    setIsEditDrawerOpen(false); // Đóng cả hai Drawer
+    setSelectedPost(null);
+  };
   const columns: ColumnsType<any> = [
     {
       title: "ID",
@@ -53,25 +74,54 @@ const BlogQueueList: React.FC = () => {
       title: "Ngày Tạo",
       dataIndex: "created_date",
       key: "created_date",
-      width: 150,
+      width: 110,
       render: (text) => <span>{new Date(text).toLocaleString()}</span>,
     },
     {
-      title: "Ngày Cập Nhật",
-      dataIndex: "updated_date",
-      key: "updated_date",
-      width: 150,
-      render: (text) => <span>{new Date(text).toLocaleString()}</span>,
-    },
-    {
-      title: "Nội Dung",
-      dataIndex: ["data", "old_data", "name"],
-      key: "data",
-      width: 250,
+      title: "Người Tạo",
+      dataIndex: ["request_user", "username"],
+      key: "request_user",
+      width: 200,
       render: (text) => <span>{text}</span>,
     },
     {
-      title: "Hình Thức",
+      title: "Nội Dung",
+      dataIndex: ["data", "old_data"],
+      key: "data",
+      width: 150,
+      render: (_, record) => {
+        const { action, status } = record; // Lấy giá trị action và status của bản ghi
+        if (status === "reject" || action !== "create") return null; // Nếu trạng thái là reject, không hiển thị nút
+
+        return (
+          <div className="flex justify-between">
+            <Button onClick={() => handleViewDetails(record)}>
+              <EyeOutlined /> Xem Chi Tiết
+            </Button>
+          </div>
+        );
+      },
+    },
+    {
+      title: "Nội Dung Sửa",
+      dataIndex: ["data", "new_data"],
+      key: "data",
+      width: 150,
+      render: (_, record) => {
+        const { action, status } = record; // Lấy giá trị action và status của bản ghi
+        if (status === "reject" || action !== "edit") return null; // Nếu trạng thái là reject, không hiển thị nút
+
+        return (
+          <div className="flex justify-between">
+            <Button onClick={() => handleViewEditDetails(record)}>
+              <EyeOutlined /> Xem Chi Tiết
+            </Button>
+          </div>
+        );
+      },
+    },
+    {
+      title: "Description",
       dataIndex: "description",
       key: "description",
       width: 150,
@@ -81,7 +131,7 @@ const BlogQueueList: React.FC = () => {
       title: "Hành Động",
       dataIndex: "action",
       key: "action",
-      width: 150,
+      width: 100,
       filters: [
         { text: "Create", value: "create" },
         { text: "Edit", value: "edit" },
@@ -128,76 +178,88 @@ const BlogQueueList: React.FC = () => {
   if (isError) return <Error />;
 
   return (
-    <div className="p-4">
+    <>
       <div className="p-4">
-        <Button
-          type="primary"
-          onClick={handleBulkApprove}
-          style={{ marginBottom: "16px" }}
-        >
-          Chấp Thuận
-        </Button>
-        <Button
-          className="text-albert-error"
-          onClick={handleBulkReject}
-          style={{ marginBottom: "16px", marginLeft: "8px" }}
-        >
-          Từ chối
-        </Button>
-        <Button
-          onClick={handleRefresh}
-          style={{ marginBottom: "16px", marginLeft: "8px" }}
-          icon={isRefreshing ? <Spin size="small" /> : <ReloadOutlined />} // Hiển thị icon làm mới hoặc spin
-        >
-          {isRefreshing ? "Đang làm mới..." : ""} {/* Thay đổi text */}
-        </Button>
-      </div>
-      <div className="overflow-auto" style={{ maxHeight: "800px" }}>
-        <Table
-          columns={columns}
-          dataSource={queueData}
-          rowKey="id"
-          pagination={false}
-          scroll={{ y: 500 }}
-          rowSelection={{
-            selectedRowKeys: selectedKeys,
-            onChange: (selectedRowKeys) =>
-              setSelectedKeys(selectedRowKeys as number[]),
-          }}
-        />
-      </div>
-      <div className="flex justify-center mt-8 items-center space-x-2">
-        <button
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-          className={`flex items-center justify-center w-6 h-6 text-10 bg-gray-200 rounded-full hover:bg-gray-300 ${
-            currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
-          }`}
-        >
-          <FaArrowLeft />
-        </button>
-        {Array.from({ length: totalPages }, (_, i) => (
+        <div>
+          <Button
+            type="primary"
+            onClick={handleBulkApprove}
+            style={{ marginBottom: "16px" }}
+          >
+            Chấp Thuận
+          </Button>
+          <Button
+            className="text-albert-error"
+            onClick={handleBulkReject}
+            style={{ marginBottom: "16px", marginLeft: "8px" }}
+          >
+            Từ chối
+          </Button>
+          <Button
+            onClick={handleRefresh}
+            style={{ marginBottom: "16px", marginLeft: "8px" }}
+            icon={isRefreshing ? <Spin size="small" /> : <ReloadOutlined />} // Hiển thị icon làm mới hoặc spin
+          >
+            {isRefreshing ? "Đang làm mới..." : ""} {/* Thay đổi text */}
+          </Button>
+        </div>
+        <div className="overflow-auto" style={{ maxHeight: "800px" }}>
+          <Table
+            columns={columns}
+            dataSource={queueData}
+            rowKey="id"
+            pagination={false}
+            scroll={{ y: 500 }}
+            rowSelection={{
+              selectedRowKeys: selectedKeys,
+              onChange: (selectedRowKeys) =>
+                setSelectedKeys(selectedRowKeys as number[]),
+            }}
+          />
+        </div>
+        <div className="flex justify-center mt-8 items-center space-x-2">
           <button
-            key={i}
-            onClick={() => setCurrentPage(i + 1)}
-            className={`w-6 h-6 text-10 rounded-full hover:bg-gray-300 ${
-              currentPage === i + 1 ? "bg-blue-500 text-white" : "bg-gray-200"
+            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
+            disabled={currentPage === 1}
+            className={`flex items-center justify-center w-6 h-6 text-10 bg-gray-200 rounded-full hover:bg-gray-300 ${
+              currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
             }`}
           >
-            {i + 1}
+            <FaArrowLeft />
           </button>
-        ))}
-        <button
-          onClick={() => setCurrentPage((prev) => prev + 1)}
-          disabled={!next}
-          className={`flex items-center justify-center w-6 h-6 text-10 bg-gray-200 rounded-full hover:bg-gray-300 ${
-            !next ? "opacity-50 cursor-not-allowed" : ""
-          }`}
-        >
-          <FaArrowRight />
-        </button>
+          {Array.from({ length: totalPages }, (_, i) => (
+            <button
+              key={i}
+              onClick={() => setCurrentPage(i + 1)}
+              className={`w-6 h-6 text-10 rounded-full hover:bg-gray-300 ${
+                currentPage === i + 1 ? "bg-blue-500 text-white" : "bg-gray-200"
+              }`}
+            >
+              {i + 1}
+            </button>
+          ))}
+          <button
+            onClick={() => setCurrentPage((prev) => prev + 1)}
+            disabled={!next}
+            className={`flex items-center justify-center w-6 h-6 text-10 bg-gray-200 rounded-full hover:bg-gray-300 ${
+              !next ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+          >
+            <FaArrowRight />
+          </button>
+        </div>
       </div>
-    </div>
+      <PostDetailDrawer
+        open={isDrawerOpen}
+        onClose={handleDrawerClose}
+        blog={selectedPost}
+      />
+      <PostEditDetailDrawer
+        open={isEditDrawerOpen}
+        onClose={handleDrawerClose}
+        blog={selectedEditPost}
+      />
+    </>
   );
 };
 

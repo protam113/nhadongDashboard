@@ -17,9 +17,8 @@ const SidebarComponent: React.FC<{ collapsed: boolean }> = ({ collapsed }) => {
     bottom: 0,
     scrollbarWidth: "thin",
     scrollbarGutter: "stable",
-    width: collapsed ? 120 : 250,
+    width: collapsed ? 150 : 300,
     transition: "width 0.2s ease",
-    fontSize: "18px",
   };
 
   interface NavItem {

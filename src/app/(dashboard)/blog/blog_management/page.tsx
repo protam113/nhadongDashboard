@@ -1,7 +1,7 @@
 "use client"; // Ensures this is a client component
 
 import React, { useState } from "react";
-import { Table, Button, Modal } from "antd";
+import { Table, Button, Modal, Tag } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { BlogList } from "@/lib/blogList";
 import BlogDetailsModal from "@/app/(dashboard)/blog/BlogDetailsModal";
@@ -87,21 +87,20 @@ const BlogManagement: React.FC = () => {
       width: 150,
       render: (categories) => (
         <span>
-          {categories.map((category: any) => (
-            <div
-              key={category.id}
-              style={{
-                backgroundColor: category.color || "#142857", // Màu nền tùy chọn cho thể loại
-                color: "#fff", // Màu chữ
-                padding: "5px 10px",
-                borderRadius: "4px",
-                marginBottom: "5px",
-                marginRight: "5px",
-              }}
-            >
-              {category.name} {/* Hiển thị tên của thể loại */}
-            </div>
-          ))}
+          {categories.map((category: any, index: number) => {
+            // Danh sách màu sắc để luân phiên
+            const colors = ["geekblue", "green", "volcano", "orange", "cyan"];
+            const color = colors[index % colors.length]; // Chọn màu theo index
+            return (
+              <Tag
+                color={color}
+                key={category.id}
+                style={{ marginBottom: "5px" }}
+              >
+                {category.name} {/* Hiển thị tên của thể loại */}
+              </Tag>
+            );
+          })}
         </span>
       ),
     },

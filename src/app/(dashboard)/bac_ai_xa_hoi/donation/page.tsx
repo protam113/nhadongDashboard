@@ -169,7 +169,7 @@ const Page: React.FC = () => {
             <FaSync /> Làm mới
           </Button>
           <PushButton
-            href="/donation/create_donation"
+            href="/bac_ai_xa_hoi/donation/create_donation"
             label={"Tạo Tin Quyên Góp"}
           />
         </div>

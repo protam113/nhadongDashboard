@@ -1,4 +1,4 @@
-"use client"; // Ensures this is a client component
+"use client";
 
 import React, { useState } from "react";
 import { Table, Button } from "antd";
@@ -9,6 +9,7 @@ import NewsQueueList from "@/app/(dashboard)/news/NewsQueueTable";
 import NewsDetailsModal from "@/app/(dashboard)/news/NewsDetailsModal";
 import { FaArrowLeft, FaArrowRight, FaSync } from "@/lib/iconLib";
 import { SpinLoading, Error, Heading } from "@/components/design/index";
+import { useUser } from "@/context/userProvider";
 
 const News: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -16,6 +17,7 @@ const News: React.FC = () => {
   const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
   const [selectedNews, setSelectedNews] = useState(null);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const { userInfo } = useUser() || {};
 
   // Pass model into CategoriesList
   const { queueData, next, isLoading, isError } = NewsList(
@@ -149,7 +151,12 @@ const News: React.FC = () => {
             <FaArrowRight />
           </button>
         </div>
-        <NewsQueueList />
+        {userInfo?.role.name === "admin" ? (
+          <>
+            <Heading name="Quản lý hàng đợi duyệt bài viết" />
+            <NewsQueueList />
+          </>
+        ) : null}
       </div>
       <NewsDetailsModal
         open={isDrawerOpen}

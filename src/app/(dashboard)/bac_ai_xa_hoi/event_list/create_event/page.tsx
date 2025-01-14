@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useCallback, useState } from "react";
 import { Input, Select, Upload, Button, Image, Form } from "antd";
 import { PlusOutlined } from "@ant-design/icons";
 import { useRouter } from "next/navigation";
@@ -10,26 +10,95 @@ import { UploadFile } from "antd/lib/upload/interface";
 import Heading from "@/components/design/Heading";
 import BackButton from "@/components/Button/BackButton";
 import EventRichText from "@/components/main/event/eventRichText";
+import MoreType from "@/app/(dashboard)/blog/blog_management/create_blog/MoreType";
 
 const { Option } = Select;
 
 const Page = () => {
+  const [form] = Form.useForm(); // Sửa lỗi không khởi tạo form
   const { mutate: createEvent } = useCreateEvent();
-  const [form] = Form.useForm();
   const router = useRouter();
-  const [fileList, setFileList] = useState<UploadFile[]>([]); // Khai báo kiểu UploadFile
+  const [loading, setLoading] = useState(false);
+
+  const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [previewImage, setPreviewImage] = useState("");
   const [previewOpen, setPreviewOpen] = useState(false);
   const [description, setDescription] = useState("");
+  const [blogData, setBlogData] = useState({
+    title: "",
+    image: [] as RcFile[],
+    category: "event",
+    file_type: [] as string[],
+    file: [] as RcFile[],
+    metadata: [] as string[],
+  });
 
-  const handleSubmit = async (values: any) => {
-    createEvent({
-      ...values,
-      image: fileList[0]?.originFileObj ?? null,
-      category: "event",
-      description: description,
-    });
-    router.back();
+  const handleDataChange = useCallback(
+    (data: { filetype: string[]; file: RcFile[]; metadata: string[] }) => {
+      const { filetype, file, metadata } = data;
+
+      // Cập nhật từng phần một như handleCategoryChange
+      if (filetype) {
+        setBlogData((prevData) => ({
+          ...prevData,
+          file_type: filetype, // Cập nhật file_type
+        }));
+      }
+
+      if (file) {
+        setBlogData((prevData) => ({
+          ...prevData,
+          file: file, // Cập nhật mảng tệp file
+        }));
+      }
+
+      if (metadata) {
+        setBlogData((prevData) => ({
+          ...prevData,
+          metadata: metadata,
+        }));
+      }
+    },
+    [] // Không phụ thuộc vào bất kỳ giá trị nào ngoài data
+  );
+
+  const handleSubmit = async () => {
+    setLoading(true);
+
+    // Chuyển đổi RcFile thành File[] hoặc string nếu cần thiết
+    const convertedImage =
+      fileList.length > 0
+        ? fileList.map((file) => file.originFileObj as File) // Chuyển RcFile thành File[]
+        : null;
+
+    const eventDataToSend = {
+      ...blogData,
+      title: form.getFieldValue("title"),
+      image: convertedImage, // Đảm bảo kiểu dữ liệu đúng
+      metadata: blogData.metadata.map((item) => JSON.stringify(item)),
+      description,
+      status: form.getFieldValue("status"),
+    };
+
+    try {
+      createEvent(eventDataToSend);
+      form.resetFields();
+      setFileList([]);
+      setBlogData({
+        title: "",
+        image: [],
+        category: "event",
+        file_type: [],
+        file: [],
+        metadata: [],
+      });
+      setDescription("");
+    } catch (error) {
+      console.error("Error creating event:", error);
+    } finally {
+      setLoading(false);
+      router.back();
+    }
   };
 
   const handleChange = ({ fileList }: { fileList: any }) =>
@@ -54,7 +123,7 @@ const Page = () => {
   );
 
   return (
-    <div className="p-6 bg-white shadow-lg rounded-lg max-w-lg mx-auto mt-8">
+    <div style={{ padding: "20px", maxWidth: "100%", margin: "0 auto" }}>
       {/* Nút quay lại */}
       <BackButton />
       <Heading name="tạo sự kiện mới " />
@@ -109,12 +178,18 @@ const Page = () => {
             />
           )}
         </Form.Item>
-
+        <Form.Item>
+          <div className="mb-4">
+            <Heading name="Thêm tài liệu hoặc PDF" />
+            <MoreType onDataChange={handleDataChange} />
+          </div>
+        </Form.Item>
         {/* Nút gửi */}
         <Form.Item>
           <Button
             type="primary"
             htmlType="submit"
+            loading={loading}
             className="w-full bg-blue-600 hover:bg-blue-700"
           >
             Tạo Sự Kiện

@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import { Table, Button, Spin } from "antd";
-import { ReloadOutlined } from "@ant-design/icons"; // Icon từ Ant Design
+import { ReloadOutlined } from "@ant-design/icons";
 import type { ColumnsType } from "antd/es/table";
 import { UserQueue } from "@/lib/userQueue";
 import { FaArrowLeft, FaArrowRight } from "@/lib/iconLib";
@@ -11,10 +11,9 @@ import { SpinLoading, Error } from "@/components/design/index";
 const CategoriesQueueTable: React.FC = () => {
   const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
-  const [refreshKey, setRefreshKey] = useState(0); // State để làm mới dữ liệu
-  const [isRefreshing, setIsRefreshing] = useState(false); // State để kiểm tra trạng thái làm mới
+  const [refreshKey, setRefreshKey] = useState(0);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
-  // Gọi hook `UserQueue` và thêm `refreshKey` làm dependency để làm mới dữ liệu
   const { queueData, next, isLoading, isError, handleBulkUpdate } = UserQueue(
     currentPage,
     "category",
@@ -25,33 +24,29 @@ const CategoriesQueueTable: React.FC = () => {
 
   // Xử lý làm mới dữ liệu
   const handleRefresh = () => {
-    setIsRefreshing(true); // Bắt đầu làm mới
-    setRefreshKey((prevKey) => prevKey + 1); // Cập nhật `refreshKey` để làm mới dữ liệu
-    setTimeout(() => setIsRefreshing(false), 1000); // Đặt lại trạng thái sau 1 giây (có thể điều chỉnh thời gian)
+    setIsRefreshing(true);
+    setRefreshKey((prevKey) => prevKey + 1);
+    setTimeout(() => setIsRefreshing(false), 1000);
   };
 
   const handleBulkApprove = async () => {
     try {
-      // Gọi hàm handleBulkUpdate với status 'approved' và chờ kết quả
       const response = await handleBulkUpdate(selectedKeys, "approve");
-      console.error("Approve Response:", response); // Log giá trị trả về từ API
+      console.error("Approve Response:", response);
     } catch (error) {
-      console.error("Error during approval:", error); // Log lỗi nếu có
+      console.error("Error during approval:", error);
     }
-    console.log("Approve setSelectedKeys:", selectedKeys);
-    setSelectedKeys([]); // Xóa các khóa đã chọn sau khi thực hiện
+    setSelectedKeys([]);
   };
 
   const handleBulkReject = async () => {
     try {
-      // Gọi hàm handleBulkUpdate với status 'approved' và chờ kết quả
       const response = await handleBulkUpdate(selectedKeys, "reject");
-      console.error("Approve Response:", response); // Log giá trị trả về từ API
+      console.error("Approve Response:", response);
     } catch (error) {
-      console.error("Error during approval:", error); // Log lỗi nếu có
+      console.error("Error during approval:", error);
     }
-    console.log("Approve setSelectedKeys:", selectedKeys);
-    setSelectedKeys([]); // Xóa các khóa đã chọn sau khi thực hiện
+    setSelectedKeys([]);
   };
 
   const columns: ColumnsType<any> = [

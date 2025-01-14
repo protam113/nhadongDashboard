@@ -1,33 +1,22 @@
 "use client";
 
-import HistoryEditRichText from "@/components/main/history/HistoryEditRichText";
 import React, { useState, useEffect } from "react";
-import {
-  Button,
-  Form,
-  Spin,
-  Input,
-  Upload,
-  message,
-  Tooltip,
-  Image,
-} from "antd";
+import { Button, Form, Spin, Input, Upload, message } from "antd";
+import { UploadOutlined } from "@ant-design/icons";
+import HistoryEditRichText from "@/components/main/history/HistoryEditRichText";
 import { HistoryMonasteryData } from "@/lib/historyMonasteryData";
 import { useUpdateHistory } from "@/hooks/history_monastery/useHistoryMonastery";
-import { UploadFile } from "antd/lib/upload";
-import { RcFile } from "antd/es/upload";
-import { PlusOutlined } from "@ant-design/icons";
+import type { UploadFile } from "antd/es/upload/interface";
 
 const Page = () => {
   const [form] = Form.useForm();
-  const [refreshKey] = useState(0); // State để làm mới dữ liệu
-  const [about, setAbout] = useState<string>(""); // State để chứa nội dung đã chỉnh sửa
-  const [initialContent, setInitialContent] = useState<string>(""); // State để lưu nội dung ban đầu
-  const [title, setTitle] = useState<string>(""); // State để chứa title
-  const [image, setImage] = useState<any>(null); // State để chứa image
-  const [previewImage, setPreviewImage] = useState<string>(""); // State cho preview image
-  const [previewOpen, setPreviewOpen] = useState<boolean>(false); // State để mở preview image
-  const [historyId] = useState<string>("5");
+  const [refreshKey] = useState(0);
+  const [about, setAbout] = useState<string>(""); // Nội dung đã chỉnh sửa
+  const [initialContent, setInitialContent] = useState<string>(""); // Nội dung ban đầu
+  const [title, setTitle] = useState<string>(""); // Tiêu đề
+  const [fileList, setFileList] = useState<UploadFile[]>([]); // Danh sách ảnh upload
+
+  const [historyId] = useState<string>("ecb2b562-247c-430b-9147-2c42d77a5a87");
   const { mutate } = useUpdateHistory();
   const model = "f33a306a-d0a2-4ab2-8e8b-01cb65f8ccb1";
   const {
@@ -39,103 +28,108 @@ const Page = () => {
   useEffect(() => {
     if (data) {
       setInitialContent(data.about);
-      setTitle(data.title || ""); // Cập nhật title
-      setImage(data.image || null); // Cập nhật image
+      setTitle(data.title || "");
+      if (data.image) {
+        setFileList([
+          {
+            uid: "-1",
+            name: "image.png",
+            status: "done",
+            url: data.image,
+          },
+        ]);
+      }
     }
   }, [data]);
 
   const handlePreview = async (file: UploadFile) => {
     if (!file.url && !file.preview) {
       const reader = new FileReader();
-      reader.onload = () => setPreviewImage(reader.result as string);
-      reader.readAsDataURL(file.originFileObj as RcFile);
+      reader.readAsDataURL(file.originFileObj as File);
     } else {
-      setPreviewImage(file.url || file.preview || "");
     }
-    setPreviewOpen(true);
   };
 
-  const handleChange = (info: any) => {
-    if (info.file.status === "done") {
-      setImage(info.file.response); // Cập nhật URL ảnh khi upload thành công
-    } else if (info.file.status === "error") {
+  const handleChange = ({
+    file,
+    fileList,
+  }: {
+    file: UploadFile;
+    fileList: UploadFile[];
+  }) => {
+    if (file.status === "done") {
+      setFileList(fileList);
+    } else if (file.status === "error") {
       message.error("Upload failed.");
+    } else {
+      setFileList(fileList);
     }
   };
-
-  const uploadButton = (
-    <div>
-      <PlusOutlined />
-      <div style={{ marginTop: 8 }}>Upload</div>
-    </div>
-  );
 
   const handleSave = () => {
+    const image = fileList[0]?.url || fileList[0]?.response?.url || null;
     if (about !== initialContent || title || image) {
       mutate({
         historyId: historyId,
         updateHistory: {
           about: about,
           title: title,
-          image: image, // Gửi image mới
+          image: image,
         },
-      }); // Gửi dữ liệu đã chỉnh sửa tới API hoặc hook xử lý
+      });
     }
   };
 
   if (isLoading) return <Spin size="large" />;
-  if (isError || !data) return <div>Error loading queue data.</div>; // Kiểm tra nếu `data` không tồn tại
+  if (isError || !data) return <div>Error loading queue data.</div>;
 
   return (
-    <Form form={form}>
-      <Form.Item label="Title">
+    <Form form={form} layout="vertical">
+      <Form.Item label="Tiêu đề" help="Vui lòng nhập tiêu đề ">
         <Input
           value={title}
           onChange={(e) => setTitle(e.target.value)}
-          placeholder="Enter title"
+          placeholder="Nhập tiêu đề của bài viết"
         />
       </Form.Item>
 
-      <Form.Item label="Image">
-        <Tooltip
-          title="Lưu ý: Vui lòng upload hình ảnh có kích thước 820x500px để hiển thị tốt nhất."
-          placement="top"
+      <Form.Item
+        label="Hình ảnh"
+        help="Tải lên hình ảnh với kích thước 820x500px để hiển thị tốt nhất"
+      >
+        <Upload
+          listType="picture-card"
+          fileList={fileList}
+          onChange={handleChange}
+          onPreview={handlePreview}
+          beforeUpload={() => false} // Ngăn tự động upload
         >
-          <Upload
-            listType="picture-card"
-            fileList={image ? [image] : []} // Chuyển đổi image state thành array với UploadFile
-            onChange={handleChange}
-            onPreview={handlePreview}
-            beforeUpload={() => false} // Ngừng upload tự động
-          >
-            {image ? null : uploadButton}
-          </Upload>
-        </Tooltip>
-        {previewImage && (
-          <Image
-            alt="Hình ảnh xem trước bài viết"
-            wrapperStyle={{ display: "none" }}
-            preview={{
-              visible: previewOpen,
-              onVisibleChange: (visible) => setPreviewOpen(visible),
-            }}
-            src={previewImage}
-          />
-        )}
+          {fileList.length < 1 && (
+            <div>
+              <UploadOutlined />
+              <p>Click để tải lên hình ảnh</p>
+            </div>
+          )}
+        </Upload>
       </Form.Item>
 
-      <HistoryEditRichText
-        onChange={setAbout} // Cập nhật `about` khi người dùng thay đổi
-        initialContent={initialContent} // Truyền dữ liệu ban đầu vào editor
-      />
+      <Form.Item label="Nội dung" help="Cung cấp nội dung">
+        <HistoryEditRichText
+          onChange={setAbout}
+          initialContent={initialContent}
+        />
+      </Form.Item>
 
-      <Button
-        type="primary"
-        onClick={handleSave}
-        disabled={about === initialContent && !title && !image}
-      >
-        Save Changes
-      </Button>
+      <Form.Item>
+        <Button
+          type="primary"
+          onClick={handleSave}
+          disabled={about === initialContent && !title && fileList.length === 0}
+          block
+        >
+          Lưu thay đổi
+        </Button>
+      </Form.Item>
     </Form>
   );
 };

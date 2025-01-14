@@ -1,7 +1,7 @@
 "use client"; // Ensures this is a client component
 
 import React, { useState } from "react";
-import { Table, Button, Modal } from "antd";
+import { Table, Button, Modal, Tag } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { useDeleteCategory } from "@/hooks/cateogry/useCategories";
 import { BlogList } from "@/lib/blogList";
@@ -14,7 +14,8 @@ import {
   MdOutlineDelete,
   FaSync,
 } from "@/lib/iconLib";
-import { SpinLoading, Error, Heading } from "@/components/design/index";
+import { Error, Heading } from "@/components/design/index";
+import { useUser } from "@/context/userProvider";
 
 const Blogs: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -22,6 +23,7 @@ const Blogs: React.FC = () => {
   const { mutate: deleteCategory } = useDeleteCategory();
   const [selectedBlog, setSelectedBlog] = useState(null); // State for selected blog
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const { userInfo } = useUser() || {}; // Provide a default empty object if useUser returns null
 
   // Pass model into CategoriesList
   const { queueData, next, isLoading, isError } = BlogList(
@@ -79,21 +81,20 @@ const Blogs: React.FC = () => {
       width: 150,
       render: (categories) => (
         <span>
-          {categories.map((category: any) => (
-            <div
-              key={category.id}
-              style={{
-                backgroundColor: category.color || "#142857", // Màu nền tùy chọn cho thể loại
-                color: "#fff", // Màu chữ
-                padding: "5px 10px",
-                borderRadius: "4px",
-                marginBottom: "5px",
-                marginRight: "5px",
-              }}
-            >
-              {category.name} {/* Hiển thị tên của thể loại */}
-            </div>
-          ))}
+          {categories.map((category: any, index: number) => {
+            // Danh sách màu sắc để luân phiên
+            const colors = ["geekblue", "green", "volcano", "orange", "cyan"];
+            const color = colors[index % colors.length]; // Chọn màu theo index
+            return (
+              <Tag
+                color={color}
+                key={category.id}
+                style={{ marginBottom: "5px" }}
+              >
+                {category.name} {/* Hiển thị tên của thể loại */}
+              </Tag>
+            );
+          })}
         </span>
       ),
     },
@@ -112,7 +113,6 @@ const Blogs: React.FC = () => {
     },
   ];
 
-  if (isLoading) return <SpinLoading />;
   if (isError) return <Error />;
 
   const handleViewDetails = (blog: any) => {
@@ -148,6 +148,7 @@ const Blogs: React.FC = () => {
             rowKey="id"
             pagination={false}
             scroll={{ y: 500 }}
+            loading={isLoading}
           />
         </div>
         <div className="flex justify-center mt-8 items-center space-x-2">
@@ -181,8 +182,12 @@ const Blogs: React.FC = () => {
             <FaArrowRight />
           </button>
         </div>
-        <Heading name="Quản lý hàng đợi duyệt bài viết" />
-        <BlogQueueList />
+        {userInfo?.role.name === "admin" ? (
+          <>
+            <Heading name="Quản lý hàng đợi duyệt bài viết" />
+            <BlogQueueList />
+          </>
+        ) : null}
       </div>
       <BlogDetailsModal
         open={isDrawerOpen}

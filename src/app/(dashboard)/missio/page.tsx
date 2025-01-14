@@ -18,6 +18,7 @@ import {
 } from "@/lib/iconLib";
 import EditMissionModal from "./drawer/EditMission";
 import { SpinLoading, Error, Heading } from "@/components/design/index";
+import { useUser } from "@/context/userProvider";
 
 const Page: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -27,6 +28,7 @@ const Page: React.FC = () => {
   const { mutate } = useDeleteMission();
   const [selectedDoc, setSelectedDoc] = useState(null);
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
+  const { userInfo } = useUser() || {}; // Provide a default empty object if useUser returns null
 
   // Pass model into CategoriesList
   const { queueData, next, isLoading, isError } = MissionList(
@@ -192,8 +194,12 @@ const Page: React.FC = () => {
             <FaArrowRight />
           </button>
         </div>
-        <Heading name="Quản lý hàng đợi duyệt sứ vụ" />
-        <MissionQueueList />
+        {userInfo?.role.name === "admin" ? (
+          <>
+            <Heading name="Quản lý hàng đợi duyệt bài viết" />
+            <MissionQueueList />
+          </>
+        ) : null}
       </div>
       <MissioDetailsDrawer
         open={isDrawerOpen}
