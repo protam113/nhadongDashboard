@@ -154,6 +154,12 @@ export interface NewVideo {
   image: File | string | null; // Use File type for file, or string if necessary
 }
 
+export interface EditVideo {
+  content:string,
+  image: File | string | null;
+  link:string
+}
+
 /**
  New Event Interface
  **/
