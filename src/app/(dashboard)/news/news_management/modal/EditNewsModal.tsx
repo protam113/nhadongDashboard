@@ -7,45 +7,43 @@ import {
   Col,
   Drawer,
   Form,
-  Image,
   Input,
+  message,
   Row,
   Space,
-  Upload,
-  UploadProps,
 } from "antd";
 import { Blog } from "@/types/types";
 import { CategoriesList } from "@/lib/categoriesList";
 import { UploadFile } from "antd/lib/upload/interface";
 import EditContentSection from "@/components/main/blog/EditContentSection";
-import { useEditNews } from "@/hooks/new/useNews";
-import { RcFile } from "antd/es/upload";
 import EditMoreType from "@/components/metamedia/Edittype";
+import { RcFile } from "antd/es/upload";
+import EditUploadImage from "@/components/common/EditUploadImage";
+import { useEditNews } from "@/hooks/new/useNews";
 
 interface EditBlogModalProps {
   open: boolean;
   onClose: () => void;
-  news: Blog | null; // Cho phép null nếu blog chưa được load
+  blog: Blog | null;
 }
 
 type BlogData = {
   file_type: string[];
   file: RcFile[];
   metadata: string[];
-  media_remove?: string[]; // Nếu bạn cần lưu media_remove
+  media_remove?: string[];
 };
 
-const EditNewsModal: React.FC<EditBlogModalProps> = ({
-  open,
-  onClose,
-  news,
-}) => {
+const EditNewsModal: React.FC<
+  EditBlogModalProps & {
+    loading: boolean;
+    setLoading: (state: boolean) => void;
+  }
+> = ({ open, onClose, blog, loading, setLoading }) => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [initialCategories, setInitialCategories] = useState<string[]>([]);
-  const [previewImage] = useState<string>("");
-  const [previewOpen, setPreviewOpen] = useState<boolean>(false);
   const { queueData, isLoading, isError } = CategoriesList(1, "news", 0);
   const { mutate: editBlogMutation } = useEditNews();
   const [blogData, setBlogData] = useState<BlogData>({
@@ -55,39 +53,35 @@ const EditNewsModal: React.FC<EditBlogModalProps> = ({
   });
 
   useEffect(() => {
-    if (news) {
+    if (blog) {
       const categoryIds =
-        news.categories?.map((category) => category.id.toString()) || [];
-      setInitialCategories(categoryIds); // Lưu thể loại ban đầu
+        blog.categories?.map((category) => category.id.toString()) || [];
+      setInitialCategories(categoryIds);
       setSelectedCategories(categoryIds);
 
       form.setFieldsValue({
-        title: news.title,
-        description: news.description,
-        content: news.content,
-        link: news.link,
+        title: blog.title,
+        description: blog.description,
+        content: blog.content,
+        link: blog.link,
         category: categoryIds,
       });
 
-      if (news.image) {
+      if (blog.image) {
         setFileList([
           {
             uid: "-1",
             name: "image.png",
             status: "done",
-            url: news.image,
+            url: blog.image,
           },
         ]);
       }
     }
-  }, [news, form]);
+  }, [blog, form]);
 
   const handleCategoryChange = (checkedValues: string[]) => {
     setSelectedCategories(checkedValues);
-  };
-
-  const handleChange: UploadProps["onChange"] = ({ fileList }) => {
-    setFileList(fileList);
   };
 
   const handleDataChange = useCallback(
@@ -135,8 +129,8 @@ const EditNewsModal: React.FC<EditBlogModalProps> = ({
   );
 
   const handleSubmit = () => {
-    if (!news) {
-      console.error("Blog is null, cannot edit.");
+    if (!blog) {
+      message.warning("Không thể cập nhật bài viết!!.");
       return;
     }
 
@@ -147,26 +141,47 @@ const EditNewsModal: React.FC<EditBlogModalProps> = ({
           (category) => !selectedCategories.includes(category)
         );
 
-        const editBlog = {
+        const hasCategoryChanged =
+          selectedCategories.length !== initialCategories.length ||
+          selectedCategories.some((cat) => !initialCategories.includes(cat));
+
+        const uniqueCategories = Array.from(new Set(selectedCategories));
+
+        const editBlog: any = {
           ...values,
-          category: selectedCategories,
           category_remove:
             category_remove.length > 0 ? category_remove : undefined,
           image: fileList.map((file) => file.originFileObj || file.url),
-          // Include all media-related fields
           file_type: blogData.file_type,
           file: blogData.file,
           metadata: blogData.metadata,
         };
 
+        // Chỉ thêm `category` khi có sự thay đổi và loại bỏ trùng lặp
+        if (hasCategoryChanged || uniqueCategories.length > 0) {
+          editBlog.category = uniqueCategories;
+        }
+
         if (blogData.media_remove && blogData.media_remove.length > 0) {
           editBlog.media_remove = blogData.media_remove;
         }
 
-        editBlogMutation({
-          editNews: editBlog,
-          blogId: news.id,
-        });
+        // Gửi mutation với payload hoàn chỉnh
+        editBlogMutation(
+          {
+            editNews: editBlog,
+            blogId: blog.id,
+          },
+          {
+            onSuccess: () => {
+              setLoading(false);
+              onClose();
+            },
+            onError: () => {
+              setLoading(false);
+            },
+          }
+        );
       })
       .catch((info) => {
         console.error("Lỗi khi xác thực form:", info);
@@ -176,13 +191,13 @@ const EditNewsModal: React.FC<EditBlogModalProps> = ({
   return (
     <Drawer
       title="Chỉnh Sửa Bài Viết"
-      width={720}
+      width={900}
       onClose={onClose}
       open={open}
       extra={
         <Space>
           <Button onClick={onClose}>Hủy</Button>
-          <Button onClick={handleSubmit} type="primary">
+          <Button onClick={handleSubmit} type="primary" loading={loading}>
             Lưu
           </Button>
         </Space>
@@ -214,12 +229,10 @@ const EditNewsModal: React.FC<EditBlogModalProps> = ({
               label="Nội dung chi tiết"
               rules={[{ required: true, message: "Hãy nhập nội dung" }]}
             >
-              {news && (
-                <EditContentSection
-                  onChange={(content) => form.setFieldValue("content", content)}
-                  initialContent={news.content || ""}
-                />
-              )}
+              <EditContentSection
+                onChange={(content) => form.setFieldValue("content", content)}
+                initialContent={blog?.content || ""}
+              />
             </Form.Item>
           </Col>
 
@@ -234,25 +247,26 @@ const EditNewsModal: React.FC<EditBlogModalProps> = ({
           </Col>
           <Col span={24}>
             <Form.Item label="Hình ảnh chính">
-              <Upload
-                listType="picture-card"
-                fileList={fileList}
-                onChange={handleChange}
-                beforeUpload={() => false} // Ngăn tự động tải lên
-              >
-                {fileList.length >= 1 ? null : <div>+ Tải lên</div>}
-              </Upload>
-              {previewImage && (
-                <Image
-                  alt="Xem Ảnh Trước"
-                  wrapperStyle={{ display: "none" }}
-                  preview={{
-                    visible: previewOpen,
-                    onVisibleChange: (visible) => setPreviewOpen(visible),
-                  }}
-                  src={previewImage}
-                />
-              )}
+              <EditUploadImage
+                file={blog?.image || ""} // URL hình ảnh hiện tại (nếu có)
+                onImageChange={(file) => {
+                  if (file) {
+                    setFileList([
+                      {
+                        uid: file.uid,
+                        name: file.name,
+                        status: "done",
+                        originFileObj: file,
+                        url: URL.createObjectURL(file),
+                      },
+                    ]);
+                  } else {
+                    setFileList([]);
+                  }
+                }}
+                maxCount={1}
+                tooltipTitle="Vui lòng upload hình ảnh kích thước 820x500px."
+              />
             </Form.Item>
           </Col>
           <Col span={12}>
@@ -276,7 +290,7 @@ const EditNewsModal: React.FC<EditBlogModalProps> = ({
               <EditMoreType
                 onDataChange={handleDataChange}
                 media={
-                  news?.media?.map((item) => ({
+                  blog?.media?.map((item) => ({
                     id: item.id ?? "",
                     file: item.file,
                     file_type: item.file_type ?? "",

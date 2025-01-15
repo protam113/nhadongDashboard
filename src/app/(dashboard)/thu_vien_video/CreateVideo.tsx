@@ -1,134 +1,120 @@
 import React, { useState } from "react";
-import { Input, Upload, Button, message, Progress, Image } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
-import { UploadFile, UploadProps } from "antd/lib/upload/interface";
-import { RcFile } from "antd/lib/upload";
+import { Form, Input, Button, message, Progress } from "antd";
 import { useCreateVideo } from "@/hooks/video/useVideo";
+import UploadImage from "@/components/common/UploadImage";
 
 const CreateVideo: React.FC<{
-  onLoadingChange: (isLoading: boolean, progress: number) => void;
+  onLoadingChange?: (isLoading: boolean, progress: number) => void;
 }> = ({ onLoadingChange }) => {
   const { mutate } = useCreateVideo();
-  const [content, setContent] = useState<string>("");
-  const [link, setLink] = useState<string>("");
-
-  const [imageList, setImageList] = useState<UploadFile[]>([]);
-  const [previewImage, setPreviewImage] = useState<string>("");
-  const [previewOpen, setPreviewOpen] = useState<boolean>(false);
-  const [progress, setProgress] = useState<number>(0);
+  const [blogData, setBlogData] = useState({
+    image: null as File | null, // Chỉ chứa một file duy nhất
+    content: "",
+    link: "",
+  });
+  const [form] = Form.useForm();
+  const [progress] = useState<number>(0);
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
+  // Xử lý thay đổi hình ảnh
+  const handleImageChange = (file: File | null) => {
+    setBlogData((prevData) => ({
+      ...prevData,
+      image: file, // Chỉ lưu file duy nhất
+    }));
+  };
+
+  // Xử lý gửi form
   const handleSubmit = async () => {
-    if (!content) {
-      message.error("Please fill all fields!");
-      return;
-    }
-
-    setProgress(0); // Reset progress
     setIsLoading(true);
-    onLoadingChange(true, 0); // Notify parent component loading has started
-
     try {
-      for (let i = 1; i <= 100; i++) {
-        await new Promise((resolve) => setTimeout(resolve, 20)); // Simulate delay
-        setProgress(i);
-        onLoadingChange(true, i); // Update progress
+      if (blogData.content.length === 0) {
+        message.error("Vui lòng nhập tiêu đề!");
+        setIsLoading(false);
+        return;
       }
 
-      await new Promise((resolve, reject) => {
-        mutate(
-          { content, link, image: imageList[0]?.originFileObj ?? null },
-          {
-            onSuccess: resolve,
-            onError: reject,
-          }
-        );
-      });
+      if (blogData.link.length === 0) {
+        message.error("Vui lòng liên kết video!");
+        setIsLoading(false);
+        return;
+      }
 
-      message.success("Category created successfully!");
-    } catch {
-      message.error("An error occurred!");
+      if (!blogData.image) {
+        message.error("Vui lòng tải lên một hình ảnh!");
+        setIsLoading(false);
+        return;
+      }
+
+      const blogDataToSend = {
+        ...blogData,
+      };
+
+      // Nếu có onLoadingChange, cập nhật trạng thái tải lên
+      if (onLoadingChange) {
+        onLoadingChange(true, progress);
+      }
+
+      mutate(blogDataToSend); // Gọi mutation để tạo video
+      form.resetFields();
+      setBlogData({
+        image: null,
+        content: "",
+        link: "",
+      });
+    } catch (error) {
+      console.error(error);
+      message.error("Có lỗi xảy ra khi thêm video.");
     } finally {
       setIsLoading(false);
-      onLoadingChange(false, 100); // Notify parent that loading is finished
+      if (onLoadingChange) {
+        onLoadingChange(false, 0); // Reset tiến trình khi kết thúc
+      }
     }
   };
-
-  const handleChange: UploadProps["onChange"] = ({ fileList }) => {
-    setImageList(fileList);
-  };
-
-  const handlePreview = async (file: UploadFile) => {
-    if (!file.url && !file.preview) {
-      const reader = new FileReader();
-      reader.onload = () => setPreviewImage(reader.result as string);
-      reader.readAsDataURL(file.originFileObj as RcFile);
-    } else {
-      setPreviewImage(file.url || file.preview || "");
-    }
-    setPreviewOpen(true);
-  };
-
-  const uploadButton = (
-    <div>
-      <PlusOutlined />
-      <div style={{ marginTop: 8 }}>Upload</div>
-    </div>
-  );
 
   return (
     <div className="p-4">
-      <h2 className="text-18 font-bold mb-4">Create Category</h2>
-      <label className="block mb-2 font-medium text-gray-700">Tiêu Đề</label>
-      <Input
-        placeholder="Tiêu Đề"
-        value={content}
-        onChange={(e) => setContent(e.target.value)}
-        className="mb-4"
-      />
-      <label className="block mb-2 font-medium text-gray-700">Đường Dẫn</label>
-      <Input
-        placeholder="Đường Dẫn"
-        value={link}
-        onChange={(e) => setLink(e.target.value)}
-        className="mb-4"
-      />
-
-      <label className="block mb-2 font-medium text-gray-700">Image</label>
-      <Upload
-        listType="picture-card"
-        fileList={imageList}
-        onPreview={handlePreview}
-        onChange={handleChange}
-        beforeUpload={() => false} // Prevent auto upload
-      >
-        {imageList.length >= 1 ? null : uploadButton}
-      </Upload>
-
-      {previewImage && (
-        <Image
-          alt="Xem Ảnh Trước"
-          wrapperStyle={{ display: "none" }}
-          preview={{
-            visible: previewOpen,
-            onVisibleChange: (visible) => setPreviewOpen(visible),
-          }}
-          src={previewImage}
+      <h2 className="text-18 font-bold mb-4">Create Video</h2>
+      <Form form={form} layout="vertical" onFinish={handleSubmit}>
+        <label className="block mb-2 font-medium text-gray-700">Tiêu Đề</label>
+        <Input
+          placeholder="Tiêu Đề"
+          value={blogData.content}
+          onChange={(e) =>
+            setBlogData({ ...blogData, content: e.target.value })
+          }
+          className="mb-4"
         />
-      )}
+        <label className="block mb-2 font-medium text-gray-700">
+          Đường Dẫn
+        </label>
+        <Input
+          placeholder="Đường Dẫn"
+          value={blogData.link}
+          onChange={(e) => setBlogData({ ...blogData, link: e.target.value })}
+          className="mb-4"
+        />
+        <label className="block mb-2 font-medium text-gray-700">Image</label>
+        <UploadImage
+          onImageChange={handleImageChange}
+          maxCount={1}
+          tooltipTitle="Vui lòng upload hình ảnh kích thước 820x500px."
+        />
 
-      <Progress
-        percent={progress}
-        status={progress === 100 ? "success" : "active"}
-      />
-      <Button
-        type="primary"
-        onClick={handleSubmit}
-        className="w-full mt-4"
-        disabled={isLoading}
-      >
-        Create Category
-      </Button>
+        <Progress
+          percent={progress}
+          status={progress === 100 ? "success" : "active"}
+        />
+        <Button
+          type="primary"
+          onClick={handleSubmit}
+          className="w-full mt-4"
+          disabled={isLoading}
+        >
+          Create Video
+        </Button>
+      </Form>
     </div>
   );
 };

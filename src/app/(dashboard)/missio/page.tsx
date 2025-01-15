@@ -1,7 +1,7 @@
 "use client"; // Ensures this is a client component
 
 import React, { useState } from "react";
-import { Table, Button, Modal } from "antd";
+import { Table, Button, Modal, Spin } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { EyeOutlined } from "@ant-design/icons";
 import { MissionList } from "@/lib/missionList";
@@ -29,6 +29,7 @@ const Page: React.FC = () => {
   const [selectedDoc, setSelectedDoc] = useState(null);
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
   const { userInfo } = useUser() || {}; // Provide a default empty object if useUser returns null
+  const [loading, setLoading] = useState(false); // Thêm state loading
 
   // Pass model into CategoriesList
   const { queueData, next, isLoading, isError } = MissionList(
@@ -42,6 +43,7 @@ const Page: React.FC = () => {
   const handleEdit = (blog: any) => {
     setSelectedDoc(blog); // Set blog to be edited
     setIsDrawerVisible(true); // Open the drawer
+    setLoading(false); // Đảm bảo trạng thái loading không bật
   };
   const handleDelete = (postId: string) => {
     // Show confirmation dialog before deletion
@@ -109,11 +111,27 @@ const Page: React.FC = () => {
       width: 100,
       render: (_, record) => (
         <>
-          <Button danger onClick={() => handleDelete(record.id)}>
-            <MdOutlineDelete className="text-albert-error" />
+          <Button
+            danger
+            onClick={() => handleDelete(record.id)}
+            disabled={loading} // Disable button nếu đang loading
+          >
+            {loading ? (
+              <Spin size="small" /> // Sử dụng Spin của Ant Design
+            ) : (
+              <MdOutlineDelete className="text-albert-error" />
+            )}
           </Button>
-          <Button type="primary" onClick={() => handleEdit(record)}>
-            <FaRegEdit />
+          <Button
+            type="primary"
+            onClick={() => handleEdit(record)}
+            disabled={loading} // Disable button nếu đang loading
+          >
+            {loading ? (
+              <Spin size="small" /> // Sử dụng Spin của Ant Design
+            ) : (
+              <FaRegEdit />
+            )}
           </Button>
         </>
       ),
@@ -148,10 +166,7 @@ const Page: React.FC = () => {
           <Button onClick={handleRefresh} style={{ marginLeft: "8px" }}>
             <FaSync /> Làm mới
           </Button>
-          <PushButton
-            href="/hoi_dong/missio/create_missio"
-            label={"Tạo Sứ Vụ"}
-          />
+          <PushButton href="/missio/create_missio" label={"Tạo Sứ Vụ"} />
         </div>
 
         <div className="overflow-auto" style={{ maxHeight: "800px" }}>
@@ -210,6 +225,8 @@ const Page: React.FC = () => {
         open={isDrawerVisible}
         onClose={handleDrawerClose}
         document={selectedDoc} // Pass selected blog to EditBlogModal
+        loading={loading}
+        setLoading={setLoading} // Truyền state và hàm setLoading
       />
     </>
   );

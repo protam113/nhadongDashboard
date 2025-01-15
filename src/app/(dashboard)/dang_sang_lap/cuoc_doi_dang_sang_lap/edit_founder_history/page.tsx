@@ -68,14 +68,27 @@ const Page = () => {
 
   const handleSave = () => {
     const image = fileList[0]?.url || fileList[0]?.response?.url || null;
-    if (about !== initialContent || title || image) {
+
+    // Chỉ gửi trường nào có thay đổi so với giá trị ban đầu
+    const updateHistory: any = {};
+
+    if (about !== initialContent) {
+      updateHistory.about = about; // Nếu nội dung thay đổi, thêm vào dữ liệu gửi
+    }
+
+    if (title !== data?.title) {
+      updateHistory.title = title; // Nếu tiêu đề thay đổi, thêm vào dữ liệu gửi
+    }
+
+    if (image !== data?.image) {
+      updateHistory.image = image; // Nếu hình ảnh thay đổi, thêm vào dữ liệu gửi
+    }
+
+    // Kiểm tra nếu có bất kỳ thay đổi nào và gửi
+    if (Object.keys(updateHistory).length > 0) {
       mutate({
         historyId: historyId,
-        updateHistory: {
-          about: about,
-          title: title,
-          image: image,
-        },
+        updateHistory: updateHistory,
       });
     }
   };

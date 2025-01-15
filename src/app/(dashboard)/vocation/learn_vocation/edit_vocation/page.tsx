@@ -16,7 +16,7 @@ const Page = () => {
   const [title, setTitle] = useState<string>(""); // Tiêu đề
   const [fileList, setFileList] = useState<UploadFile[]>([]); // Danh sách ảnh upload
 
-  const [historyId] = useState<string>("ecb2b562-247c-430b-9147-2c42d77a5a87");
+  const [historyId] = useState<string>("6e11d70f-17ec-4027-a602-e2a1b9a76384");
   const { mutate } = useUpdateHistory();
   const model = "3b164b58-18c6-454b-bfec-3e345f8fe33f";
   const {
@@ -68,14 +68,27 @@ const Page = () => {
 
   const handleSave = () => {
     const image = fileList[0]?.url || fileList[0]?.response?.url || null;
-    if (about !== initialContent || title || image) {
+
+    // Chỉ gửi trường nào có thay đổi so với giá trị ban đầu
+    const updateHistory: any = {};
+
+    if (about !== initialContent) {
+      updateHistory.about = about; // Nếu nội dung thay đổi, thêm vào dữ liệu gửi
+    }
+
+    if (title !== data?.title) {
+      updateHistory.title = title; // Nếu tiêu đề thay đổi, thêm vào dữ liệu gửi
+    }
+
+    if (image !== data?.image) {
+      updateHistory.image = image; // Nếu hình ảnh thay đổi, thêm vào dữ liệu gửi
+    }
+
+    // Kiểm tra nếu có bất kỳ thay đổi nào và gửi
+    if (Object.keys(updateHistory).length > 0) {
       mutate({
         historyId: historyId,
-        updateHistory: {
-          about: about,
-          title: title,
-          image: image,
-        },
+        updateHistory: updateHistory,
       });
     }
   };

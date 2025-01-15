@@ -45,7 +45,7 @@ const Page: React.FC = () => {
     first_name: string | null;
     last_name: string | null;
   }) => {
-    const profileImage = fileList[0]?.originFileObj || null; // Lấy file ảnh đại diện từ fileList
+    const profileImage = fileList[0]?.originFileObj || null;
     mutate({
       ...values,
       profile_image: profileImage, // Gửi file ảnh vào API

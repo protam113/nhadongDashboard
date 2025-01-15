@@ -160,7 +160,7 @@ const Categories: React.FC = () => {
                 <Option value="news">Tin Tức</Option>
                 <Option value="document">Tư Liệu</Option>
                 <Option value="mission">Sứ Vụ</Option>
-                <Option value="messageformfounder">Thư Đấng Sáng Lập</Option>
+                <Option value="website">Các Thành Phần Web</Option>
               </Select>
 
               <Button onClick={handleRefresh} style={{ marginLeft: "8px" }}>

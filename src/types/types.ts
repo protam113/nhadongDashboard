@@ -199,6 +199,18 @@ export interface NewDocs {
   }
 
   
+export interface NewMessage {
+  title: string;
+  description: string;
+  content: string; // Mảng nội dung chi tiết
+  link: string;
+  image: File[] | string;
+  file_type: string[]  | null; 
+  file: File[] | string  | null;
+  metadata: string[] | null;
+}
+
+  
   export interface EditDocs {
     title: string | null;
     description: string | null;
@@ -212,6 +224,20 @@ export interface NewDocs {
     metadata: string[] | null;
     media_remove:string[] | null;
   }
+
+  export interface EditMessageDetail {
+    title: string | null;
+    description: string | null;
+    content: string | null; // Mảng nội dung chi tiết
+    link: string | null;
+    image: File[] | string | null; // Hình ảnh chính cho bài viết
+    category_remove:string | null;
+    file_type: string[]  | null; 
+    file: File[] | string | null;
+    metadata: string[] | null;
+    media_remove:string[] | null;
+  }
+
 
 
 /**

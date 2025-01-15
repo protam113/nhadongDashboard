@@ -21,7 +21,6 @@ const BlogQueueList: React.FC = () => {
   const [isEditDrawerOpen, setIsEditDrawerOpen] = useState(false); // State mới
   const [selectedEditPost, setSelectedEditPost] = useState(null); // State for selected blog
 
-  // Gọi hook `UserQueue` và thêm `refreshKey` làm dependency để làm mới dữ liệu
   const { queueData, next, isLoading, isError, handleBulkUpdate } = UserQueue(
     currentPage,
     "blog",
@@ -32,9 +31,9 @@ const BlogQueueList: React.FC = () => {
 
   // Xử lý làm mới dữ liệu
   const handleRefresh = () => {
-    setIsRefreshing(true); // Bắt đầu làm mới
-    setRefreshKey((prevKey) => prevKey + 1); // Cập nhật `refreshKey` để làm mới dữ liệu
-    setTimeout(() => setIsRefreshing(false), 1000); // Đặt lại trạng thái sau 1 giây (có thể điều chỉnh thời gian)
+    setIsRefreshing(true);
+    setRefreshKey((prevKey) => prevKey + 1);
+    setTimeout(() => setIsRefreshing(false), 1000);
   };
 
   const handleBulkApprove = () => {
@@ -90,8 +89,8 @@ const BlogQueueList: React.FC = () => {
       key: "data",
       width: 150,
       render: (_, record) => {
-        const { action, status } = record; // Lấy giá trị action và status của bản ghi
-        if (status === "reject" || action !== "create") return null; // Nếu trạng thái là reject, không hiển thị nút
+        const { action, status } = record;
+        if (status === "reject" || action !== "create") return null;
 
         return (
           <div className="flex justify-between">
@@ -108,8 +107,8 @@ const BlogQueueList: React.FC = () => {
       key: "data",
       width: 150,
       render: (_, record) => {
-        const { action, status } = record; // Lấy giá trị action và status của bản ghi
-        if (status === "reject" || action !== "edit") return null; // Nếu trạng thái là reject, không hiển thị nút
+        const { action, status } = record;
+        if (status === "reject" || action !== "edit") return null;
 
         return (
           <div className="flex justify-between">

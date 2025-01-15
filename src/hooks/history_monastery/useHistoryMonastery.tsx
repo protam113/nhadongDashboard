@@ -78,7 +78,7 @@ const useHistory = (refreshKey: number, filters: Filters = {}) => {
 };
 
 interface updateHistory {
-  about: string;
+  about: string | null;
   title: string | null;
   image: File[] | string | null;
 }

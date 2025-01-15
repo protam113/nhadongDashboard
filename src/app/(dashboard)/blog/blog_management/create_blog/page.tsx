@@ -1,37 +1,21 @@
 "use client";
 
 import React, { useState, useCallback } from "react";
-import {
-  Form,
-  Input,
-  Button,
-  Upload,
-  Card,
-  Checkbox,
-  message,
-  Image,
-  Row,
-  Col,
-  Tooltip,
-} from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { Form, Input, Button, Card, Checkbox, message, Row, Col } from "antd";
 import { RcFile } from "antd/lib/upload";
 import { useCreateBlog } from "@/hooks/blog/useBlog";
 import { CategoriesList } from "@/lib/categoriesList";
-import { UploadFile, UploadProps } from "antd/lib/upload/interface";
 import { useRouter } from "next/navigation";
 import BackButton from "@/components/Button/BackButton";
 import Heading from "@/components/design/Heading";
 import ContentSection from "@/components/main/blog/ContentSection";
 import MoreType from "./MoreType";
+import UploadImage from "@/components/common/UploadImage";
 
 const { TextArea } = Input;
 
 const CreateBlogPage: React.FC = () => {
   const [content, setContent] = useState<string>("");
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
-  const [previewImage, setPreviewImage] = useState<string>("");
-  const [previewOpen, setPreviewOpen] = useState<boolean>(false);
   const [blogData, setBlogData] = useState({
     title: "",
     description: "",
@@ -83,23 +67,18 @@ const CreateBlogPage: React.FC = () => {
     [] // Không phụ thuộc vào bất kỳ giá trị nào ngoài data
   );
 
-  const handleChange: UploadProps["onChange"] = ({ fileList }) => {
-    setFileList(fileList);
-    setBlogData((prevData) => ({
-      ...prevData,
-      image: fileList.map((file) => file.originFileObj as RcFile),
-    }));
-  };
-
-  const handlePreview = async (file: UploadFile) => {
-    if (!file.url && !file.preview) {
-      const reader = new FileReader();
-      reader.onload = () => setPreviewImage(reader.result as string);
-      reader.readAsDataURL(file.originFileObj as RcFile);
+  const handleImageChange = (file: RcFile | null) => {
+    if (file) {
+      setBlogData((prevData) => ({
+        ...prevData,
+        image: [file],
+      }));
     } else {
-      setPreviewImage(file.url || file.preview || "");
+      setBlogData((prevData) => ({
+        ...prevData,
+        image: [],
+      }));
     }
-    setPreviewOpen(true);
   };
 
   const handleSaveBlog = async () => {
@@ -108,11 +87,14 @@ const CreateBlogPage: React.FC = () => {
       if (blogData.category.length === 0) {
         message.error("Vui lòng chọn ít nhất một thể loại!");
         setLoading(false);
+        window.location.reload();
         return;
       }
 
       if (blogData.image.length === 0) {
         message.error("Vui lòng tải lên một hình ảnh!");
+        window.location.reload();
+
         return;
       }
 
@@ -143,13 +125,6 @@ const CreateBlogPage: React.FC = () => {
       router.back();
     }
   };
-
-  const uploadButton = (
-    <div>
-      <PlusOutlined />
-      <div style={{ marginTop: 8 }}>Upload</div>
-    </div>
-  );
 
   return (
     <div style={{ padding: "20px", maxWidth: "100%", margin: "0 auto" }}>
@@ -201,31 +176,11 @@ const CreateBlogPage: React.FC = () => {
             {/* Nhóm hình ảnh */}
             <Col span={12}>
               <Form.Item label="Hình ảnh chính">
-                <Tooltip
-                  title="Vui lòng upload hình ảnh kích thước 820x500px."
-                  placement="topLeft"
-                >
-                  <Upload
-                    listType="picture-card"
-                    fileList={fileList}
-                    onPreview={handlePreview}
-                    onChange={handleChange}
-                    beforeUpload={() => false}
-                  >
-                    {fileList.length >= 1 ? null : uploadButton}
-                  </Upload>
-                </Tooltip>
-                {previewImage && (
-                  <Image
-                    alt="Hình ảnh xem trước bài viết"
-                    wrapperStyle={{ display: "none" }}
-                    preview={{
-                      visible: previewOpen,
-                      onVisibleChange: (visible) => setPreviewOpen(visible),
-                    }}
-                    src={previewImage}
-                  />
-                )}
+                <UploadImage
+                  onImageChange={handleImageChange}
+                  maxCount={1}
+                  tooltipTitle="Vui lòng upload hình ảnh kích thước 820x500px."
+                />
               </Form.Item>
             </Col>
 

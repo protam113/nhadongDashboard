@@ -1,7 +1,7 @@
 "use client"; // Ensures this is a client component
 
 import React, { useState } from "react";
-import { Table, Button, Modal, Tag } from "antd";
+import { Table, Button, Modal, Tag, Spin } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { BlogList } from "@/lib/blogList";
 import BlogDetailsModal from "@/app/(dashboard)/blog/BlogDetailsModal";
@@ -26,10 +26,12 @@ const BlogManagement: React.FC = () => {
   const [selectedBlog, setSelectedBlog] = useState(null);
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [loading, setLoading] = useState(false); // Thêm state loading
 
   const handleEdit = (blog: any) => {
     setSelectedBlog(blog); // Set blog to be edited
     setIsDrawerVisible(true); // Open the drawer
+    setLoading(false); // Đảm bảo trạng thái loading không bật
   };
 
   // Pass model into CategoriesList
@@ -111,11 +113,27 @@ const BlogManagement: React.FC = () => {
       width: 100,
       render: (_, record) => (
         <>
-          <Button danger onClick={() => handleDelete(record.id)}>
-            <MdOutlineDelete className="text-albert-error" />
+          <Button
+            danger
+            onClick={() => handleDelete(record.id)}
+            disabled={loading} // Disable button nếu đang loading
+          >
+            {loading ? (
+              <Spin size="small" /> // Sử dụng Spin của Ant Design
+            ) : (
+              <MdOutlineDelete className="text-albert-error" />
+            )}
           </Button>
-          <Button type="primary" onClick={() => handleEdit(record)}>
-            <FaRegEdit />
+          <Button
+            type="primary"
+            onClick={() => handleEdit(record)}
+            disabled={loading} // Disable button nếu đang loading
+          >
+            {loading ? (
+              <Spin size="small" /> // Sử dụng Spin của Ant Design
+            ) : (
+              <FaRegEdit />
+            )}
           </Button>
         </>
       ),
@@ -206,6 +224,8 @@ const BlogManagement: React.FC = () => {
         open={isDrawerVisible}
         onClose={handleDrawerClose}
         blog={selectedBlog} // Pass selected blog to EditBlogModal
+        loading={loading}
+        setLoading={setLoading} // Truyền state và hàm setLoading
       />
     </>
   );

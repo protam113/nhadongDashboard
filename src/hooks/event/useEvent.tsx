@@ -81,11 +81,11 @@ const useEventList = (
  Tạo Tin Sự Kiện
 **/
 
-const CreateEvent = async (newDoc: NewEvent, token: string) => {
+const CreateEvent = async (newEvent: NewEvent, token: string) => {
   const formData = new FormData();
 
-  for (const key in newDoc) {
-    const value = newDoc[key as keyof NewEvent];
+  for (const key in newEvent) {
+    const value = newEvent[key as keyof NewEvent];
 
     if (key === "image" && typeof value === "string") {
       // Nếu là URL hình ảnh
@@ -142,11 +142,11 @@ const useCreateEvent = () => {
   }, [getToken]);
 
   return useMutation({
-    mutationFn: async (newDoc: NewEvent) => {
+    mutationFn: async (newEvent: NewEvent) => {
       if (!token) {
         throw new Error("Token is not available");
       }
-      return CreateEvent(newDoc, token);
+      return CreateEvent(newEvent, token);
     },
     onSuccess: () => {
       message.success("Sự kiện đã được thêm thành công");

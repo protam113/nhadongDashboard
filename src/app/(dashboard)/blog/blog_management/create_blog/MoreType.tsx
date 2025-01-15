@@ -1,10 +1,9 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
-import { Form, Image, Select, Tooltip, Upload } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { Form, Select } from "antd";
 import { RcFile } from "antd/es/upload";
-import { UploadFile } from "antd/lib/upload/interface";
+import UploadFileMedia from "@/components/common/UploadFile";
 
 interface MoreTypeProps {
   onDataChange: (data: {
@@ -15,9 +14,6 @@ interface MoreTypeProps {
 }
 
 const MoreType: React.FC<MoreTypeProps> = ({ onDataChange }) => {
-  const [previewImage, setPreviewImage] = useState<string>("");
-  const [previewOpen, setPreviewOpen] = useState<boolean>(false);
-
   const [uploadFields, setUploadFields] = useState<
     {
       filetype: string;
@@ -29,19 +25,16 @@ const MoreType: React.FC<MoreTypeProps> = ({ onDataChange }) => {
   const handleDataChange = useCallback(() => {
     const validFields = uploadFields.filter(({ file }) => file !== null);
 
-    // Tạo mảng chứa từng phần dữ liệu
     const fileArray = validFields.map(({ file }) => file as RcFile);
-    // Tạo mảng chứa từng phần dữ liệu
     const filetypeArray = validFields.map(({ filetype }) => filetype);
-    const metadataArray = validFields.map(
-      ({ metadata }) => JSON.parse(metadata) // Chuyển metadata từ chuỗi JSON thành đối tượng
-    ); // metadata sẽ là mảng các đối tượng thay vì chuỗi
+    const metadataArray = validFields.map(({ metadata }) =>
+      JSON.parse(metadata)
+    );
 
-    // Gửi dữ liệu cho onDataChange
     onDataChange({
       filetype: filetypeArray,
       file: fileArray,
-      metadata: metadataArray, // metadata là mảng các đối tượng JSON
+      metadata: metadataArray,
     });
   }, [uploadFields, onDataChange]);
 
@@ -60,50 +53,16 @@ const MoreType: React.FC<MoreTypeProps> = ({ onDataChange }) => {
     ]);
   };
 
-  const handlePreview = async (file: UploadFile) => {
-    if (!file.url && !file.preview) {
-      const reader = new FileReader();
-      reader.onload = () => setPreviewImage(reader.result as string);
-      reader.readAsDataURL(file.originFileObj as RcFile);
-    } else {
-      setPreviewImage(file.url || file.preview || "");
-    }
-    setPreviewOpen(true);
-  };
-
   const removeUploadField = (index: number) => {
     const updatedFields = uploadFields.filter((_, idx) => idx !== index);
     setUploadFields(updatedFields);
   };
 
-  const handleFieldChange = (
-    index: number,
-    fileList: UploadFile[],
-    filetype: string
-  ) => {
+  const handleFieldChange = (index: number, file: RcFile | null) => {
     const updatedFields = [...uploadFields];
-    const newFile =
-      fileList.length > 0
-        ? (fileList[fileList.length - 1].originFileObj as RcFile)
-        : null;
-
-    if (newFile) {
-      updatedFields[index] = {
-        ...updatedFields[index],
-        filetype,
-        file: newFile,
-      };
-    }
-
+    updatedFields[index].file = file;
     setUploadFields(updatedFields);
   };
-
-  const uploadButton = (
-    <div>
-      <PlusOutlined />
-      <div style={{ marginTop: 8 }}>Upload</div>
-    </div>
-  );
 
   const renderUploadFields = () =>
     uploadFields.map((field, index) => (
@@ -122,33 +81,11 @@ const MoreType: React.FC<MoreTypeProps> = ({ onDataChange }) => {
           </Select>
         </Form.Item>
         <Form.Item label={`Tải lên tệp ${index + 1}`}>
-          <Tooltip
-            title="Lưu ý: Vui lòng upload hình ảnh có kích thước 820x500px để hiển thị tốt nhất."
-            placement="top"
-          >
-            <Upload
-              multiple={false}
-              listType="picture-card"
-              onChange={({ fileList }) =>
-                handleFieldChange(index, fileList, field.filetype)
-              }
-              onPreview={handlePreview}
-              beforeUpload={() => false}
-            >
-              {field.file ? null : uploadButton}
-            </Upload>
-          </Tooltip>
-          {previewImage && (
-            <Image
-              alt="Hình ảnh xem trước bài viết"
-              wrapperStyle={{ display: "none" }}
-              preview={{
-                visible: previewOpen,
-                onVisibleChange: (visible) => setPreviewOpen(visible),
-              }}
-              src={previewImage}
-            />
-          )}
+          <UploadFileMedia
+            onFileChange={(file) => handleFieldChange(index, file)}
+            maxCount={1}
+            tooltipTitle="Vui lòng upload hình ảnh hoặc tệp PDF."
+          />
           <button
             type="button"
             onClick={() => removeUploadField(index)}

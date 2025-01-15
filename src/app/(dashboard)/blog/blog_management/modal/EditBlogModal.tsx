@@ -7,13 +7,10 @@ import {
   Col,
   Drawer,
   Form,
-  Image,
   Input,
   message,
   Row,
   Space,
-  Upload,
-  UploadProps,
 } from "antd";
 import { Blog } from "@/types/types";
 import { CategoriesList } from "@/lib/categoriesList";
@@ -22,31 +19,31 @@ import { useEditBlog } from "@/hooks/blog/useBlog";
 import EditContentSection from "@/components/main/blog/EditContentSection";
 import EditMoreType from "@/components/metamedia/Edittype";
 import { RcFile } from "antd/es/upload";
+import EditUploadImage from "@/components/common/EditUploadImage";
 
 interface EditBlogModalProps {
   open: boolean;
   onClose: () => void;
-  blog: Blog | null; // Cho phép null nếu blog chưa được load
+  blog: Blog | null;
 }
 
 type BlogData = {
   file_type: string[];
   file: RcFile[];
   metadata: string[];
-  media_remove?: string[]; // Nếu bạn cần lưu media_remove
+  media_remove?: string[];
 };
 
-const EditBlogModal: React.FC<EditBlogModalProps> = ({
-  open,
-  onClose,
-  blog,
-}) => {
+const EditBlogModal: React.FC<
+  EditBlogModalProps & {
+    loading: boolean;
+    setLoading: (state: boolean) => void;
+  }
+> = ({ open, onClose, blog, loading, setLoading }) => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [initialCategories, setInitialCategories] = useState<string[]>([]);
-  const [previewImage] = useState<string>("");
-  const [previewOpen, setPreviewOpen] = useState<boolean>(false);
   const { queueData, isLoading, isError } = CategoriesList(1, "blog", 0);
   const { mutate: editBlogMutation } = useEditBlog();
   const [blogData, setBlogData] = useState<BlogData>({
@@ -85,10 +82,6 @@ const EditBlogModal: React.FC<EditBlogModalProps> = ({
 
   const handleCategoryChange = (checkedValues: string[]) => {
     setSelectedCategories(checkedValues);
-  };
-
-  const handleChange: UploadProps["onChange"] = ({ fileList }) => {
-    setFileList(fileList);
   };
 
   const handleDataChange = useCallback(
@@ -137,40 +130,58 @@ const EditBlogModal: React.FC<EditBlogModalProps> = ({
 
   const handleSubmit = () => {
     if (!blog) {
-      message.warning("Không thể thể cập nhật bài viết !!.");
+      message.warning("Không thể cập nhật bài viết!!.");
       return;
     }
 
     form
       .validateFields()
       .then((values) => {
-        // Calculate removed categories
         const category_remove = initialCategories.filter(
           (category) => !selectedCategories.includes(category)
         );
 
-        // Create the edit blog payload with all media data
-        const editBlog = {
+        const hasCategoryChanged =
+          selectedCategories.length !== initialCategories.length ||
+          selectedCategories.some((cat) => !initialCategories.includes(cat));
+
+        const uniqueCategories = Array.from(new Set(selectedCategories));
+
+        const editBlog: any = {
           ...values,
-          category: selectedCategories,
           category_remove:
             category_remove.length > 0 ? category_remove : undefined,
           image: fileList.map((file) => file.originFileObj || file.url),
-          // Include all media-related fields
           file_type: blogData.file_type,
           file: blogData.file,
           metadata: blogData.metadata,
         };
 
+        // Chỉ thêm `category` khi có sự thay đổi và loại bỏ trùng lặp
+        if (hasCategoryChanged || uniqueCategories.length > 0) {
+          editBlog.category = uniqueCategories;
+        }
+
         if (blogData.media_remove && blogData.media_remove.length > 0) {
           editBlog.media_remove = blogData.media_remove;
         }
 
-        // Send the mutation with complete media data
-        editBlogMutation({
-          editBlog: editBlog,
-          blogId: blog.id,
-        });
+        // Gửi mutation với payload hoàn chỉnh
+        editBlogMutation(
+          {
+            editBlog: editBlog,
+            blogId: blog.id,
+          },
+          {
+            onSuccess: () => {
+              setLoading(false);
+              onClose();
+            },
+            onError: () => {
+              setLoading(false);
+            },
+          }
+        );
       })
       .catch((info) => {
         console.error("Lỗi khi xác thực form:", info);
@@ -186,7 +197,7 @@ const EditBlogModal: React.FC<EditBlogModalProps> = ({
       extra={
         <Space>
           <Button onClick={onClose}>Hủy</Button>
-          <Button onClick={handleSubmit} type="primary">
+          <Button onClick={handleSubmit} type="primary" loading={loading}>
             Lưu
           </Button>
         </Space>
@@ -236,25 +247,26 @@ const EditBlogModal: React.FC<EditBlogModalProps> = ({
           </Col>
           <Col span={24}>
             <Form.Item label="Hình ảnh chính">
-              <Upload
-                listType="picture-card"
-                fileList={fileList}
-                onChange={handleChange}
-                beforeUpload={() => false} // Ngăn tự động tải lên
-              >
-                {fileList.length >= 1 ? null : <div>+ Tải lên</div>}
-              </Upload>
-              {previewImage && (
-                <Image
-                  alt="Xem Ảnh Trước"
-                  wrapperStyle={{ display: "none" }}
-                  preview={{
-                    visible: previewOpen,
-                    onVisibleChange: (visible) => setPreviewOpen(visible),
-                  }}
-                  src={previewImage}
-                />
-              )}
+              <EditUploadImage
+                file={blog?.image || ""} // URL hình ảnh hiện tại (nếu có)
+                onImageChange={(file) => {
+                  if (file) {
+                    setFileList([
+                      {
+                        uid: file.uid,
+                        name: file.name,
+                        status: "done",
+                        originFileObj: file,
+                        url: URL.createObjectURL(file),
+                      },
+                    ]);
+                  } else {
+                    setFileList([]);
+                  }
+                }}
+                maxCount={1}
+                tooltipTitle="Vui lòng upload hình ảnh kích thước 820x500px."
+              />
             </Form.Item>
           </Col>
           <Col span={12}>

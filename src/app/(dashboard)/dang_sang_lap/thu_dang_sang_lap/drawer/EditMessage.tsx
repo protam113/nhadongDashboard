@@ -1,27 +1,14 @@
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
-import {
-  Button,
-  Col,
-  Drawer,
-  Form,
-  Image,
-  Input,
-  message,
-  Row,
-  Select,
-  Space,
-  Upload,
-  UploadProps,
-} from "antd";
+import { Button, Col, Drawer, Form, Input, message, Row, Space } from "antd";
 import { Document } from "@/types/types";
-import { CategoriesList } from "@/lib/categoriesList";
 import { UploadFile } from "antd/lib/upload/interface";
 import EditContentSection from "@/components/main/blog/EditContentSection";
 import { useEditMessage } from "@/hooks/message/useMessage";
 import { RcFile } from "antd/es/upload";
 import EditMoreType from "@/components/metamedia/Edittype";
+import EditUploadImage from "@/components/common/EditUploadImage";
 
 interface EditBlogModalProps {
   open: boolean;
@@ -36,22 +23,14 @@ type BlogData = {
   media_remove?: string[]; // Nếu bạn cần lưu media_remove
 };
 
-const EditMessageModal: React.FC<EditBlogModalProps> = ({
-  open,
-  onClose,
-  document,
-}) => {
+const EditMessageModal: React.FC<
+  EditBlogModalProps & {
+    loading: boolean;
+    setLoading: (state: boolean) => void;
+  }
+> = ({ open, onClose, document, loading, setLoading }) => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
-  const [initialCategory, setInitialCategory] = useState<string | null>(null);
-  const [previewImage] = useState<string>("");
-  const [previewOpen, setPreviewOpen] = useState<boolean>(false);
-  const { queueData, isLoading, isError } = CategoriesList(
-    1,
-    "messageformfounder",
-    0
-  );
   const { mutate: editBlogMutation } = useEditMessage();
   const [blogData, setBlogData] = useState<BlogData>({
     file_type: [],
@@ -61,16 +40,11 @@ const EditMessageModal: React.FC<EditBlogModalProps> = ({
 
   useEffect(() => {
     if (document) {
-      const categoryId = document.category?.id.toString() || null;
-      setInitialCategory(categoryId); // Lưu thể loại ban đầu
-      setSelectedCategory(categoryId); // Thiết lập giá trị thể loại hiện tại
-
       form.setFieldsValue({
         title: document.title,
         description: document.description,
         content: document.content,
         link: document.link,
-        category: categoryId,
       });
 
       if (document.image) {
@@ -85,10 +59,6 @@ const EditMessageModal: React.FC<EditBlogModalProps> = ({
       }
     }
   }, [document, form]);
-
-  const handleCategoryChange = (value: string) => {
-    setSelectedCategory(value);
-  };
 
   const handleDataChange = useCallback(
     (data: {
@@ -134,10 +104,6 @@ const EditMessageModal: React.FC<EditBlogModalProps> = ({
     [] // Không phụ thuộc vào bất kỳ giá trị nào ngoài data
   );
 
-  const handleChange: UploadProps["onChange"] = ({ fileList }) => {
-    setFileList(fileList);
-  };
-
   const handleSubmit = () => {
     if (!document) {
       message.warning("Không thể thể cập nhật bài viết !!.");
@@ -149,11 +115,7 @@ const EditMessageModal: React.FC<EditBlogModalProps> = ({
       .then((values) => {
         const editBlog = {
           ...values,
-          category: selectedCategory ? [selectedCategory] : [],
-          category_remove:
-            initialCategory && initialCategory !== selectedCategory
-              ? [initialCategory]
-              : [],
+
           image: fileList.map((file) => file.originFileObj || file.url),
           // Include all media-related fields
           file_type: blogData.file_type,
@@ -165,10 +127,21 @@ const EditMessageModal: React.FC<EditBlogModalProps> = ({
           editBlog.media_remove = blogData.media_remove;
         }
 
-        editBlogMutation({
-          editDoc: editBlog,
-          blogId: document.id,
-        });
+        editBlogMutation(
+          {
+            editDoc: editBlog,
+            blogId: document.id,
+          },
+          {
+            onSuccess: () => {
+              setLoading(false);
+              onClose();
+            },
+            onError: () => {
+              setLoading(false);
+            },
+          }
+        );
       })
       .catch((info) => {
         console.error("Validation failed:", info);
@@ -184,7 +157,7 @@ const EditMessageModal: React.FC<EditBlogModalProps> = ({
       extra={
         <Space>
           <Button onClick={onClose}>Hủy</Button>
-          <Button onClick={handleSubmit} type="primary">
+          <Button onClick={handleSubmit} type="primary" loading={loading}>
             Lưu
           </Button>
         </Space>
@@ -236,46 +209,29 @@ const EditMessageModal: React.FC<EditBlogModalProps> = ({
           </Col>
           <Col span={24}>
             <Form.Item label="Hình ảnh chính">
-              <Upload
-                listType="picture-card"
-                fileList={fileList}
-                onChange={handleChange}
-                beforeUpload={() => false} // Ngăn tự động tải lên
-              >
-                {fileList.length >= 1 ? null : <div>+ Tải lên</div>}
-              </Upload>
-              {previewImage && (
-                <Image
-                  alt="Xem Ảnh Trước"
-                  wrapperStyle={{ display: "none" }}
-                  preview={{
-                    visible: previewOpen,
-                    onVisibleChange: (visible) => setPreviewOpen(visible),
-                  }}
-                  src={previewImage}
-                />
-              )}
+              <EditUploadImage
+                file={document?.image || ""} // URL hình ảnh hiện tại (nếu có)
+                onImageChange={(file) => {
+                  if (file) {
+                    setFileList([
+                      {
+                        uid: file.uid,
+                        name: file.name,
+                        status: "done",
+                        originFileObj: file,
+                        url: URL.createObjectURL(file),
+                      },
+                    ]);
+                  } else {
+                    setFileList([]);
+                  }
+                }}
+                maxCount={1}
+                tooltipTitle="Vui lòng upload hình ảnh kích thước 820x500px."
+              />
             </Form.Item>
           </Col>
           <Col span={12}>
-            <Form.Item label="Thể loại">
-              {isLoading ? (
-                <p>Đang tải thể loại...</p>
-              ) : isError ? (
-                <p>Có lỗi khi tải thể loại</p>
-              ) : (
-                <Select
-                  options={queueData?.map((category: any) => ({
-                    label: category.name,
-                    value: category.id.toString(),
-                  }))}
-                  value={selectedCategory}
-                  onChange={handleCategoryChange}
-                  allowClear
-                  placeholder="Chọn thể loại"
-                />
-              )}
-            </Form.Item>
             <Form.Item label="Media">
               <EditMoreType
                 onDataChange={handleDataChange}

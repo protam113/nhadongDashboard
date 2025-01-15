@@ -21,6 +21,7 @@ import {
 } from "@/hooks/donation/useDonation";
 import EditDonationModal from "./drawer/EditDonation";
 import { SpinLoading, Error, Heading } from "@/components/design/index";
+import { useUser } from "@/context/userProvider";
 
 const Page: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -32,6 +33,8 @@ const Page: React.FC = () => {
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
   const [selectedPostId, setSelectedPostId] = useState<string>(""); // State to hold the selected event ID
   const { mutate: updateDonation } = useEditDonation();
+  const [loading, setLoading] = useState(false); // Thêm state loading
+  const { userInfo } = useUser() || {}; // Provide a default empty object if useUser returns null
 
   // Pass model into CategoriesList
   const { queueData, next, isLoading, isError } = DonateList(
@@ -43,6 +46,7 @@ const Page: React.FC = () => {
   const handleEdit = (blog: any) => {
     setSelectedBlog(blog); // Set blog to be edited
     setIsDrawerVisible(true); // Open the drawer
+    setLoading(false);
   };
 
   const handleSelectDonation = (postId: string) => {
@@ -214,7 +218,11 @@ const Page: React.FC = () => {
             <FaArrowRight />
           </button>
         </div>
-        <EventQueueTable PostModel="donation" />
+        {userInfo?.role.name === "admin" ? (
+          <>
+            <EventQueueTable PostModel="donation" />
+          </>
+        ) : null}
       </div>
 
       <DonationDetailDrawer
@@ -225,7 +233,9 @@ const Page: React.FC = () => {
       <EditDonationModal
         open={isDrawerVisible}
         onClose={handleDrawerClose}
-        blog={selectedBlog} // Pass selected blog to EditBlogModal
+        blog={selectedBlog}
+        loading={loading}
+        setLoading={setLoading}
       />
     </>
   );

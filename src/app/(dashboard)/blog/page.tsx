@@ -1,26 +1,19 @@
 "use client"; // Ensures this is a client component
 
-import React, { useState } from "react";
-import { Table, Button, Modal, Tag } from "antd";
+import React, { useState, useMemo } from "react";
+import { Table, Button, Tag } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { useDeleteCategory } from "@/hooks/cateogry/useCategories";
 import { BlogList } from "@/lib/blogList";
 import BlogDetailsModal from "@/app/(dashboard)/blog/BlogDetailsModal";
 import { EyeOutlined } from "@ant-design/icons";
 import BlogQueueList from "@/app/(dashboard)/blog/BlogQueueTable";
-import {
-  FaArrowLeft,
-  FaArrowRight,
-  MdOutlineDelete,
-  FaSync,
-} from "@/lib/iconLib";
+import { FaArrowLeft, FaArrowRight, FaSync } from "@/lib/iconLib";
 import { Error, Heading } from "@/components/design/index";
 import { useUser } from "@/context/userProvider";
 
 const Blogs: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
-  const { mutate: deleteCategory } = useDeleteCategory();
   const [selectedBlog, setSelectedBlog] = useState(null); // State for selected blog
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const { userInfo } = useUser() || {}; // Provide a default empty object if useUser returns null
@@ -33,20 +26,6 @@ const Blogs: React.FC = () => {
   );
 
   const totalPages = next ? currentPage + 1 : currentPage;
-
-  const handleDelete = (categoryId: string) => {
-    // Show confirmation dialog before deletion
-    Modal.confirm({
-      title: "Xác nhận xóa",
-      content: "Bạn có chắc chắn muốn xóa thể loại này?",
-      okText: "Xóa",
-      okType: "danger",
-      cancelText: "Hủy",
-      onOk: () => {
-        deleteCategory(categoryId);
-      },
-    });
-  };
 
   const columns: ColumnsType<any> = [
     {
@@ -98,20 +77,9 @@ const Blogs: React.FC = () => {
         </span>
       ),
     },
-    {
-      title: "Action",
-      dataIndex: "action",
-      key: "action",
-      width: 100,
-      render: (_, record) => (
-        <>
-          <Button danger onClick={() => handleDelete(record.id)}>
-            <MdOutlineDelete className="text-albert-error" />
-          </Button>
-        </>
-      ),
-    },
   ];
+
+  const dataSource = useMemo(() => queueData, [queueData]);
 
   if (isError) return <Error />;
 
@@ -144,7 +112,7 @@ const Blogs: React.FC = () => {
         <div className="overflow-auto" style={{ maxHeight: "800px" }}>
           <Table
             columns={columns}
-            dataSource={queueData}
+            dataSource={dataSource}
             rowKey="id"
             pagination={false}
             scroll={{ y: 500 }}

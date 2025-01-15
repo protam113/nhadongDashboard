@@ -18,6 +18,7 @@ import {
 import { useDeleteDoc } from "@/hooks/document/useDocs";
 import { SpinLoading, Error, Heading } from "@/components/design/index";
 import DocsDetailsModal from "../DocumentDetailModal";
+import EditDocumentModal from "../modal/EditDocumentDrawer";
 
 const { Option } = Select;
 
@@ -29,6 +30,8 @@ const Page: React.FC = () => {
   const [selectedDoc, setSelectedDoc] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [model, setModel] = useState<string>(""); // State to hold selected model
+  const [isDrawerVisible, setIsDrawerVisible] = useState(false);
+  const [loading, setLoading] = useState(false); // Thêm state loading
 
   // Pass model into CategoriesList
   const {
@@ -44,6 +47,12 @@ const Page: React.FC = () => {
   } = CategoriesList(currentPage, "document", refreshKey);
 
   const totalPages = next ? currentPage + 1 : currentPage;
+
+  const handleEdit = (blog: any) => {
+    setSelectedDoc(blog); // Set blog to be edited
+    setIsDrawerVisible(true); // Open the drawer
+    setLoading(false); // Đảm bảo trạng thái loading không bật
+  };
 
   const handleDelete = (blogId: string) => {
     // Show confirmation dialog before deletion
@@ -115,7 +124,7 @@ const Page: React.FC = () => {
           <Button danger onClick={() => handleDelete(record.id)}>
             <MdOutlineDelete className="text-albert-error" />
           </Button>
-          <Button>
+          <Button type="primary" onClick={() => handleEdit(record)}>
             <FaRegEdit />
           </Button>
         </>
@@ -140,6 +149,11 @@ const Page: React.FC = () => {
   const handleModelChange = (value: string) => {
     setModel(value);
     setRefreshKey((prev) => prev + 1); // Refresh data when model changes
+  };
+
+  const handleDrawerClose = () => {
+    setSelectedDoc(null);
+    setIsDrawerVisible(false); // Close the drawer
   };
 
   const handleRefresh = () => {
@@ -183,8 +197,7 @@ const Page: React.FC = () => {
               <FaSync /> Làm mới
             </Button>
           </div>
-          <Link href="/study/document/create_document">
-            {" "}
+          <Link href="/document/create_document">
             {/* Change the URL as needed */}
             <Button
               style={{
@@ -248,6 +261,13 @@ const Page: React.FC = () => {
         visible={isModalVisible}
         onClose={handleModalClose}
         doc={selectedDoc}
+      />
+      <EditDocumentModal
+        open={isDrawerVisible}
+        onClose={handleDrawerClose}
+        document={selectedDoc} // Pass selected blog to EditBlogModal
+        loading={loading}
+        setLoading={setLoading} // Truyền state và hàm setLoading
       />
     </>
   );

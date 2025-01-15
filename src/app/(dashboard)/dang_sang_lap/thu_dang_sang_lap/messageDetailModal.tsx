@@ -68,21 +68,6 @@ const MessageDetailsDrawer: React.FC<BlogDetailsDrawerProps> = ({
         </div>
       )}
 
-      <Paragraph className="text-gray-800 mb-4">
-        <strong>Thể loại:</strong>
-      </Paragraph>
-      <div className="flex flex-wrap gap-2 mb-4">
-        {blog.category ? (
-          <span
-            key={blog.category.id}
-            className="bg-indigo-500 text-white py-1 px-3 rounded-full text-sm"
-          >
-            {blog.category.name}
-          </span>
-        ) : (
-          <span>No category available</span>
-        )}
-      </div>
       <Paragraph className="text-gray-800 mb-2">
         <strong>Hình Ảnh Bổ Sung:</strong>
       </Paragraph>

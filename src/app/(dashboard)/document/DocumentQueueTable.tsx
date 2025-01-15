@@ -8,8 +8,8 @@ import { UserQueue } from "@/lib/userQueue";
 import { FaArrowLeft, FaArrowRight } from "@/lib/iconLib";
 import SpinLoading from "@/components/design/Spin";
 import Error from "@/components/design/Error";
-import PostDetailDrawer from "@/components/drawer/PostDetailDrawer";
-import PostEditDetailDrawer from "@/components/drawer/PostEditDetailDrawer";
+import DocEditDetailDrawer from "@/components/drawer/DocEditDetailDrawer";
+import DocDetailDrawer from "@/components/drawer/DocDetailDrawer";
 
 const DocumentQueueList: React.FC = () => {
   const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
@@ -249,12 +249,12 @@ const DocumentQueueList: React.FC = () => {
           </button>
         </div>
       </div>
-      <PostDetailDrawer
+      <DocDetailDrawer
         open={isDrawerOpen}
         onClose={handleDrawerClose}
         blog={selectedPost}
       />
-      <PostEditDetailDrawer
+      <DocEditDetailDrawer
         open={isEditDrawerOpen}
         onClose={handleDrawerClose}
         blog={selectedEditPost}

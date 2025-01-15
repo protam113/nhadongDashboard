@@ -1,24 +1,14 @@
 "use client";
 
 import React, { useCallback, useEffect, useState } from "react";
-import {
-  Button,
-  Col,
-  Drawer,
-  Form,
-  Image,
-  Input,
-  Row,
-  Space,
-  Upload,
-  UploadProps,
-} from "antd";
+import { Button, Col, Drawer, Form, Input, Row, Space } from "antd";
 import { Donation } from "@/types/types";
 import { UploadFile } from "antd/lib/upload/interface";
 import EditContentSection from "@/components/main/blog/EditContentSection";
 import { useEditDonation } from "@/hooks/donation/useDonation";
 import { RcFile } from "antd/es/upload";
 import EditMoreType from "@/components/metamedia/Edittype";
+import EditUploadImage from "@/components/common/EditUploadImage";
 
 interface EditBlogModalProps {
   open: boolean;
@@ -33,15 +23,14 @@ type BlogData = {
   media_remove?: string[]; // Nếu bạn cần lưu media_remove
 };
 
-const EditDonationModal: React.FC<EditBlogModalProps> = ({
-  open,
-  onClose,
-  blog,
-}) => {
+const EditDonationModal: React.FC<
+  EditBlogModalProps & {
+    loading: boolean;
+    setLoading: (state: boolean) => void;
+  }
+> = ({ open, onClose, blog, loading, setLoading }) => {
   const [form] = Form.useForm();
   const [fileList, setFileList] = useState<UploadFile[]>([]);
-  const [previewImage, setPreviewImage] = useState<string>("");
-  const [previewOpen, setPreviewOpen] = useState<boolean>(false);
   const { mutate } = useEditDonation();
   const [blogData, setBlogData] = useState<BlogData>({
     file_type: [],
@@ -70,10 +59,6 @@ const EditDonationModal: React.FC<EditBlogModalProps> = ({
       }
     }
   }, [blog, form]);
-
-  const handleChange: UploadProps["onChange"] = ({ fileList }) => {
-    setFileList(fileList);
-  };
 
   const handleDataChange = useCallback(
     (data: {
@@ -118,12 +103,6 @@ const EditDonationModal: React.FC<EditBlogModalProps> = ({
     },
     [] // Không phụ thuộc vào bất kỳ giá trị nào ngoài data
   );
-
-  const handlePreview = (file: UploadFile) => {
-    setPreviewImage(file.url || file.preview || "");
-    setPreviewOpen(true);
-  };
-
   const handleSubmit = () => {
     if (!blog) {
       console.error("Blog is null, cannot edit.");
@@ -145,10 +124,21 @@ const EditDonationModal: React.FC<EditBlogModalProps> = ({
           editDonation.media_remove = blogData.media_remove;
         }
 
-        mutate({
-          editDonation: editDonation,
-          blogId: blog.id,
-        });
+        mutate(
+          {
+            editDonation: editDonation,
+            blogId: blog.id,
+          },
+          {
+            onSuccess: () => {
+              setLoading(false);
+              onClose();
+            },
+            onError: () => {
+              setLoading(false);
+            },
+          }
+        );
       })
       .catch((info) => {
         console.error("Lỗi khi xác thực form:", info);
@@ -164,7 +154,7 @@ const EditDonationModal: React.FC<EditBlogModalProps> = ({
       extra={
         <Space>
           <Button onClick={onClose}>Hủy</Button>
-          <Button onClick={handleSubmit} type="primary">
+          <Button onClick={handleSubmit} type="primary" loading={loading}>
             Lưu
           </Button>
         </Space>
@@ -214,22 +204,25 @@ const EditDonationModal: React.FC<EditBlogModalProps> = ({
           </Col>
           <Col span={24}>
             <Form.Item label="Hình ảnh chính">
-              <Upload
-                listType="picture-card"
-                fileList={fileList}
-                onPreview={handlePreview}
-                onChange={handleChange}
-                beforeUpload={() => false}
-              >
-                {fileList.length >= 1 ? null : <div>+ Tải lên</div>}
-              </Upload>
-              <Image
-                alt="Xem trước"
-                preview={{
-                  visible: previewOpen,
-                  onVisibleChange: (visible) => setPreviewOpen(visible),
+              <EditUploadImage
+                file={blog?.image || ""} // URL hình ảnh hiện tại (nếu có)
+                onImageChange={(file) => {
+                  if (file) {
+                    setFileList([
+                      {
+                        uid: file.uid,
+                        name: file.name,
+                        status: "done",
+                        originFileObj: file,
+                        url: URL.createObjectURL(file),
+                      },
+                    ]);
+                  } else {
+                    setFileList([]);
+                  }
                 }}
-                src={previewImage}
+                maxCount={1}
+                tooltipTitle="Vui lòng upload hình ảnh kích thước 820x500px."
               />
             </Form.Item>
           </Col>

@@ -249,7 +249,7 @@ export const NavItems = () => {
         },
         {
           name: "Video",
-          link: "/thu_vien_vieo",
+          link: "/thu_vien_video",
           key: "30",
           icon: <MdManageSearch />,
         },

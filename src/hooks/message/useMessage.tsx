@@ -9,8 +9,8 @@ import { message } from "antd";
 import {
   FetchDocsListResponse,
   Filters,
-  NewDocs,
-  EditDocs,
+  NewMessage,
+  EditMessageDetail,
 } from "@/types/types";
 
 const fetchMessagelist = async (
@@ -83,18 +83,24 @@ const useMessageList = (
   });
 };
 
-const CreateMessage = async (newDoc: NewDocs, token: string) => {
+const CreateMessage = async (newDoc: NewMessage, token: string) => {
   const formData = new FormData();
 
   for (const key in newDoc) {
-    const value = newDoc[key as keyof NewDocs];
+    const value = newDoc[key as keyof NewMessage];
 
-    if (key === "category") {
-      // Gửi category là một chuỗi đơn, không cần phải là mảng
-      formData.append("category", value as string);
-    } else if (key === "image" && typeof value === "string") {
+    if (key === "image" && typeof value === "string") {
       // Nếu là URL hình ảnh
       formData.append(key, value);
+    }
+    if (key === "file" && Array.isArray(value)) {
+      value.forEach((file) => formData.append("file", file));
+    } else if (key === "file_type" && Array.isArray(value)) {
+      // Xử lý file
+      value.forEach((string) => formData.append("file_type", string));
+    } else if (key === "metadata" && Array.isArray(value)) {
+      // Xử lý metadata
+      value.forEach((string) => formData.append("metadata", string));
     } else if (key === "image" && Array.isArray(value)) {
       // Nếu là mảng hình ảnh tải lên
       value.forEach((file) => {
@@ -138,14 +144,14 @@ const useCreateMessage = () => {
   }, [getToken]);
 
   return useMutation({
-    mutationFn: async (newDoc: NewDocs) => {
+    mutationFn: async (newDoc: NewMessage) => {
       if (!token) {
         throw new Error("Token is not available");
       }
       return CreateMessage(newDoc, token);
     },
     onSuccess: () => {
-      message.success("Sứ Vụ đã được thêm thành công");
+      message.success("Thư đã được thêm thành công");
       queryClient.invalidateQueries({ queryKey: ["messageList"] });
     },
     onError: (error) => {
@@ -211,7 +217,7 @@ const useDeleteMessage = () => {
 };
 
 const EditMessage = async (
-  editDoc: EditDocs,
+  editDoc: EditMessageDetail,
   blogId: string,
   token: string
 ) => {
@@ -221,13 +227,16 @@ const EditMessage = async (
 
   // Duyệt qua các trường trong editBlog
   for (const key in editDoc) {
-    const value = editDoc[key as keyof EditDocs];
+    const value = editDoc[key as keyof EditMessageDetail];
 
-    if (key === "category") {
-      // Nếu là mảng, lấy giá trị đầu tiên; nếu không, giữ nguyên giá trị
-      if (typeof value === "string") {
-        formData.append("category", value); // Nếu đã là string thì truyền trực tiếp
-      }
+    if (key === "file" && Array.isArray(value)) {
+      value.forEach((file) => formData.append("file", file));
+    } else if (key === "file_type" && Array.isArray(value)) {
+      // Xử lý file
+      value.forEach((string) => formData.append("file_type", string));
+    } else if (key === "metadata" && Array.isArray(value)) {
+      // Xử lý metadata
+      value.forEach((string) => formData.append("metadata", string));
     } else if (key === "image") {
       // Xử lý trường image
       if (typeof value === "string") {
@@ -283,7 +292,7 @@ const useEditMessage = () => {
       editDoc,
       blogId,
     }: {
-      editDoc: EditDocs;
+      editDoc: EditMessageDetail;
       blogId: string;
     }) => {
       if (!token) {

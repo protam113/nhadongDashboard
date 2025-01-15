@@ -1,34 +1,31 @@
 "use client";
 
 import React, { useCallback, useState } from "react";
-import { Input, Select, Upload, Button, Image, Form } from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { Input, Select, Button, Form, message } from "antd";
 import { useRouter } from "next/navigation";
 import { RcFile } from "antd/lib/upload";
-import { UploadFile } from "antd/lib/upload/interface";
 import Heading from "@/components/design/Heading";
 import BackButton from "@/components/Button/BackButton";
 import { useCreateDonation } from "@/hooks/donation/useDonation";
 import DonationRichText from "@/components/main/donation/DonationRichText";
 import MoreType from "@/app/(dashboard)/blog/blog_management/create_blog/MoreType";
+import UploadImage from "@/components/common/UploadImage";
 
 const { Option } = Select;
 const { TextArea } = Input;
 
 const Page = () => {
-  const { mutate: createEvent } = useCreateDonation();
+  const { mutate } = useCreateDonation();
   const [form] = Form.useForm();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  const [fileList, setFileList] = useState<UploadFile[]>([]); // Khai báo kiểu UploadFile
-  const [previewImage, setPreviewImage] = useState("");
-  const [previewOpen, setPreviewOpen] = useState(false);
   const [content, setContent] = useState("");
   const [blogData, setBlogData] = useState({
     title: "",
     description: "",
     image: [] as RcFile[],
+    content: "",
     link: "",
     visibility: "",
     file_type: [] as string[],
@@ -67,68 +64,59 @@ const Page = () => {
 
   const handleSubmit = async () => {
     setLoading(true);
-
-    // Convert RcFile to File[] if necessary
-    const convertedImage =
-      fileList.length > 0
-        ? fileList.map((file) => file.originFileObj as File)
-        : null;
-
-    const donationDataToSend = {
-      ...blogData,
-      title: form.getFieldValue("title"),
-      description: form.getFieldValue("description"),
-      image: convertedImage,
-      metadata: blogData.metadata.map((item) => JSON.stringify(item)),
-      content,
-      status: form.getFieldValue("status"),
-      link: form.getFieldValue("link"), // Add the 'link' field
-      visibility: form.getFieldValue("visibility"), // Add the 'visibility' field
-    };
-
     try {
-      createEvent(donationDataToSend);
+      if (blogData.title.length === 0) {
+        message.error("Vui lòng nhập tiêu đề!");
+        setLoading(false);
+        return;
+      }
+
+      if (blogData.image.length === 0) {
+        message.error("Vui lòng tải lên một hình ảnh!");
+
+        return;
+      }
+
+      const donationDataToSend = {
+        ...blogData,
+        metadata: blogData.metadata.map((item) => JSON.stringify(item)),
+        content,
+      };
+      mutate(donationDataToSend);
       form.resetFields();
-      setFileList([]);
       setBlogData({
         title: "",
         description: "",
         image: [],
+        content: "",
         visibility: "",
         link: "",
         file_type: [],
         file: [],
         metadata: [],
       });
-      setContent("");
     } catch (error) {
-      console.error("Error creating event:", error);
+      console.error(error);
+      message.error("Có lỗi xảy ra khi thêm bài viết.");
     } finally {
       setLoading(false);
       router.back();
     }
   };
 
-  const handleChange = ({ fileList }: { fileList: any }) =>
-    setFileList(fileList);
-
-  const handlePreview = async (file: any) => {
-    if (!file.url && !file.preview) {
-      const reader = new FileReader();
-      reader.onload = () => setPreviewImage(reader.result as string);
-      reader.readAsDataURL(file.originFileObj as RcFile);
+  const handleImageChange = (file: RcFile | null) => {
+    if (file) {
+      setBlogData((prevData) => ({
+        ...prevData,
+        image: [file],
+      }));
     } else {
-      setPreviewImage(file.url || file.preview || "");
+      setBlogData((prevData) => ({
+        ...prevData,
+        image: [],
+      }));
     }
-    setPreviewOpen(true);
   };
-
-  const uploadButton = (
-    <div>
-      <PlusOutlined />
-      <div style={{ marginTop: 8 }}>Tải lên</div>
-    </div>
-  );
 
   return (
     <div style={{ padding: "20px", maxWidth: "100%", margin: "0 auto" }}>
@@ -144,14 +132,33 @@ const Page = () => {
           name="title"
           rules={[{ required: true, message: "Vui lòng nhập tên sự kiện!" }]}
         >
-          <Input placeholder="Nhập tên sự kiện" />
+          <Input
+            placeholder="Nhập tiêu đề bài viết "
+            value={blogData.title}
+            onChange={(e) =>
+              setBlogData((prevData) => ({
+                ...prevData,
+                title: e.target.value,
+              }))
+            }
+          />
         </Form.Item>
         <Form.Item
           label="Mô Tả Ngắn"
           name="description"
           rules={[{ required: true, message: "Vui lòng nhập tên sự kiện!" }]}
         >
-          <TextArea placeholder="Nhập tên sự kiện" />
+          <TextArea
+            placeholder="Nhập một đoạn mô tả ngắn về bài viết"
+            rows={4}
+            value={blogData.description}
+            onChange={(e) =>
+              setBlogData((prevData) => ({
+                ...prevData,
+                description: e.target.value,
+              }))
+            }
+          />
         </Form.Item>
 
         {/* Mô tả */}
@@ -174,25 +181,11 @@ const Page = () => {
 
         {/* Upload ảnh */}
         <Form.Item label="Hình ảnh">
-          <Upload
-            listType="picture-card"
-            fileList={fileList}
-            onPreview={handlePreview}
-            onChange={handleChange}
-            beforeUpload={() => false} // Ngăn tự động tải lên
-          >
-            {fileList.length >= 1 ? null : uploadButton}
-          </Upload>
-          {previewImage && (
-            <Image
-              preview={{
-                visible: previewOpen,
-                onVisibleChange: (visible) => setPreviewOpen(visible),
-              }}
-              src={previewImage}
-              alt="Preview"
-            />
-          )}
+          <UploadImage
+            onImageChange={handleImageChange}
+            maxCount={1}
+            tooltipTitle="Vui lòng upload hình ảnh kích thước 820x500px."
+          />
         </Form.Item>
         <Form.Item
           label="Link"

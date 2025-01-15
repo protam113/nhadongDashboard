@@ -1,21 +1,13 @@
 "use client"; // Ensures this is a client component
 
 import React, { useState } from "react";
-import { Table, Button, Modal } from "antd";
+import { Table, Button } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { EyeOutlined } from "@ant-design/icons";
 import { DocsList } from "@/lib/docslist";
 import Link from "next/link";
 import BackButton from "@/components/Button/BackButton";
-import { useDeleteDoc } from "@/hooks/document/useDocs";
-import {
-  FaArrowLeft,
-  FaArrowRight,
-  MdOutlineDelete,
-  FaSync,
-  FaRegEdit,
-} from "@/lib/iconLib";
-import EditDocumentModal from "./modal/EditDocumentDrawer";
+import { FaArrowLeft, FaArrowRight, FaSync } from "@/lib/iconLib";
 import { SpinLoading, Error, Heading } from "@/components/design/index";
 import DocsDetailsModal from "./DocumentDetailModal";
 import DocumentCategoriesTable from "./DocumentCategoriesTable";
@@ -27,10 +19,8 @@ const Documents: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [model] = useState<string>("");
   const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
-  const { mutate } = useDeleteDoc();
   const [selectedDoc, setSelectedDoc] = useState(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
-  const [isDrawerVisible, setIsDrawerVisible] = useState(false);
   const { userInfo } = useUser() || {};
 
   // Pass model into CategoriesList
@@ -41,25 +31,6 @@ const Documents: React.FC = () => {
   );
 
   const totalPages = next ? currentPage + 1 : currentPage;
-
-  const handleEdit = (blog: any) => {
-    setSelectedDoc(blog); // Set blog to be edited
-    setIsDrawerVisible(true); // Open the drawer
-  };
-
-  const handleDelete = (blogId: string) => {
-    // Show confirmation dialog before deletion
-    Modal.confirm({
-      title: "Xác nhận xóa",
-      content: "Bạn có chắc chắn muốn xóa tài liệu này?",
-      okText: "Xóa",
-      okType: "danger",
-      cancelText: "Hủy",
-      onOk: () => {
-        mutate(blogId);
-      },
-    });
-  };
 
   const columns: ColumnsType<any> = [
     {
@@ -107,22 +78,6 @@ const Documents: React.FC = () => {
         </div>
       ),
     },
-    {
-      title: "Action",
-      dataIndex: "action",
-      key: "action",
-      width: 100,
-      render: (_, record) => (
-        <>
-          <Button danger onClick={() => handleDelete(record.id)}>
-            <MdOutlineDelete className="text-albert-error" />
-          </Button>
-          <Button type="primary" onClick={() => handleEdit(record)}>
-            <FaRegEdit />
-          </Button>
-        </>
-      ),
-    },
   ];
 
   if (isLoading) return <SpinLoading />;
@@ -137,11 +92,6 @@ const Documents: React.FC = () => {
   const handleModalClose = () => {
     setIsModalVisible(false);
     setSelectedDoc(null);
-  };
-
-  const handleDrawerClose = () => {
-    setSelectedDoc(null);
-    setIsDrawerVisible(false); // Close the drawer
   };
 
   const handleRefresh = () => {
@@ -159,7 +109,7 @@ const Documents: React.FC = () => {
           <Button onClick={handleRefresh} style={{ marginLeft: "8px" }}>
             <FaSync /> Làm mới
           </Button>
-          <Link href="/study/document/create_document">
+          <Link href="/document/create_document">
             {" "}
             {/* Change the URL as needed */}
             <Button
@@ -231,11 +181,6 @@ const Documents: React.FC = () => {
         visible={isModalVisible}
         onClose={handleModalClose}
         doc={selectedDoc}
-      />
-      <EditDocumentModal
-        open={isDrawerVisible}
-        onClose={handleDrawerClose}
-        document={selectedDoc} // Pass selected blog to EditBlogModal
       />
     </>
   );

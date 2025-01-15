@@ -160,7 +160,8 @@ const useCreateNews = () => {
       queryClient.invalidateQueries({ queryKey: ["newsList"] });
     },
     onError: (error) => {
-      console.log(error.message || "Failed to create news.");
+      console.error(error.message || "Failed to create news.");
+      window.location.reload();
     },
   });
 };

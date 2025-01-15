@@ -1,7 +1,7 @@
 "use client"; // Ensures this is a client component
 
-import React, { useState } from "react";
-import { Table, Button, Modal } from "antd";
+import React, { useMemo, useState } from "react";
+import { Table, Button, Modal, Tag, Spin } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { useRouter } from "next/navigation";
 import { EyeOutlined } from "@ant-design/icons";
@@ -27,6 +27,7 @@ const NewsManagement: React.FC = () => {
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
   const [selectedBlog, setSelectedBlog] = useState(null);
+  const [loading, setLoading] = useState(false); // Thêm state loading
 
   // Pass model into CategoriesList
   const { queueData, next, isLoading, isError } = NewsList(
@@ -40,6 +41,7 @@ const NewsManagement: React.FC = () => {
   const handleEdit = (blog: any) => {
     setSelectedBlog(blog); // Set blog to be edited
     setIsDrawerVisible(true); // Open the drawer
+    setLoading(false); // Đảm bảo trạng thái loading không bật
   };
 
   const handleDelete = (newsId: string) => {
@@ -89,21 +91,20 @@ const NewsManagement: React.FC = () => {
       width: 150,
       render: (categories) => (
         <span>
-          {categories.map((category: any) => (
-            <div
-              key={category.id}
-              style={{
-                backgroundColor: category.color || "#142857", // Màu nền tùy chọn cho thể loại
-                color: "#fff", // Màu chữ
-                padding: "5px 10px",
-                borderRadius: "4px",
-                marginBottom: "5px",
-                marginRight: "5px",
-              }}
-            >
-              {category.name} {/* Hiển thị tên của thể loại */}
-            </div>
-          ))}
+          {categories.map((category: any, index: number) => {
+            // Danh sách màu sắc để luân phiên
+            const colors = ["geekblue", "green", "volcano", "orange", "cyan"];
+            const color = colors[index % colors.length]; // Chọn màu theo index
+            return (
+              <Tag
+                color={color}
+                key={category.id}
+                style={{ marginBottom: "5px" }}
+              >
+                {category.name} {/* Hiển thị tên của thể loại */}
+              </Tag>
+            );
+          })}
         </span>
       ),
     },
@@ -114,16 +115,33 @@ const NewsManagement: React.FC = () => {
       width: 100,
       render: (_, record) => (
         <>
-          <Button danger onClick={() => handleDelete(record.id)}>
-            <MdOutlineDelete className="text-albert-error" />
+          <Button
+            danger
+            onClick={() => handleDelete(record.id)}
+            disabled={loading} // Disable button nếu đang loading
+          >
+            {loading ? (
+              <Spin size="small" /> // Sử dụng Spin của Ant Design
+            ) : (
+              <MdOutlineDelete className="text-albert-error" />
+            )}
           </Button>
-          <Button type="primary" onClick={() => handleEdit(record)}>
-            <FaRegEdit />
+          <Button
+            type="primary"
+            onClick={() => handleEdit(record)}
+            disabled={loading} // Disable button nếu đang loading
+          >
+            {loading ? (
+              <Spin size="small" /> // Sử dụng Spin của Ant Design
+            ) : (
+              <FaRegEdit />
+            )}
           </Button>
         </>
       ),
     },
   ];
+  const dataSource = useMemo(() => queueData, [queueData]);
 
   if (isLoading) return <SpinLoading />;
   if (isError) return <Error />;
@@ -165,7 +183,7 @@ const NewsManagement: React.FC = () => {
         <div className="overflow-auto" style={{ maxHeight: "800px" }}>
           <Table
             columns={columns}
-            dataSource={queueData}
+            dataSource={dataSource}
             rowKey="id"
             pagination={false}
             scroll={{ y: 500 }}
@@ -211,7 +229,9 @@ const NewsManagement: React.FC = () => {
       <EditNewsModal
         open={isDrawerVisible}
         onClose={handleDrawerClose}
-        news={selectedBlog} // Pass selected blog to EditBlogModal
+        blog={selectedBlog}
+        loading={loading}
+        setLoading={setLoading}
       />
     </>
   );

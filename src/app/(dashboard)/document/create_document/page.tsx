@@ -1,35 +1,20 @@
 "use client";
 
 import React, { useCallback, useState } from "react";
-import {
-  Form,
-  Input,
-  Button,
-  Upload,
-  Card,
-  Select,
-  message,
-  Image,
-  Row,
-  Col,
-} from "antd";
-import { PlusOutlined } from "@ant-design/icons";
+import { Form, Input, Button, Card, Select, message, Row, Col } from "antd";
 import { RcFile } from "antd/lib/upload";
 import { CategoriesList } from "@/lib/categoriesList";
-import { UploadFile, UploadProps } from "antd/lib/upload/interface";
 import BackButton from "@/components/Button/BackButton";
 import Heading from "@/components/design/Heading";
 import ContentSection from "@/components/main/blog/ContentSection";
 import { useCreateDoc } from "@/hooks/document/useDocs";
 import MoreType from "@/app/(dashboard)/blog/blog_management/create_blog/MoreType";
+import UploadImage from "@/components/common/UploadImage";
 
 const { TextArea } = Input;
 
 const Page: React.FC = () => {
   const [content, setContent] = useState<string>("");
-  const [fileList, setFileList] = useState<UploadFile[]>([]);
-  const [previewImage, setPreviewImage] = useState<string>("");
-  const [previewOpen, setPreviewOpen] = useState<boolean>(false);
   const [blogData, setBlogData] = useState({
     title: "",
     description: "",
@@ -80,35 +65,35 @@ const Page: React.FC = () => {
     [] // Không phụ thuộc vào bất kỳ giá trị nào ngoài data
   );
 
-  const handleChange: UploadProps["onChange"] = ({ fileList }) => {
-    setFileList(fileList);
-    setBlogData({
-      ...blogData,
-      image: fileList.map((file) => file.originFileObj as RcFile),
-    }); // Lưu mảng file
-  };
-
-  const handlePreview = async (file: UploadFile) => {
-    if (!file.url && !file.preview) {
-      const reader = new FileReader();
-      reader.onload = () => setPreviewImage(reader.result as string);
-      reader.readAsDataURL(file.originFileObj as RcFile);
+  const handleImageChange = (file: RcFile | null) => {
+    if (file) {
+      setBlogData((prevData) => ({
+        ...prevData,
+        image: [file],
+      }));
     } else {
-      setPreviewImage(file.url || file.preview || "");
+      setBlogData((prevData) => ({
+        ...prevData,
+        image: [],
+      }));
     }
-    setPreviewOpen(true);
   };
-
-  const uploadButton = (
-    <div>
-      <PlusOutlined />
-      <div style={{ marginTop: 8 }}>Upload</div>
-    </div>
-  );
 
   const handleSaveBlog = async () => {
     setLoading(true);
     try {
+      if (blogData.title.length === 0) {
+        message.error("Vui lòng nhập tiêu đề!");
+        setLoading(false);
+        return;
+      }
+
+      if (blogData.category.length === 0) {
+        message.error("Vui lòng chọn ít nhất một thể loại!");
+        setLoading(false);
+        return;
+      }
+
       if (blogData.image.length === 0) {
         message.error("Vui lòng tải lên một hình ảnh!");
         setLoading(false);
@@ -144,7 +129,7 @@ const Page: React.FC = () => {
   };
 
   return (
-    <div style={{ padding: "20px", maxWidth: "800px", margin: "0 auto" }}>
+    <div style={{ padding: "20px", maxWidth: "1400px", margin: "0 auto" }}>
       <BackButton />
 
       <Heading name="tạo sứ vụ mới  " />
@@ -178,27 +163,11 @@ const Page: React.FC = () => {
                 />
               </Form.Item>
               <Form.Item label="Hình ảnh chính">
-                <Upload
-                  listType="picture-card"
-                  fileList={fileList}
-                  onPreview={handlePreview}
-                  onChange={handleChange}
-                  beforeUpload={() => false} // Ngăn tự động tải lên
-                >
-                  {fileList.length >= 1 ? null : uploadButton}
-                </Upload>
-
-                {previewImage && (
-                  <Image
-                    alt="Hình ảnh xem trước bài viết"
-                    wrapperStyle={{ display: "none" }}
-                    preview={{
-                      visible: previewOpen,
-                      onVisibleChange: (visible) => setPreviewOpen(visible),
-                    }}
-                    src={previewImage}
-                  />
-                )}
+                <UploadImage
+                  onImageChange={handleImageChange}
+                  maxCount={1}
+                  tooltipTitle="Vui lòng upload hình ảnh kích thước 820x500px."
+                />
               </Form.Item>
               <Form.Item label="Nôi Dung Chi Tiết">
                 <ContentSection

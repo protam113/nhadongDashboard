@@ -13,6 +13,7 @@ import MessageDetailsDrawer from "./messageDetailModal";
 import { useDeleteMessage } from "@/hooks/message/useMessage";
 import EditMessageModal from "./drawer/EditMessage";
 import { SpinLoading, Error, Heading } from "@/components/design/index";
+import { useUser } from "@/context/userProvider";
 
 const Page: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -22,6 +23,8 @@ const Page: React.FC = () => {
   const { mutate } = useDeleteMessage();
   const [selectedDoc, setSelectedDoc] = useState(null);
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
+  const { userInfo } = useUser() || {};
+  const [loading, setLoading] = useState(false); // Thêm state loading
 
   // Pass model into CategoriesList
   const { queueData, next, isLoading, isError } = MessageList(
@@ -35,6 +38,7 @@ const Page: React.FC = () => {
   const handleEdit = (blog: any) => {
     setSelectedDoc(blog); // Set blog to be edited
     setIsDrawerVisible(true); // Open the drawer
+    setLoading(false); // Đảm bảo trạng thái loading không bật
   };
   const handleDelete = (postId: string) => {
     // Show confirmation dialog before deletion
@@ -74,26 +78,6 @@ const Page: React.FC = () => {
       key: "title",
       width: 400,
       render: (text) => <span>{text}</span>,
-    },
-    {
-      title: "Thể Loại",
-      dataIndex: "category",
-      key: "category",
-      width: 150,
-      render: (category) => (
-        <div
-          style={{
-            backgroundColor: category.color || "#142857", // Background color for category
-            color: "#fff", // Text color
-            padding: "5px 10px",
-            borderRadius: "4px",
-            marginBottom: "5px",
-            marginRight: "5px",
-          }}
-        >
-          {category.name} {/* Display category name */}
-        </div>
-      ),
     },
     {
       title: "Action",
@@ -142,10 +126,6 @@ const Page: React.FC = () => {
             <Button onClick={handleRefresh}>
               <FaSync /> Làm mới
             </Button>
-            <PushButton
-              href="/dang_sang_lap/thu_dang_sang_lap/message_categories"
-              label={"Quản Lý Thể Loại"}
-            />
           </div>
 
           <PushButton
@@ -194,8 +174,12 @@ const Page: React.FC = () => {
             <FaArrowRight />
           </button>
         </div>
-        <Heading name="Quản lý hàng đợi duyệt thư đấng sáng lập" />
-        <MessageQueueList />
+        {userInfo?.role.name === "admin" ? (
+          <>
+            <Heading name="Quản lý hàng đợi duyệt thư đấng sáng lập" />
+            <MessageQueueList />
+          </>
+        ) : null}
       </div>
       <MessageDetailsDrawer
         open={isDrawerOpen}
@@ -206,6 +190,8 @@ const Page: React.FC = () => {
         open={isDrawerVisible}
         onClose={handleDrawerClose}
         document={selectedDoc} // Pass selected blog to EditBlogModal
+        loading={loading}
+        setLoading={setLoading} // Truyền state và hàm setLoading
       />
     </>
   );

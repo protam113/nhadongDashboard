@@ -167,6 +167,7 @@ const useCreateDoc = () => {
     },
     onError: (error) => {
       console.log(error.message || "Failed to create docs.");
+      window.location.reload();
     },
   });
 };
