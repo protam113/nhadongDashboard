@@ -7,6 +7,7 @@ import HistoryEditRichText from "@/components/main/history/HistoryEditRichText";
 import { HistoryMonasteryData } from "@/lib/historyMonasteryData";
 import { useUpdateHistory } from "@/hooks/history_monastery/useHistoryMonastery";
 import type { UploadFile } from "antd/es/upload/interface";
+import BackButton from "@/components/Button/BackButton";
 
 const Page = () => {
   const [form] = Form.useForm();
@@ -97,53 +98,59 @@ const Page = () => {
   if (isError || !data) return <div>Error loading queue data.</div>;
 
   return (
-    <Form form={form} layout="vertical">
-      <Form.Item label="Tiêu đề" help="Vui lòng nhập tiêu đề ">
-        <Input
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Nhập tiêu đề của bài viết"
-        />
-      </Form.Item>
+    <div>
+      {" "}
+      <BackButton />
+      <Form form={form} layout="vertical">
+        <Form.Item label="Tiêu đề" help="Vui lòng nhập tiêu đề ">
+          <Input
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            placeholder="Nhập tiêu đề của bài viết"
+          />
+        </Form.Item>
 
-      <Form.Item
-        label="Hình ảnh"
-        help="Tải lên hình ảnh với kích thước 820x500px để hiển thị tốt nhất"
-      >
-        <Upload
-          listType="picture-card"
-          fileList={fileList}
-          onChange={handleChange}
-          onPreview={handlePreview}
-          beforeUpload={() => false} // Ngăn tự động upload
+        <Form.Item
+          label="Hình ảnh"
+          help="Tải lên hình ảnh với kích thước 820x500px để hiển thị tốt nhất"
         >
-          {fileList.length < 1 && (
-            <div>
-              <UploadOutlined />
-              <p>Click để tải lên hình ảnh</p>
-            </div>
-          )}
-        </Upload>
-      </Form.Item>
+          <Upload
+            listType="picture-card"
+            fileList={fileList}
+            onChange={handleChange}
+            onPreview={handlePreview}
+            beforeUpload={() => false} // Ngăn tự động upload
+          >
+            {fileList.length < 1 && (
+              <div>
+                <UploadOutlined />
+                <p>Click để tải lên hình ảnh</p>
+              </div>
+            )}
+          </Upload>
+        </Form.Item>
 
-      <Form.Item label="Nội dung" help="Cung cấp nội dung">
-        <HistoryEditRichText
-          onChange={setAbout}
-          initialContent={initialContent}
-        />
-      </Form.Item>
+        <Form.Item label="Nội dung" help="Cung cấp nội dung">
+          <HistoryEditRichText
+            onChange={setAbout}
+            initialContent={initialContent}
+          />
+        </Form.Item>
 
-      <Form.Item>
-        <Button
-          type="primary"
-          onClick={handleSave}
-          disabled={about === initialContent && !title && fileList.length === 0}
-          block
-        >
-          Lưu thay đổi
-        </Button>
-      </Form.Item>
-    </Form>
+        <Form.Item>
+          <Button
+            type="primary"
+            onClick={handleSave}
+            disabled={
+              about === initialContent && !title && fileList.length === 0
+            }
+            block
+          >
+            Lưu thay đổi
+          </Button>
+        </Form.Item>
+      </Form>
+    </div>
   );
 };
 
