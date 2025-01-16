@@ -17,7 +17,7 @@ const Page = () => {
   const [title, setTitle] = useState<string>(""); // Tiêu đề
   const [fileList, setFileList] = useState<UploadFile[]>([]); // Danh sách ảnh upload
 
-  const [historyId] = useState<string>("ecb2b562-247c-430b-9147-2c42d77a5a87");
+  const [historyId] = useState<string>("53f26019-e428-4609-849d-1a523f794380");
   const { mutate } = useUpdateHistory();
   const model = "316132a6-b1ca-4071-8515-bc4fd077e638";
   const {
