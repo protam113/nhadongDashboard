@@ -40,7 +40,7 @@ const Page = () => {
         ]);
       }
     }
-  }, [data]);
+  }, [data, form]);
 
   const handlePreview = async (file: UploadFile) => {
     if (!file.url && !file.preview) {

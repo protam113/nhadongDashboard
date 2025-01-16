@@ -15,8 +15,10 @@ const Page = () => {
   const [fileList, setFileList] = useState<UploadFile[]>([]); // Danh sách ảnh upload
 
   const [historyId] = useState<string>("53f26019-e428-4609-849d-1a523f794380");
+  // 53f26019-e428-4609-849d-1a523f794380"
   const { mutate } = useUpdateHistory();
   const model = "316132a6-b1ca-4071-8515-bc4fd077e638";
+  // 316132a6-b1ca-4071-8515-bc4fd077e638
   const {
     queueData: data,
     isLoading,
@@ -40,7 +42,7 @@ const Page = () => {
         ]);
       }
     }
-  }, [data]);
+  }, [data, form]);
 
   const handlePreview = async (file: UploadFile) => {
     if (!file.url && !file.preview) {
