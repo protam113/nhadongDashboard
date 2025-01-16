@@ -12,9 +12,6 @@ import BackButton from "@/components/Button/BackButton";
 const Page = () => {
   const [form] = Form.useForm();
   const [refreshKey] = useState(0);
-  const [about, setAbout] = useState<string>(""); // Nội dung đã chỉnh sửa
-  const [initialContent, setInitialContent] = useState<string>(""); // Nội dung ban đầu
-  const [title, setTitle] = useState<string>(""); // Tiêu đề
   const [fileList, setFileList] = useState<UploadFile[]>([]); // Danh sách ảnh upload
 
   const [historyId] = useState<string>("6e11d70f-17ec-4027-a602-e2a1b9a76384");
@@ -28,8 +25,10 @@ const Page = () => {
 
   useEffect(() => {
     if (data) {
-      setInitialContent(data.about);
-      setTitle(data.title || "");
+      form.setFieldsValue({
+        title: data.title,
+        about: data.about,
+      });
       if (data.image) {
         setFileList([
           {
@@ -72,6 +71,10 @@ const Page = () => {
       message.warning("Không thể cập nhật bài viết!!.");
       return;
     }
+    if (data.title.length === 0) {
+      message.error("Vui lòng bổ sung tiêu đề!");
+      return;
+    }
 
     form
       .validateFields()
@@ -96,14 +99,13 @@ const Page = () => {
   return (
     <div>
       <BackButton />
-
       <Form form={form} layout="vertical">
-        <Form.Item label="Tiêu đề" help="Vui lòng nhập tiêu đề ">
-          <Input
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            placeholder="Nhập tiêu đề của bài viết"
-          />
+        <Form.Item
+          name="title"
+          label="Tiêu Đề"
+          rules={[{ required: true, message: "Hãy nhập tiêu đề" }]}
+        >
+          <Input placeholder="Nhập tiêu đề" />
         </Form.Item>
 
         <Form.Item
@@ -126,22 +128,19 @@ const Page = () => {
           </Upload>
         </Form.Item>
 
-        <Form.Item label="Nội dung" help="Cung cấp nội dung">
+        <Form.Item
+          name="about"
+          label="Nội dung"
+          rules={[{ required: true, message: "Hãy nhập nội dung" }]}
+        >
           <HistoryEditRichText
-            onChange={setAbout}
-            initialContent={initialContent}
+            onChange={(about) => form.setFieldValue("about", about)}
+            initialContent={data?.about}
           />
         </Form.Item>
 
         <Form.Item>
-          <Button
-            type="primary"
-            onClick={handleSave}
-            disabled={
-              about === initialContent && !title && fileList.length === 0
-            }
-            block
-          >
+          <Button type="primary" onClick={handleSave}>
             Lưu thay đổi
           </Button>
         </Form.Item>
