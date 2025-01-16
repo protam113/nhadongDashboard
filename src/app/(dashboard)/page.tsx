@@ -7,6 +7,7 @@ import { useUser } from "@/context/userProvider";
 
 const Home: React.FC = () => {
   const { userInfo } = useUser() || {};
+
   return (
     <div className="p-4">
       <div className="">

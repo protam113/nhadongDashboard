@@ -68,30 +68,26 @@ const Page = () => {
   };
 
   const handleSave = () => {
-    const image = fileList[0]?.url || fileList[0]?.response?.url || null;
-
-    // Chỉ gửi trường nào có thay đổi so với giá trị ban đầu
-    const updateHistory: any = {};
-
-    if (about !== initialContent) {
-      updateHistory.about = about; // Nếu nội dung thay đổi, thêm vào dữ liệu gửi
+    if (!data) {
+      message.warning("Không thể cập nhật bài viết!!.");
+      return;
     }
 
-    if (title !== data?.title) {
-      updateHistory.title = title; // Nếu tiêu đề thay đổi, thêm vào dữ liệu gửi
-    }
-
-    if (image !== data?.image) {
-      updateHistory.image = image; // Nếu hình ảnh thay đổi, thêm vào dữ liệu gửi
-    }
-
-    // Kiểm tra nếu có bất kỳ thay đổi nào và gửi
-    if (Object.keys(updateHistory).length > 0) {
-      mutate({
-        historyId: historyId,
-        updateHistory: updateHistory,
+    form
+      .validateFields()
+      .then((values) => {
+        const updateHistory: any = {
+          ...values,
+          image: fileList.map((file) => file.originFileObj || file.url),
+        };
+        mutate({
+          historyId: historyId,
+          updateHistory: updateHistory,
+        });
+      })
+      .catch((info) => {
+        console.error("Lỗi khi xác thực form:", info);
       });
-    }
   };
 
   if (isLoading) return <Spin size="large" />;
