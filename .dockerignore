@@ -2,3 +2,9 @@ node_modules
 .git
 .next
 *.md
+Dockerfile
+.dockerignore
+.next
+.next/static
+!next/standalone
+.git
