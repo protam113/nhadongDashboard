@@ -103,10 +103,8 @@ interface BannerList {
 
 
 export interface FetchBannerListResponse {
-  count: number;
-  next: string | null;
-  previous: string | null;
-  results: BannerList[];
+  data: BannerList[];
+
 }
 
 

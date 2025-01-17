@@ -73,33 +73,32 @@ const Page: React.FC = () => {
         <Option value="show">Hiện</Option>
         <Option value="hide">Ẩn</Option>
       </Select>
-
-      {/* Image Upload with Preview */}
-      <label className="block mb-2 font-medium text-gray-700">Ảnh</label>
-      <Tooltip title="Kích thước đề xuất: 2560x720">
-        <label className="block mb-2 font-medium text-gray-700">Ảnh</label>
-        <Upload
-          listType="picture-card"
-          fileList={fileList}
-          onPreview={handlePreview}
-          onChange={handleChange}
-          beforeUpload={() => false} // Ngăn tự động tải lên
-        >
-          {fileList.length >= 1 ? null : uploadButton}
-        </Upload>
-      </Tooltip>
-      {previewImage && (
-        <Image
-          alt="Xem Anh Trươc"
-          wrapperStyle={{ display: "none" }}
-          preview={{
-            visible: previewOpen,
-            onVisibleChange: (visible) => setPreviewOpen(visible),
-          }}
-          src={previewImage}
-        />
-      )}
-
+      <div className="mb-4">
+        {/* Image Upload with Preview */}
+        <Tooltip title="Kích thước đề xuất: 2560x720">
+          <label className="block mb-2 font-medium text-gray-700">Ảnh</label>
+          <Upload
+            listType="picture-card"
+            fileList={fileList}
+            onPreview={handlePreview}
+            onChange={handleChange}
+            beforeUpload={() => false} // Ngăn tự động tải lên
+          >
+            {fileList.length >= 1 ? null : uploadButton}
+          </Upload>
+        </Tooltip>
+        {previewImage && (
+          <Image
+            alt="Xem Anh Trươc"
+            wrapperStyle={{ display: "none" }}
+            preview={{
+              visible: previewOpen,
+              onVisibleChange: (visible) => setPreviewOpen(visible),
+            }}
+            src={previewImage}
+          />
+        )}
+      </div>
       {/* Submit Button */}
       <Button type="primary" onClick={handleSubmit} className="w-full">
         Thêm Banner{" "}

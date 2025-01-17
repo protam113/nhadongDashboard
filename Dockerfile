@@ -1,10 +1,12 @@
 # Stage 1: Build stage
-FROM node:20-slim AS builder
+FROM node:20-slim AS base
+
+FROM base AS builder
 
 WORKDIR /app
 
 # Copy package files
-COPY package*.json ./
+COPY package*.json package-lock.json* ./
 
 # Cài đặt tất cả dependencies (bao gồm devDependencies) để build
 RUN npm ci

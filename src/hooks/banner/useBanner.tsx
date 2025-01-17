@@ -19,23 +19,26 @@ import { message } from "antd";
 
 const fetchBannerList = async (
   filters: Filters,
-  pageParam: number = 1,
   token: string
 ): Promise<FetchBannerListResponse> => {
   try {
-    // Filter out undefined or empty values from filters
+    // Filter out undefined, null, or empty values from filters
     const validFilters = Object.fromEntries(
       Object.entries(filters).filter(
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        ([, value]) => value !== undefined && value !== "" && value !== null
+        ([, value]) => value !== undefined && value !== null && value !== ""
       )
     );
 
-    // Construct the query string
-    const queryString = new URLSearchParams({
-      page: pageParam.toString(),
-      ...validFilters, // Merge the valid filters into the query string
-    }).toString();
+    // Convert filter values to strings and handle arrays by converting them to comma-separated strings
+    const queryString = new URLSearchParams(
+      Object.entries(validFilters).map(([key, value]) => {
+        if (Array.isArray(value)) {
+          // If the value is an array, join it into a string with commas
+          return [key, value.join(",")];
+        }
+        return [key, String(value)];
+      })
+    ).toString();
 
     // Make the API request using handleAPI
     const response = await handleAPI(
@@ -44,15 +47,16 @@ const fetchBannerList = async (
       null,
       token
     );
+
     return response;
   } catch (error) {
-    console.error("Error fetching document list:", error);
-    throw error; // Rethrow error for further handling
+    console.error("Error fetching banner list:", error);
+    throw error; // Rethrow the error for further handling
   }
 };
 
 // Custom hook for fetching the queue list
-const useBanner = (page: number, filters: Filters = {}, refreshKey: number) => {
+const useBanner = (filters: Filters = {}, refreshKey: number) => {
   const { getToken } = useAuth();
   const [token, setToken] = useState<string | null>(null);
 
@@ -66,12 +70,12 @@ const useBanner = (page: number, filters: Filters = {}, refreshKey: number) => {
   }, [getToken]);
 
   return useQuery<FetchBannerListResponse, Error>({
-    queryKey: ["bannerList", filters, page, token, refreshKey],
+    queryKey: ["bannerList", filters, token, refreshKey],
     queryFn: async () => {
       if (!token) {
         throw new Error("Token is not available");
       }
-      return fetchBannerList(filters, page, token);
+      return fetchBannerList(filters, token);
     },
 
     staleTime: 60000,
