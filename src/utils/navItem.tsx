@@ -5,7 +5,7 @@ import {
   MdManageSearch,
   MdOutlineAdminPanelSettings,
 } from "react-icons/md";
-import { FaNewspaper, FaFileAlt, FaChurch } from "react-icons/fa";
+import { FaNewspaper, FaFileAlt, FaChurch, FaEyeDropper } from "react-icons/fa";
 import { HiUserGroup } from "react-icons/hi2";
 import { SlNotebook, SlCalender } from "react-icons/sl";
 import { BiCategory } from "react-icons/bi";
@@ -13,8 +13,6 @@ import { HiOutlineNewspaper } from "react-icons/hi";
 import { RiCommunityLine } from "react-icons/ri";
 import { BiDonateHeart } from "@/lib/iconLib";
 import { RiCommunityFill } from "react-icons/ri";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBullseye } from "@fortawesome/free-solid-svg-icons";
 import { IoDocumentsSharp } from "react-icons/io5";
 
 // 35
@@ -148,7 +146,7 @@ export const NavItems = () => {
       name: "Sứ Vụ",
       link: "/missio",
       key: "18",
-      icon: <FontAwesomeIcon icon={faBullseye} />,
+      icon: <FaEyeDropper />,
       children: [
         {
           name: "Thể loại",

@@ -2,10 +2,10 @@
 
 import React, { useState, useRef } from "react";
 import { HistoryMonasteryData } from "@/lib/historyMonasteryData";
-import { ClipLoader } from "react-spinners";
 import Image from "next/image";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { TextParallaxContentProps, OverlayCopyProps } from "@/types/types";
+import { Spin } from "antd";
 
 const History = ({ data }: { data: any }) => {
   return (
@@ -31,7 +31,7 @@ export const HistoryContent = ({ category }: { category: string }) => {
   if (isLoading)
     return (
       <div className="text-center">
-        <ClipLoader size="20" loading={isLoading} />
+        <Spin />
       </div>
     );
   if (isError || !data) return <div>Error loading queue data.{isError}</div>;

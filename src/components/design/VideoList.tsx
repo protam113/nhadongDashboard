@@ -1,10 +1,9 @@
 "use client";
 
 import React, { useState } from "react";
-import { ClipLoader } from "react-spinners";
 import { useDeleteVideo, useVideoList } from "@/hooks/video/useVideo";
 import Image from "next/image";
-import { Modal, Button } from "antd";
+import { Modal, Button, Spin } from "antd";
 import { FaRegEdit, FaTrashAlt } from "@/lib/iconLib";
 import EditVideo from "@/app/(dashboard)/thu_vien_video/EditVideo";
 
@@ -48,7 +47,7 @@ const VideoGallery = () => {
   if (isLoading)
     return (
       <div className="text-center">
-        <ClipLoader size="20" loading={isLoading} />
+        <Spin />
       </div>
     );
 

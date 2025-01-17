@@ -1,9 +1,8 @@
 "use client";
 
 import React, { useState } from "react";
-import { Image } from "antd";
+import { Image, Spin } from "antd";
 import { FaArrowLeft, FaArrowRight } from "@/lib/iconLib";
-import { ClipLoader } from "react-spinners";
 import { GaleryList } from "@/lib/galeryList";
 
 const BlogsGallery = () => {
@@ -33,7 +32,7 @@ const BlogsGallery = () => {
   if (isLoading)
     return (
       <div className="text-center">
-        <ClipLoader loading={isLoading} />
+        <Spin />
       </div>
     );
   return (
