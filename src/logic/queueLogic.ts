@@ -34,5 +34,6 @@ export const useQueueManagement = (currentPage: number, type: string, refreshKey
         browseQueue(browseManager);
     };
 
-    return { queueData,next:data?.next, isLoading, isError, handleBulkUpdate, handleStatusChange };
+    return { queueData,next:data?.next,        count: data?.count,
+ isLoading, isError, handleBulkUpdate, handleStatusChange };
 };

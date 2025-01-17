@@ -5,8 +5,8 @@ import { Table, Button, Spin, Select } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { useQueueManagement } from "@/logic/queueLogic";
 import { ReloadOutlined } from "@ant-design/icons";
-import { FaArrowLeft, FaArrowRight } from "@/lib/iconLib";
 import { SpinLoading, Error, Heading } from "@/components/design/index";
+import Pagination from "@/components/Pagination";
 
 const { Option } = Select;
 
@@ -18,8 +18,14 @@ const Queue: React.FC = () => {
   const [type, setType] = useState<string>("");
   const [isExpanded, setIsExpanded] = useState(false);
 
-  const { queueData, next, isLoading, isError, handleBulkUpdate } =
-    useQueueManagement(currentPage, type, refreshKey);
+  const {
+    queueData,
+    next,
+    isLoading,
+    isError,
+    handleBulkUpdate,
+    count = 0,
+  } = useQueueManagement(currentPage, type, refreshKey);
   const totalPages = next ? currentPage + 1 : currentPage;
 
   const handleRefresh = () => {
@@ -221,37 +227,13 @@ const Queue: React.FC = () => {
           }}
         />
       </div>
-      <div className="flex justify-center mt-8 items-center space-x-2">
-        <button
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
-          className={`flex items-center justify-center w-6 h-6 text-10 bg-gray-200 rounded-full hover:bg-gray-300 ${
-            currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
-          }`}
-        >
-          <FaArrowLeft />
-        </button>
-        {Array.from({ length: totalPages }, (_, i) => (
-          <button
-            key={i}
-            onClick={() => setCurrentPage(i + 1)}
-            className={`w-6 h-6 text-10 rounded-full hover:bg-gray-300 ${
-              currentPage === i + 1 ? "bg-blue-500 text-white" : "bg-gray-200"
-            }`}
-          >
-            {i + 1}
-          </button>
-        ))}
-        <button
-          onClick={() => setCurrentPage((prev) => prev + 1)}
-          disabled={!next}
-          className={`flex items-center justify-center w-6 h-6 text-10 bg-gray-200 rounded-full hover:bg-gray-300 ${
-            !next ? "opacity-50 cursor-not-allowed" : ""
-          }`}
-        >
-          <FaArrowRight />
-        </button>
-      </div>
+      {count > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={setCurrentPage}
+        />
+      )}
     </div>
   );
 };

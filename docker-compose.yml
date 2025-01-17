@@ -1,0 +1,24 @@
+version: "3.8"
+
+services:
+  nextjs-app:
+    container_name: dashboard  # Tên container
+    build:
+      context: .  # Thư mục chứa Dockerfile
+      dockerfile: Dockerfile  # Tên Dockerfile
+    ports:
+      - "4000:4000"  # Map cổng 4000 của container với cổng 4000 trên host
+    environment:
+      - NODE_ENV=production  # Đặt môi trường production
+      - NEXT_TELEMETRY_DISABLED=1  # Tắt telemetry của Next.js
+      - PORT=4000  # Cổng cho ứng dụng Next.js
+    volumes:
+      - .:/app  # Mount mã nguồn (chỉ dùng trong dev)
+      - /app/node_modules  # Tránh ghi đè node_modules
+      - /app/.next  # Đảm bảo thư mục build không bị ghi đè
+    networks:
+      - app-network  # Kết nối container với mạng riêng
+
+networks:
+  app-network:
+    driver: bridge  # Sử dụng driver mặc định

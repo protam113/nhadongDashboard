@@ -105,6 +105,10 @@ const endpoints = {
      //video
      videos: process.env.NEXT_PUBLIC_VIDEOS,
      video: process.env.NEXT_PUBLIC_VIDEO,
+
+     //banner
+     banners: process.env.NEXT_PUBLIC_BANNERS,
+     banner: process.env.NEXT_PUBLIC_BANNER
 };
 
 export { baseURL, endpoints };

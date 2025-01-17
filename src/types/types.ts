@@ -86,6 +86,30 @@ export interface FetchGaleryListResponse {
   results: GaleryList[];
 }
 
+export interface BannerEdit {
+  visibility:string,
+  image: File | string | null;
+}
+export interface BannerCreate {
+  image: File | string | null; 
+  visibility:string,
+}
+
+interface BannerList {
+  id: string;
+  image: string;
+  visibility:string,
+}
+
+
+export interface FetchBannerListResponse {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: BannerList[];
+}
+
+
 
 export interface SectionField {
     type: 'title' | 'description' | 'content' | 'link';

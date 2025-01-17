@@ -9,14 +9,9 @@ import { EyeOutlined } from "@ant-design/icons";
 import EditBlogModal from "@/app/(dashboard)/blog/blog_management/modal/EditBlogModal";
 import { useDeleteBlog } from "@/hooks/blog/useBlog";
 import PushButton from "@/components/Button/PushButton";
-import {
-  FaArrowLeft,
-  FaArrowRight,
-  FaSync,
-  FaRegEdit,
-  MdOutlineDelete,
-} from "@/lib/iconLib";
+import { FaSync, FaRegEdit, MdOutlineDelete } from "@/lib/iconLib";
 import { SpinLoading, Error, Heading } from "@/components/design/index";
+import Pagination from "@/components/Pagination";
 
 const BlogManagement: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -35,11 +30,13 @@ const BlogManagement: React.FC = () => {
   };
 
   // Pass model into CategoriesList
-  const { queueData, next, isLoading, isError } = BlogList(
-    currentPage,
-    category,
-    refreshKey
-  );
+  const {
+    queueData,
+    next,
+    isLoading,
+    isError,
+    count = 0,
+  } = BlogList(currentPage, category, refreshKey);
   const totalPages = next ? currentPage + 1 : currentPage;
 
   const handleDelete = (categoryId: string) => {
@@ -183,37 +180,13 @@ const BlogManagement: React.FC = () => {
             scroll={{ y: 500 }}
           />
         </div>
-        <div className="flex justify-center mt-8 items-center space-x-2">
-          <button
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-            className={`flex items-center justify-center w-6 h-6 text-10 bg-gray-200 rounded-full hover:bg-gray-300 ${
-              currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-          >
-            <FaArrowLeft />
-          </button>
-          {Array.from({ length: totalPages }, (_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrentPage(i + 1)}
-              className={`w-6 h-6 text-10 rounded-full hover:bg-gray-300 ${
-                currentPage === i + 1 ? "bg-blue-500 text-white" : "bg-gray-200"
-              }`}
-            >
-              {i + 1}
-            </button>
-          ))}
-          <button
-            onClick={() => setCurrentPage((prev) => prev + 1)}
-            disabled={!next}
-            className={`flex items-center justify-center w-6 h-6 text-10 bg-gray-200 rounded-full hover:bg-gray-300 ${
-              !next ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-          >
-            <FaArrowRight />
-          </button>
-        </div>
+        {count > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        )}
       </div>
       <BlogDetailsModal
         open={isDrawerOpen}

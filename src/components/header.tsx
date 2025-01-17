@@ -49,6 +49,10 @@ const DropdownMenu: React.FC = () => {
             label: <a href="/statical">Thống Kê</a>,
             key: "4",
           },
+          {
+            label: <a href="/banner">Banner</a>,
+            key: "5",
+          },
         ]
       : []),
     {

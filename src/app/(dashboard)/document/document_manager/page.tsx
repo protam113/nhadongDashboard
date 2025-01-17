@@ -8,17 +8,12 @@ import { DocsList } from "@/lib/docslist";
 import Link from "next/link";
 import { CategoriesList } from "@/lib/categoriesList";
 import BackButton from "@/components/Button/BackButton";
-import {
-  FaArrowLeft,
-  FaArrowRight,
-  FaSync,
-  MdOutlineDelete,
-  FaRegEdit,
-} from "@/lib/iconLib";
+import { FaSync, MdOutlineDelete, FaRegEdit } from "@/lib/iconLib";
 import { useDeleteDoc } from "@/hooks/document/useDocs";
 import { SpinLoading, Error, Heading } from "@/components/design/index";
 import DocsDetailsModal from "../DocumentDetailModal";
 import EditDocumentModal from "../modal/EditDocumentDrawer";
+import Pagination from "@/components/Pagination";
 
 const { Option } = Select;
 
@@ -39,6 +34,7 @@ const Page: React.FC = () => {
     next,
     isLoading: isDocumentLoad,
     isError: isDocumentError,
+    count = 0,
   } = DocsList(currentPage, model, refreshKey);
   const {
     queueData: category,
@@ -225,37 +221,13 @@ const Page: React.FC = () => {
             }}
           />
         </div>
-        <div className="flex justify-center mt-8 items-center space-x-2">
-          <button
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-            className={`flex items-center justify-center w-6 h-6 text-10 bg-gray-200 rounded-full hover:bg-gray-300 ${
-              currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-          >
-            <FaArrowLeft />
-          </button>
-          {Array.from({ length: totalPages }, (_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrentPage(i + 1)}
-              className={`w-6 h-6 text-10 rounded-full hover:bg-gray-300 ${
-                currentPage === i + 1 ? "bg-blue-500 text-white" : "bg-gray-200"
-              }`}
-            >
-              {i + 1}
-            </button>
-          ))}
-          <button
-            onClick={() => setCurrentPage((prev) => prev + 1)}
-            disabled={!next}
-            className={`flex items-center justify-center w-6 h-6 text-10 bg-gray-200 rounded-full hover:bg-gray-300 ${
-              !next ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-          >
-            <FaArrowRight />
-          </button>
-        </div>
+        {count > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        )}
       </div>
       <DocsDetailsModal
         visible={isModalVisible}
