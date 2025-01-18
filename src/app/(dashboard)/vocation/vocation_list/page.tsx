@@ -3,10 +3,13 @@
 import React, { useState } from "react";
 import { Table, Button, Spin, Select, message, Checkbox } from "antd";
 import type { ColumnsType } from "antd/es/table";
-import { FaSync } from "@/lib/iconLib";
+import { FaSync, MdOutlineDelete } from "@/lib/iconLib";
 import Heading from "@/components/design/Heading";
 import { VocationList } from "@/lib/vocationList";
-import { useUpdateVocation } from "@/hooks/vocation/useVocation";
+import {
+  useDeleteVocation,
+  useUpdateVocation,
+} from "@/hooks/vocation/useVocation";
 import Pagination from "@/components/Pagination";
 
 const Page: React.FC = () => {
@@ -16,6 +19,7 @@ const Page: React.FC = () => {
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]); // Đảm bảo selectedKeys là mảng string[]
 
   const { mutate } = useUpdateVocation();
+  const { mutate: deleteVocation } = useDeleteVocation();
 
   // Pass model into CategoriesList
   const {
@@ -82,6 +86,32 @@ const Page: React.FC = () => {
     } catch (error) {
       console.error("Error rejecting selected registrations:", error);
       message.error("Có lỗi xảy ra khi từ chối!");
+    }
+  };
+
+  const handleDelete = async () => {
+    const selectedData = queueData.filter(
+      (item) => selectedKeys.includes(String(item.id)) // Kiểm tra nếu item.id tồn tại trong selectedKeys
+    );
+
+    // Kiểm tra nếu không có dữ liệu nào được chọn
+    if (selectedData.length === 0) {
+      message.warning("Không có id nào được chọn!");
+      return;
+    }
+
+    try {
+      // Phê duyệt các mục đã chọn
+      await Promise.all(
+        selectedData.map((item) =>
+          deleteVocation({
+            id: [item.id.toString()], // Đảm bảo rằng item.id là chuỗi và bao bọc trong mảng
+          })
+        )
+      );
+    } catch (error) {
+      console.error("Error approving selected registrations:", error);
+      message.error("Có lỗi xảy ra khi phê duyệt!");
     }
   };
 
@@ -177,6 +207,19 @@ const Page: React.FC = () => {
         />
       ),
     },
+    {
+      title: "Action",
+      dataIndex: "action",
+      key: "action",
+      width: 100,
+      render: () => (
+        <>
+          <Button danger onClick={handleDelete} style={{ marginRight: "8px" }}>
+            <MdOutlineDelete className="text-albert-error" />
+          </Button>
+        </>
+      ),
+    },
   ];
 
   if (isLoading) {
@@ -232,6 +275,16 @@ const Page: React.FC = () => {
             >
               Từ Chối
             </Button>
+            <div className="flex space-x-4">
+              <Button
+                type="primary"
+                danger
+                onClick={handleDelete}
+                style={{ marginBottom: "16px" }}
+              >
+                Xóa đã chọn
+              </Button>
+            </div>
           </div>
 
           <div className="flex items-center space-x-4">

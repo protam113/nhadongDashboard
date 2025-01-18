@@ -18,7 +18,7 @@ const Page: React.FC = () => {
         </div>
 
         <ShowBanner />
-        <Heading name="Quản Lý Ẩn" />
+        <Heading name="Quản Lý Banner Ẩn" />
 
         <HideBanner />
       </div>

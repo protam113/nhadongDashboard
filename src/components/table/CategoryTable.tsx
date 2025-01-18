@@ -6,18 +6,18 @@ import type { ColumnsType } from "antd/es/table";
 import { CategoriesList } from "@/lib/categoriesList";
 import { useDeleteCategory } from "@/hooks/cateogry/useCategories";
 import EditBlogCategory from "@/app/(dashboard)/blog/blog_categories/EditBlogCategory";
-import CreateDocsCategoryModal from "./modal/CreateDocsCategoryModal";
-import {
-  FaArrowLeft,
-  FaArrowRight,
-  MdOutlineDelete,
-  FaRegEdit,
-  FaSync,
-} from "@/lib/iconLib";
+import { FaRegEdit, MdOutlineDelete, FaSync } from "@/lib/iconLib";
 import { SpinLoading, Error, Heading } from "@/components/design/index";
+import Pagination from "../Pagination";
+import CreateBlogCategory from "@/app/(dashboard)/blog/blog_categories/CreateBlogCategory";
 
-const DocumentCategoriesTable: React.FC = () => {
-  const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
+const CategoryListTable = ({
+  model,
+  title,
+}: {
+  model: string;
+  title: string;
+}) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [refreshKey, setRefreshKey] = useState(0);
   const [isCreateModalVisible, setIsCreateModalVisible] = useState(false); // For creating category
@@ -27,12 +27,13 @@ const DocumentCategoriesTable: React.FC = () => {
 
   const { mutate: deleteCategory } = useDeleteCategory();
 
-  const { queueData, next, isLoading, isError } = CategoriesList(
-    currentPage,
-    "document",
-    refreshKey
-  );
-
+  const {
+    queueData,
+    next,
+    isLoading,
+    isError,
+    count = 0,
+  } = CategoriesList(currentPage, model, refreshKey);
   const totalPages = next ? currentPage + 1 : currentPage;
 
   const handleDelete = (categoryId: string) => {
@@ -46,6 +47,11 @@ const DocumentCategoriesTable: React.FC = () => {
         deleteCategory(categoryId);
       },
     });
+  };
+
+  // Handle loading change
+  const handleLoadingChange = (isLoading: boolean) => {
+    setIsCreateLoading(isLoading);
   };
 
   const handleEdit = (editCategory: any) => {
@@ -63,7 +69,7 @@ const DocumentCategoriesTable: React.FC = () => {
       dataIndex: "id",
       key: "id",
       width: 80,
-      render: (_, __, index) => <span>{index + 1}</span>, // Dynamically assign the ID based on index
+      render: (_, __, index) => <span>{index + 1}</span>, // index + 1
     },
     {
       title: "Tên Thể Loại",
@@ -118,7 +124,7 @@ const DocumentCategoriesTable: React.FC = () => {
   };
 
   const handleCreateCategory = () => {
-    setIsCreateModalVisible(true); // Show the modal when "Create Category" is clicked
+    setIsCreateModalVisible(true);
   };
 
   const handleCancelCreateModal = () => {
@@ -130,14 +136,10 @@ const DocumentCategoriesTable: React.FC = () => {
     setEditingCategory(null); // Reset editing category
   };
 
-  const handleLoadingChange = (isLoading: boolean) => {
-    setIsCreateLoading(isLoading);
-  };
-
   return (
     <>
       <div className="p-4">
-        <Heading name="Quản Lý Thể Loại Tài Liệu (Document)" />
+        <Heading name={`quản lý thể loại ${title}`} />
 
         <div className="flex justify-between items-center mb-4">
           <Button onClick={handleRefresh}>
@@ -159,44 +161,15 @@ const DocumentCategoriesTable: React.FC = () => {
             rowKey="id"
             pagination={false}
             scroll={{ y: 500 }}
-            rowSelection={{
-              selectedRowKeys: selectedKeys,
-              onChange: (selectedRowKeys) =>
-                setSelectedKeys(selectedRowKeys as number[]),
-            }}
           />
         </div>
-        <div className="flex justify-center mt-8 items-center space-x-2">
-          <button
-            onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-            disabled={currentPage === 1}
-            className={`flex items-center justify-center w-6 h-6 text-10 bg-gray-200 rounded-full hover:bg-gray-300 ${
-              currentPage === 1 ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-          >
-            <FaArrowLeft />
-          </button>
-          {Array.from({ length: totalPages }, (_, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrentPage(i + 1)}
-              className={`w-6 h-6 text-10 rounded-full hover:bg-gray-300 ${
-                currentPage === i + 1 ? "bg-blue-500 text-white" : "bg-gray-200"
-              }`}
-            >
-              {i + 1}
-            </button>
-          ))}
-          <button
-            onClick={() => setCurrentPage((prev) => prev + 1)}
-            disabled={!next}
-            className={`flex items-center justify-center w-6 h-6 text-10 bg-gray-200 rounded-full hover:bg-gray-300 ${
-              !next ? "opacity-50 cursor-not-allowed" : ""
-            }`}
-          >
-            <FaArrowRight />
-          </button>
-        </div>
+        {count > 0 && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+          />
+        )}
       </div>
 
       {/* Modal tạo thể loại */}
@@ -207,12 +180,13 @@ const DocumentCategoriesTable: React.FC = () => {
         footer={null}
         width={600}
       >
-        <CreateDocsCategoryModal onLoadingChange={handleLoadingChange} />{" "}
-        {/* Render CreateBlogCategory form */}
+        <CreateBlogCategory
+          onLoadingChange={handleLoadingChange}
+          model={model}
+        />
       </Modal>
 
       {/* Modal sửa thể loại */}
-
       <Modal
         title="Sửa Thể Loại"
         visible={isEditModalVisible}
@@ -221,10 +195,10 @@ const DocumentCategoriesTable: React.FC = () => {
         width={600}
       >
         <EditBlogCategory category={editingCategory} />{" "}
-        {/* Render CreateBlogCategory form */}
+        {/* Hiển thị thông tin thể loại */}
       </Modal>
     </>
   );
 };
 
-export default DocumentCategoriesTable;
+export default CategoryListTable;

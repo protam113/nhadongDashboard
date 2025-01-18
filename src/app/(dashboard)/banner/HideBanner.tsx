@@ -75,10 +75,10 @@ const HideBanner: React.FC = () => {
       render: (text, index) => (
         <Image
           alt={`Image ${index + 1}`}
-          src={text} // Sử dụng dữ liệu từ dataIndex "image"
-          width={600} // Chiều rộng
-          height={300} // Chiều cao
-          className="object-cover" // Đảm bảo tỷ lệ cắt hình ảnh
+          src={text}
+          width="100%"
+          height="100%"
+          className="object-cover"
         />
       ),
     },
@@ -86,9 +86,20 @@ const HideBanner: React.FC = () => {
       title: "Trạng Thái",
       dataIndex: "visibility",
       key: "visibility",
-      width: 400,
-      render: (text) => <span>{text}</span>,
+      width: 100,
+      render: (text) => (
+        <span
+          className={`px-2 py-1 rounded-full ${
+            text === "show"
+              ? "bg-green-500 text-white"
+              : "bg-red-500 text-white"
+          }`}
+        >
+          {text}
+        </span>
+      ),
     },
+
     {
       title: "Action",
       dataIndex: "action",

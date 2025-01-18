@@ -5,21 +5,21 @@ import { Table, Button, Modal, Spin } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { EyeOutlined } from "@ant-design/icons";
 import { MissionList } from "@/lib/missionList";
-import MissionQueueList from "./MissionQueueList";
 import PushButton from "@/components/Button/PushButton";
 import { useDeleteMission } from "@/hooks/mission/useMission";
-import MissioDetailsDrawer from "./missioDetailModal";
 import { FaRegEdit, FaSync, MdOutlineDelete } from "@/lib/iconLib";
 import EditMissionModal from "./drawer/EditMission";
 import { SpinLoading, Error, Heading } from "@/components/design/index";
 import { useUser } from "@/context/userProvider";
 import Pagination from "@/components/Pagination";
+import DocumentQueueList from "../document/DocumentQueueTable";
+import DocsDetailsModal from "../document/DocumentDetailModal";
 
 const Page: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [refreshKey, setRefreshKey] = useState(0); // State to refresh data
   const [selectedBlog, setSelectedBlog] = useState(null); // State for selected blog
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
   const { mutate } = useDeleteMission();
   const [selectedDoc, setSelectedDoc] = useState(null);
   const [isDrawerVisible, setIsDrawerVisible] = useState(false);
@@ -140,11 +140,11 @@ const Page: React.FC = () => {
 
   const handleViewDetails = (blog: any) => {
     setSelectedBlog(blog);
-    setIsDrawerOpen(true);
+    setIsModalVisible(true);
   };
 
   const handleDrawerClose = () => {
-    setIsDrawerOpen(false);
+    setIsModalVisible(false);
     setSelectedBlog(null);
     setIsDrawerVisible(false); // Close the drawer
   };
@@ -185,14 +185,14 @@ const Page: React.FC = () => {
         {userInfo?.role.name === "admin" ? (
           <>
             <Heading name="Quản lý hàng đợi duyệt bài viết" />
-            <MissionQueueList />
+            <DocumentQueueList model="mission" />
           </>
         ) : null}
       </div>
-      <MissioDetailsDrawer
-        open={isDrawerOpen}
+      <DocsDetailsModal
+        visible={isModalVisible}
         onClose={handleDrawerClose}
-        blog={selectedBlog}
+        doc={selectedBlog}
       />
       <EditMissionModal
         open={isDrawerVisible}

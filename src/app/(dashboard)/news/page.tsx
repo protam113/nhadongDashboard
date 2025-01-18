@@ -5,12 +5,12 @@ import { Table, Button, Tag } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { EyeOutlined } from "@ant-design/icons";
 import { NewsList } from "@/lib/newsList";
-import NewsQueueList from "@/app/(dashboard)/news/NewsQueueTable";
-import NewsDetailsModal from "@/app/(dashboard)/news/NewsDetailsModal";
 import { FaSync } from "@/lib/iconLib";
 import { SpinLoading, Error, Heading } from "@/components/design/index";
 import { useUser } from "@/context/userProvider";
 import Pagination from "@/components/Pagination";
+import TableQueueList from "../blog/BlogQueueTable";
+import BlogDetailsDrawer from "../blog/BlogDetailsModal";
 
 const News: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -132,11 +132,11 @@ const News: React.FC = () => {
         {userInfo?.role.name === "admin" ? (
           <>
             <Heading name="Quản lý hàng đợi duyệt bài viết" />
-            <NewsQueueList />
+            <TableQueueList model="news" />
           </>
         ) : null}
       </div>
-      <NewsDetailsModal
+      <BlogDetailsDrawer
         open={isDrawerOpen}
         onClose={handleModalClose}
         blog={selectedNews}

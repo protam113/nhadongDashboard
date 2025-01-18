@@ -5,10 +5,6 @@ const nextConfig = {
   images: {
     domains: ["hcm03.vstorage.vngcloud.vn"], // Thêm domain tại đây
   },
-  experimental: {
-    // Optional: if you're using app directory
-    appDir: true,
-  },
 };
 
 export default nextConfig;

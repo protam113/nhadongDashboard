@@ -25,7 +25,6 @@ const ShowBanner: React.FC = () => {
   const { data, isLoading, isError } = useBanner(filters, refreshKey);
 
   const queueData: Banner[] = Array.isArray(data) ? data : [];
-  console.log("🚀 ~ queueData:", queueData);
 
   const { mutate } = useDeleteBanner();
   const [isEditModalVisible, setIsEditModalVisible] = useState(false); // For editing category
@@ -76,19 +75,31 @@ const ShowBanner: React.FC = () => {
         <Image
           alt={`Image ${index + 1}`}
           src={text} // Sử dụng dữ liệu từ dataIndex "image"
-          width={600} // Chiều rộng
-          height={300} // Chiều cao
-          className="object-cover" // Đảm bảo tỷ lệ cắt hình ảnh
+          width="100%" // Chiều rộng 100%
+          height="100%" // Chiều cao 100%
+          className="object-cover" // Đảm bảo tỷ lệ cắt hình ảnh và fill đầy không gian
         />
       ),
     },
+
     {
       title: "Trạng Thái",
       dataIndex: "visibility",
       key: "visibility",
-      width: 400,
-      render: (text) => <span>{text}</span>,
+      width: 100,
+      render: (text) => (
+        <span
+          className={`px-2 py-1 rounded-full ${
+            text === "show"
+              ? "bg-green-500 text-white"
+              : "bg-red-500 text-white"
+          }`}
+        >
+          {text}
+        </span>
+      ),
     },
+
     {
       title: "Action",
       dataIndex: "action",

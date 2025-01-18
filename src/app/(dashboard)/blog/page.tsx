@@ -6,10 +6,10 @@ import type { ColumnsType } from "antd/es/table";
 import { BlogList } from "@/lib/blogList";
 import BlogDetailsModal from "@/app/(dashboard)/blog/BlogDetailsModal";
 import { EyeOutlined } from "@ant-design/icons";
-import BlogQueueList from "@/app/(dashboard)/blog/BlogQueueTable";
 import { FaArrowLeft, FaArrowRight, FaSync } from "@/lib/iconLib";
 import { Error, Heading } from "@/components/design/index";
 import { useUser } from "@/context/userProvider";
+import TableQueueList from "@/app/(dashboard)/blog/BlogQueueTable";
 
 const Blogs: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -153,7 +153,7 @@ const Blogs: React.FC = () => {
         {userInfo?.role.name === "admin" ? (
           <>
             <Heading name="Quản lý hàng đợi duyệt bài viết" />
-            <BlogQueueList />
+            <TableQueueList model="blog" />
           </>
         ) : null}
       </div>

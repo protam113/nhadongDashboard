@@ -7,7 +7,8 @@ import { RcFile } from "antd/lib/upload";
 
 const CreateBlogCategory: React.FC<{
   onLoadingChange: (isLoading: boolean, progress: number) => void;
-}> = ({ onLoadingChange }) => {
+  model: string; // Thêm định nghĩa cho prop model
+}> = ({ onLoadingChange, model }) => {
   const { mutate: createCategory } = useCreateCategory();
   const [name, setName] = useState<string>("");
   const [imageList, setImageList] = useState<UploadFile[]>([]);
@@ -35,7 +36,7 @@ const CreateBlogCategory: React.FC<{
 
       await new Promise((resolve, reject) => {
         createCategory(
-          { name, model: "blog", image: imageList[0]?.originFileObj ?? null },
+          { name, model: model, image: imageList[0]?.originFileObj ?? null },
           {
             onSuccess: resolve,
             onError: reject,

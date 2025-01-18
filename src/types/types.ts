@@ -158,6 +158,10 @@ export interface UpdateVocation {
   id: string[];
 }
 
+export interface DeleteVocationForm {
+  id: string[];
+}
+
 interface MediaVideoList {
   id: string;
   content: string;

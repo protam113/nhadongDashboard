@@ -10,6 +10,7 @@ import {
   UpdateVocation,
   VocationRegisterListResponse,
   Filters,
+  DeleteVocationForm,
 } from "@/types/types";
 
 const fetchVocationList = async (
@@ -146,4 +147,70 @@ const useUpdateVocation = () => {
   });
 };
 
-export { useVocationList, useUpdateVocation };
+const DeleteVocation = async (
+  deleteVocation: DeleteVocationForm,
+  token: string
+) => {
+  const formData = new FormData();
+
+  // Duyệt qua các key trong deleteVocation
+  for (const key in deleteVocation) {
+    const value = deleteVocation[key as keyof DeleteVocationForm];
+
+    if (key === "id" && Array.isArray(value)) {
+      value.forEach((id) => formData.append("id", id)); // Thêm từng phần tử từ mảng
+    } else if (typeof value === "string") {
+      formData.append(key, value); // Chỉ thêm nếu value là chuỗi
+    }
+  }
+
+  // Kiểm tra token
+  if (!token) throw new Error("No token available");
+
+  try {
+    const response = await handleAPI(
+      `${endpoints.vocation}`, // Đường dẫn API
+      "DELETE", // Phương thức DELETE
+      formData, // Gửi formData
+      token // Token để xác thực
+    );
+    return response.data; // Trả về dữ liệu nếu thành công
+  } catch (error: any) {
+    console.error("Error deleting vocation:", error.response?.data);
+    throw new Error(
+      error.response?.data?.message || "Failed to delete vocation"
+    );
+  }
+};
+
+const useDeleteVocation = () => {
+  const queryClient = useQueryClient();
+  const { getToken } = useAuth();
+  const [token, setToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchToken = async () => {
+      const userToken = await getToken();
+      setToken(userToken);
+    };
+
+    fetchToken();
+  }, [getToken]);
+
+  return useMutation({
+    mutationFn: async (deleteVocation: DeleteVocationForm) => {
+      if (!token) {
+        throw new Error("Token is not available");
+      }
+      return DeleteVocation(deleteVocation, token);
+    },
+    onSuccess: () => {
+      message.success("Xóa Thành Công Ơn Gọi");
+      queryClient.invalidateQueries({ queryKey: ["vocationList"] });
+    },
+    onError: (error) => {
+      console.log(error.message || "Failed to create vocation.");
+    },
+  });
+};
+export { useVocationList, useUpdateVocation, useDeleteVocation };

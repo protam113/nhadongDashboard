@@ -11,7 +11,7 @@ import Error from "@/components/design/Error";
 import DocEditDetailDrawer from "@/components/drawer/DocEditDetailDrawer";
 import DocDetailDrawer from "@/components/drawer/DocDetailDrawer";
 
-const DocumentQueueList: React.FC = () => {
+const DocumentQueueList = ({ model }: { model: string }) => {
   const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [refreshKey, setRefreshKey] = useState(0); // State để làm mới dữ liệu
@@ -24,7 +24,7 @@ const DocumentQueueList: React.FC = () => {
   // Gọi hook `UserQueue` và thêm `refreshKey` làm dependency để làm mới dữ liệu
   const { queueData, next, isLoading, isError, handleBulkUpdate } = UserQueue(
     currentPage,
-    "document",
+    model,
     refreshKey
   );
 

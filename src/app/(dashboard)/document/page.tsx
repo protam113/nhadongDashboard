@@ -10,10 +10,10 @@ import BackButton from "@/components/Button/BackButton";
 import { FaSync } from "@/lib/iconLib";
 import { SpinLoading, Error, Heading } from "@/components/design/index";
 import DocsDetailsModal from "./DocumentDetailModal";
-import DocumentCategoriesTable from "./DocumentCategoriesTable";
 import DocumentQueueList from "./DocumentQueueTable";
 import { useUser } from "@/context/userProvider";
 import Pagination from "@/components/Pagination";
+import CategoryListTable from "@/components/table/CategoryTable";
 
 const Documents: React.FC = () => {
   const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
@@ -105,7 +105,7 @@ const Documents: React.FC = () => {
     <>
       <div className="p-4">
         <BackButton />
-        <Heading name="Quản Lý Tài Liệu (Document)" />
+        <Heading name="Quản Lý Tư Liệu" />
 
         {/* Model selection */}
         <div className="flex justify-between items-center mb-4">
@@ -148,11 +148,11 @@ const Documents: React.FC = () => {
             onPageChange={setCurrentPage}
           />
         )}
-        <DocumentCategoriesTable />
+        <CategoryListTable model="document" title="Tư Liệu" />
         {userInfo?.role.name === "admin" ? (
           <>
             <Heading name="Quản lý hàng đợi duyệt bài viết" />
-            <DocumentQueueList />
+            <DocumentQueueList model="document" />
           </>
         ) : null}
       </div>

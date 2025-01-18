@@ -8,10 +8,10 @@ import { EyeOutlined } from "@ant-design/icons";
 import { NewsList } from "@/lib/newsList";
 import { useDeleteNews } from "@/hooks/new/useNews";
 import EditNewsModal from "@/app/(dashboard)/news/news_management/modal/EditNewsModal";
-import NewsDetailsModal from "@/app/(dashboard)/news/NewsDetailsModal";
 import { FaRegEdit, MdOutlineDelete, FaSync } from "@/lib/iconLib";
 import { SpinLoading, Error, Heading } from "@/components/design/index";
 import Pagination from "@/components/Pagination";
+import BlogDetailsDrawer from "../../blog/BlogDetailsModal";
 
 const NewsManagement: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
@@ -194,7 +194,7 @@ const NewsManagement: React.FC = () => {
           />
         )}
       </div>
-      <NewsDetailsModal
+      <BlogDetailsDrawer
         open={isDrawerOpen}
         onClose={handleDrawerClose}
         blog={selectedBlog}

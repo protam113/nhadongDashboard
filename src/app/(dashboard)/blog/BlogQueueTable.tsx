@@ -11,7 +11,7 @@ import Error from "@/components/design/Error";
 import PostDetailDrawer from "@/components/drawer/PostDetailDrawer";
 import PostEditDetailDrawer from "@/components/drawer/PostEditDetailDrawer";
 
-const BlogQueueList: React.FC = () => {
+const TableQueueList = ({ model }: { model: string }) => {
   const [selectedKeys, setSelectedKeys] = useState<number[]>([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [refreshKey, setRefreshKey] = useState(0); // State để làm mới dữ liệu
@@ -23,7 +23,7 @@ const BlogQueueList: React.FC = () => {
 
   const { queueData, next, isLoading, isError, handleBulkUpdate } = UserQueue(
     currentPage,
-    "blog",
+    model,
     refreshKey
   );
 
@@ -262,4 +262,4 @@ const BlogQueueList: React.FC = () => {
   );
 };
 
-export default BlogQueueList;
+export default TableQueueList;
